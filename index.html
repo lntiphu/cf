@@ -157,7 +157,7 @@
         // Cấu hình kết nối Supabase
         const SUPABASE_URL = "https://cqtqpejhcsjqpllhhsls.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdHFwZWpoY3NqcXBsbGhoc2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzMxOTYsImV4cCI6MjA5OTUwOTE5Nn0.gpA1BL8ccxli_l9lrWRpVjVYSysTMUDFI6wmpLwvbBk";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let places = [];
         let userLocation = null;
@@ -176,7 +176,7 @@
         // Hàm tải dữ liệu từ Supabase
         async function loadPlaces() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('places')
                     .select('*')
                     .order('id', { ascending: false });
@@ -229,7 +229,7 @@
         async function confirmDelete() {
             if (placeToDeleteId !== null) {
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('places')
                         .delete()
                         .eq('id', placeToDeleteId);
