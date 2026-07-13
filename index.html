@@ -10,18 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Ẩn scrollbar cho đẹp */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 min-h-screen">
 
-    <!-- Header (Thanh điều hướng trên cùng) -->
     <header class="bg-orange-500 shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3 text-white">
@@ -34,32 +28,22 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Khu vực Bộ lọc và Tiện ích -->
         <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
                 <!-- Lọc Thể loại -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <i class="fa-solid fa-filter text-gray-400"></i>
                     <select id="filterCategory" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                        <option value="Tất cả">Mọi thể loại</option>
-                        <option value="Cafe">Cafe</option>
-                        <option value="Quán ăn">Quán ăn</option>
+                        <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <i class="fa-solid fa-map text-gray-400"></i>
                     <select id="filterDistrict" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                        <option value="Tất cả">Tất cả khu vực</option>
-                        <option value="Quận 1">Quận 1</option>
-                        <option value="Quận 2">Quận 2</option>
-                        <option value="Quận 3">Quận 3</option>
-                        <option value="Quận 10">Quận 10</option>
-                        <option value="Quận Phú Nhuận">Quận Phú Nhuận</option>
-                        <option value="Quận Tân Bình">Quận Tân Bình</option>
+                        <!-- Render tự động -->
                     </select>
                 </div>
             </div>
@@ -71,7 +55,6 @@
             </button>
         </div>
 
-        <!-- Thông báo lỗi vị trí (nếu có) -->
         <p id="locationError" class="text-red-500 text-sm mb-4 hidden text-center md:text-right"></p>
 
         <!-- Danh sách Quán (Grid) -->
@@ -81,7 +64,6 @@
 
     </main>
 
-    <!-- Modal Thêm Quán Mới -->
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -100,22 +82,12 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại</label>
-                            <select id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                                <option value="Cafe">Cafe</option>
-                                <option value="Quán ăn">Quán ăn</option>
-                            </select>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập) *</label>
+                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực</label>
-                            <select id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
-                                <option value="Quận 1">Quận 1</option>
-                                <option value="Quận 2">Quận 2</option>
-                                <option value="Quận 3">Quận 3</option>
-                                <option value="Quận 10">Quận 10</option>
-                                <option value="Quận Phú Nhuận">Quận Phú Nhuận</option>
-                                <option value="Quận Tân Bình">Quận Tân Bình</option>
-                            </select>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập) *</label>
+                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
                         </div>
                     </div>
 
@@ -144,7 +116,20 @@
         </div>
     </div>
 
-    <!-- Script xử lý Logic -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-6 text-center">
+                <i class="fa-solid fa-circle-exclamation text-4xl text-red-500 mb-4"></i>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Xác nhận xóa</h3>
+                <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa Quán</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Dữ liệu mẫu (Mock Data)
         let places = [
@@ -157,10 +142,11 @@
         ];
 
         let userLocation = null;
+        let placeToDeleteId = null;
 
-        // Hàm tính khoảng cách (Haversine formula) - trả về km
+        // Tính khoảng cách (Haversine formula) - km
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Bán kính trái đất (km)
+            const R = 6371; 
             const dLat = (lat2 - lat1) * (Math.PI / 180);
             const dLon = (lon2 - lon1) * (Math.PI / 180);
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
@@ -173,14 +159,34 @@
             const modal = document.getElementById('addModal');
             if(show) {
                 modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // Khóa cuộn background
+                document.body.style.overflow = 'hidden'; 
             } else {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }
         }
 
-        // Lấy vị trí người dùng
+        // Bật/Tắt Modal Xóa
+        function deletePlace(id) {
+            placeToDeleteId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            placeToDeleteId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        function confirmDelete() {
+            if (placeToDeleteId !== null) {
+                places = places.filter(p => p.id !== placeToDeleteId);
+                updateFilters();
+                renderPlaces();
+                closeDeleteModal();
+            }
+        }
+
+        // Lấy vị trí
         function getUserLocation() {
             const btn = document.getElementById('btnLocation');
             const icon = document.getElementById('locationIcon');
@@ -194,16 +200,13 @@
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
+                        userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
                         icon.classList.remove('fa-spin');
                         icon.classList.replace('fa-location-crosshairs', 'fa-check');
                         btn.classList.replace('bg-blue-100', 'bg-green-100');
                         btn.classList.replace('text-blue-700', 'text-green-700');
                         text.innerText = "Đã lấy vị trí (Ưu tiên gần nhất)";
-                        renderPlaces(); // Render lại danh sách
+                        renderPlaces(); 
                     },
                     (error) => {
                         icon.classList.remove('fa-spin');
@@ -220,7 +223,7 @@
             }
         }
 
-        // Mở Google Map
+        // Mở Maps
         function openGoogleMap(lat, lng, address, district) {
             let url = '';
             if (lat && lng && lat !== 'undefined' && lng !== 'undefined') {
@@ -231,55 +234,73 @@
             window.open(url, '_blank');
         }
 
-        // Hàm Thêm Quán Mới
+        // Hàm cập nhật Option cho Filter tự động
+        function updateFilters() {
+            const categorySelect = document.getElementById('filterCategory');
+            const districtSelect = document.getElementById('filterDistrict');
+
+            // Lưu lại giá trị đang chọn
+            const currentCat = categorySelect.value || 'Tất cả';
+            const currentDist = districtSelect.value || 'Tất cả';
+
+            // Lấy danh sách duy nhất
+            const categories = ['Tất cả', ...new Set(places.map(p => p.category))];
+            const districts = ['Tất cả', ...new Set(places.map(p => p.district))];
+
+            // Render lại option
+            categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c === 'Tất cả' ? 'Mọi thể loại' : c}</option>`).join('');
+            districtSelect.innerHTML = districts.map(d => `<option value="${d}">${d === 'Tất cả' ? 'Tất cả khu vực' : d}</option>`).join('');
+
+            // Phục hồi giá trị đang chọn nếu còn tồn tại
+            if (categories.includes(currentCat)) categorySelect.value = currentCat;
+            if (districts.includes(currentDist)) districtSelect.value = currentDist;
+        }
+
+        // Thêm mới quán
         function handleAddNewPlace(e) {
             e.preventDefault();
             
             const newPlace = {
                 id: Date.now(),
                 name: document.getElementById('inputName').value,
-                category: document.getElementById('inputCategory').value,
-                district: document.getElementById('inputDistrict').value,
+                category: document.getElementById('inputCategory').value.trim(),
+                district: document.getElementById('inputDistrict').value.trim(),
                 address: document.getElementById('inputAddress').value,
                 rating: parseFloat(document.getElementById('inputRating').value),
                 review: document.getElementById('inputReview').value,
-                // Quán do user thêm tự động chưa có tọa độ lat/lng chính xác
                 lat: null, 
                 lng: null
             };
 
-            places.unshift(newPlace); // Đẩy lên đầu danh sách
+            places.unshift(newPlace);
             toggleModal(false);
             document.getElementById('addForm').reset();
+            updateFilters(); // Cập nhật lại thanh lọc
             renderPlaces();
         }
 
-        // Render Danh sách lên HTML
+        // Render Cards
         function renderPlaces() {
             const filterCat = document.getElementById('filterCategory').value;
             const filterDist = document.getElementById('filterDistrict').value;
             const grid = document.getElementById('placesGrid');
 
-            // 1. Lọc
             let result = places.filter(p => {
                 const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                 const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
                 return matchCat && matchDist;
             });
 
-            // 2. Tính khoảng cách & Sắp xếp (nếu có vị trí)
             if (userLocation) {
                 result = result.map(p => {
                     if (p.lat && p.lng) {
                         return { ...p, distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lng) };
                     }
-                    return { ...p, distance: 9999 }; // Quán không có tọa độ đẩy xuống cuối
+                    return { ...p, distance: 9999 };
                 });
-                
                 result.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
             }
 
-            // 3. Render HTML
             grid.innerHTML = '';
 
             if (result.length === 0) {
@@ -291,7 +312,7 @@
             }
 
             result.forEach(place => {
-                const badgeClass = place.category === 'Cafe' 
+                const badgeClass = place.category.toLowerCase().includes('cafe') 
                     ? 'bg-amber-100 text-amber-800' 
                     : 'bg-rose-100 text-rose-800';
 
@@ -302,49 +323,46 @@
                     </div>`;
                 }
 
-                // Xây dựng card HTML
                 const card = `
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
-                        
-                        <!-- Tag Thể Loại -->
                         <div class="absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${badgeClass}">
                             ${place.category}
                         </div>
-
                         <div>
                             <h3 class="font-bold text-xl text-gray-800 pr-16 leading-tight">${place.name}</h3>
-                            
                             <div class="flex items-center gap-1 text-yellow-400 mt-1.5 mb-3">
                                 <i class="fa-solid fa-star"></i>
                                 <span class="text-sm font-bold text-gray-700">${place.rating}</span>
                             </div>
-
                             <div class="flex items-start gap-2 text-gray-600 text-sm">
                                 <i class="fa-solid fa-map-location-dot mt-0.5 text-orange-500 w-4 text-center"></i>
                                 <span>${place.address}, ${place.district}</span>
                             </div>
-
                             ${distanceHTML}
-
                             ${place.review ? `
                                 <div class="mt-3 bg-gray-50 border-l-2 border-orange-300 p-2 text-sm text-gray-500 italic rounded-r">
                                     "${place.review}"
                                 </div>
                             ` : ''}
                         </div>
-
-                        <!-- Nút Google Maps -->
-                        <button onclick="openGoogleMap('${place.lat}', '${place.lng}', '${place.address.replace(/'/g, "\\'")}', '${place.district}')" 
-                            class="mt-5 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200">
-                            <i class="fa-solid fa-location-dot"></i> Mở Google Maps
-                        </button>
+                        <div class="mt-5 flex gap-2">
+                            <button onclick="openGoogleMap('${place.lat}', '${place.lng}', '${place.address.replace(/'/g, "\\'")}', '${place.district}')" 
+                                class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200">
+                                <i class="fa-solid fa-location-dot"></i> Chỉ đường
+                            </button>
+                            <button onclick="deletePlace(${place.id})" 
+                                class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Xóa quán này">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
                 grid.innerHTML += card;
             });
         }
 
-        // Khởi chạy render lần đầu
+        // Khởi chạy khi tải trang
+        updateFilters();
         renderPlaces();
 
     </script>
