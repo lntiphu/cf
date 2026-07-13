@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background tròn bo góc mượt mà -->
+  <rect width="512" height="512" rx="112" fill="url(#grad)" />
+  <!-- Biểu tượng Cốc cà phê màu trắng nổi bật ở giữa -->
+  <g transform="translate(128, 128) scale(0.5)" fill="#ffffff">
+    <path d="M127.1 146.5c1.3 7.7 8 13.5 15.8 13.5h16.2c6.6 0 12-5.4 12-12V32c0-6.6-5.4-12-12-12h-16.2c-7.9 0-14.6 5.8-15.8 13.5L115.4 116H96v-4c0-6.6-5.4-12-12-12H67.8c-7.9 0-14.6 5.8-15.8 13.5L39.4 200H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h38.2l12.7 76.5c1.3 7.7 8 13.5 15.8 13.5h16.2c6.6 0 12-5.4 12-12V264H224v104c0 30.9 25.1 56 56 56h160c30.9 0 56-25.1 56-56V264h16c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H288v-48h144c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H288V32c0-8.8-7.2-16-16-16H184c-8.8 0-16 7.2-16 16v80.5l-40.9 34zM448 368c0 8.8-7.2 16-16 16H280c-8.8 0-16-7.2-16-16V264h184v104zm0-152H280V128h168v88z"/>
+  </g>
+</svg>

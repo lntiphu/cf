@@ -8,6 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Nhúng FontAwesome cho Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Cấu hình PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ea580c">
+    
+    <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Góc Quán Quen">
+    <link rel="apple-touch-icon" href="icon.svg">
+
     <style>
         /* Ẩn scrollbar cho đẹp */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -131,8 +142,17 @@
     </div>
 
     <script>
+        // Đăng ký Service Worker cho PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker đã đăng ký thành công.', reg))
+                    .catch(err => console.log('Đăng ký Service Worker thất bại: ', err));
+            });
+        }
+
         // Dữ liệu mẫu (Mock Data)
-        let places = [
+        const defaultPlaces = [
             { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042 },
             { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713 },
             { id: 3, name: "The Workshop Coffee", category: "Cafe", district: "Quận 1", address: "27 Ngô Đức Kế, Bến Nghé", rating: 4.6, review: "Cà phê specialty xịn xò, không gian làm việc lý tưởng.", lat: 10.7741, lng: 106.7051 },
@@ -140,6 +160,13 @@
             { id: 5, name: "Cheese Coffee - Sư Vạn Hạnh", category: "Cafe", district: "Quận 10", address: "747 Sư Vạn Hạnh, Phường 12", rating: 4.3, review: "Phong cách châu Âu hiện đại, đồ uống béo ngậy.", lat: 10.7745, lng: 106.6678 },
             { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853 }
         ];
+
+        // Khởi tạo places từ localStorage hoặc sử dụng dữ liệu mặc định
+        let places = JSON.parse(localStorage.getItem('places')) || defaultPlaces;
+
+        function savePlaces() {
+            localStorage.setItem('places', JSON.stringify(places));
+        }
 
         let userLocation = null;
         let placeToDeleteId = null;
@@ -180,6 +207,7 @@
         function confirmDelete() {
             if (placeToDeleteId !== null) {
                 places = places.filter(p => p.id !== placeToDeleteId);
+                savePlaces();
                 updateFilters();
                 renderPlaces();
                 closeDeleteModal();
@@ -273,6 +301,7 @@
             };
 
             places.unshift(newPlace);
+            savePlaces();
             toggleModal(false);
             document.getElementById('addForm').reset();
             updateFilters(); // Cập nhật lại thanh lọc
