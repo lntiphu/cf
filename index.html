@@ -19,6 +19,9 @@
     <meta name="apple-mobile-web-app-title" content="Góc Quán Quen">
     <link rel="apple-touch-icon" href="icon.svg">
 
+    <!-- Nhúng thư viện Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         /* Ẩn scrollbar cho đẹp */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -151,7 +154,16 @@
             });
         }
 
-        // Dữ liệu mẫu (Mock Data)
+        // Cấu hình kết nối Supabase
+        const SUPABASE_URL = "https://cqtqpejhcsjqpllhhsls.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_ao9SDp9czoKeRUA3KU_dxw_fdYRZaxD";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let places = [];
+        let userLocation = null;
+        let placeToDeleteId = null;
+
+        // Dữ liệu mẫu làm fallback dự phòng
         const defaultPlaces = [
             { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042 },
             { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713 },
@@ -161,15 +173,25 @@
             { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853 }
         ];
 
-        // Khởi tạo places từ localStorage hoặc sử dụng dữ liệu mặc định
-        let places = JSON.parse(localStorage.getItem('places')) || defaultPlaces;
+        // Hàm tải dữ liệu từ Supabase
+        async function loadPlaces() {
+            try {
+                const { data, error } = await supabase
+                    .from('places')
+                    .select('*')
+                    .order('id', { ascending: false });
 
-        function savePlaces() {
-            localStorage.setItem('places', JSON.stringify(places));
+                if (error) throw error;
+                places = data || [];
+                // Đồng bộ dự phòng sang localStorage
+                localStorage.setItem('places', JSON.stringify(places));
+            } catch (err) {
+                console.error("Lỗi khi tải dữ liệu từ Supabase (Chuyển sang dùng bộ nhớ cục bộ):", err);
+                places = JSON.parse(localStorage.getItem('places')) || defaultPlaces;
+            }
+            updateFilters();
+            renderPlaces();
         }
-
-        let userLocation = null;
-        let placeToDeleteId = null;
 
         // Tính khoảng cách (Haversine formula) - km
         function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -204,10 +226,21 @@
             document.getElementById('deleteModal').classList.add('hidden');
         }
 
-        function confirmDelete() {
+        async function confirmDelete() {
             if (placeToDeleteId !== null) {
+                try {
+                    const { error } = await supabase
+                        .from('places')
+                        .delete()
+                        .eq('id', placeToDeleteId);
+                    if (error) throw error;
+                } catch (err) {
+                    console.error("Lỗi khi xóa trên Supabase:", err);
+                }
+
                 places = places.filter(p => p.id !== placeToDeleteId);
-                savePlaces();
+                localStorage.setItem('places', JSON.stringify(places));
+
                 updateFilters();
                 renderPlaces();
                 closeDeleteModal();
@@ -285,7 +318,7 @@
         }
 
         // Thêm mới quán
-        function handleAddNewPlace(e) {
+        async function handleAddNewPlace(e) {
             e.preventDefault();
             
             const newPlace = {
@@ -300,8 +333,18 @@
                 lng: null
             };
 
+            try {
+                const { error } = await supabase
+                    .from('places')
+                    .insert([newPlace]);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Lỗi khi thêm mới trên Supabase:", err);
+            }
+
             places.unshift(newPlace);
-            savePlaces();
+            localStorage.setItem('places', JSON.stringify(places));
+
             toggleModal(false);
             document.getElementById('addForm').reset();
             updateFilters(); // Cập nhật lại thanh lọc
@@ -391,8 +434,7 @@
         }
 
         // Khởi chạy khi tải trang
-        updateFilters();
-        renderPlaces();
+        loadPlaces();
 
     </script>
 </body>

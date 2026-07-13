@@ -1,14 +1,67 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
-    </linearGradient>
+    <!-- Đổ bóng nhẹ tạo chiều sâu như tranh vẽ -->
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#1b5e20" flood-opacity="0.08" />
+    </filter>
+    
+    <!-- Hiệu ứng chuyển màu nước (watercolor gradient) mô phỏng ảnh gốc -->
+    <radialGradient id="leaf-grad-1" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#81c784" />
+      <stop offset="50%" stop-color="#4caf50" />
+      <stop offset="100%" stop-color="#2e7d32" />
+    </radialGradient>
+    <radialGradient id="leaf-grad-2" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#a5d6a7" />
+      <stop offset="60%" stop-color="#66bb6a" />
+      <stop offset="100%" stop-color="#388e3c" />
+    </radialGradient>
   </defs>
-  <!-- Background tròn bo góc mượt mà -->
-  <rect width="512" height="512" rx="112" fill="url(#grad)" />
-  <!-- Biểu tượng Cốc cà phê màu trắng nổi bật ở giữa -->
-  <g transform="translate(128, 128) scale(0.5)" fill="#ffffff">
-    <path d="M127.1 146.5c1.3 7.7 8 13.5 15.8 13.5h16.2c6.6 0 12-5.4 12-12V32c0-6.6-5.4-12-12-12h-16.2c-7.9 0-14.6 5.8-15.8 13.5L115.4 116H96v-4c0-6.6-5.4-12-12-12H67.8c-7.9 0-14.6 5.8-15.8 13.5L39.4 200H16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h38.2l12.7 76.5c1.3 7.7 8 13.5 15.8 13.5h16.2c6.6 0 12-5.4 12-12V264H224v104c0 30.9 25.1 56 56 56h160c30.9 0 56-25.1 56-56V264h16c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16H288v-48h144c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H288V32c0-8.8-7.2-16-16-16H184c-8.8 0-16 7.2-16 16v80.5l-40.9 34zM448 368c0 8.8-7.2 16-16 16H280c-8.8 0-16-7.2-16-16V264h184v104zm0-152H280V128h168v88z"/>
+
+  <!-- Nền màu trắng ngà giống hệt trong ảnh -->
+  <rect width="512" height="512" rx="128" fill="#fcfbf7" />
+
+  <g filter="url(#soft-shadow)">
+    <!-- Cuống cỏ 4 lá nét mềm mại -->
+    <path d="M 256,290 C 253,340 230,390 200,410" fill="none" stroke="#2e7d32" stroke-width="12" stroke-linecap="round" />
+
+    <!-- Cỏ 4 lá đặt tại trung tâm (được xoay nhẹ tự nhiên) -->
+    <g transform="translate(256, 240) rotate(-12) scale(4)">
+      
+      <!-- Cánh 1: Hướng lên (Xoay 0 độ) -->
+      <g transform="rotate(0)">
+        <path d="M 0,0 C -12,-20 -24,-15 -20,2 C -16,18 0,22 0,0" fill="url(#leaf-grad-1)" />
+        <path d="M 0,0 C 12,-20 24,-15 20,2 C 16,18 0,22 0,0" fill="url(#leaf-grad-2)" />
+        <!-- Gân lá giữa -->
+        <path d="M 0,0 L 0,-15" stroke="#1b5e20" stroke-width="1" opacity="0.3" stroke-linecap="round" />
+      </g>
+
+      <!-- Cánh 2: Hướng sang phải (Xoay 90 độ) -->
+      <g transform="rotate(90)">
+        <path d="M 0,0 C -12,-20 -24,-15 -20,2 C -16,18 0,22 0,0" fill="url(#leaf-grad-1)" />
+        <path d="M 0,0 C 12,-20 24,-15 20,2 C 16,18 0,22 0,0" fill="url(#leaf-grad-2)" />
+        <path d="M 0,0 L 0,-15" stroke="#1b5e20" stroke-width="1" opacity="0.3" stroke-linecap="round" />
+      </g>
+
+      <!-- Cánh 3: Hướng xuống (Xoay 180 độ) -->
+      <g transform="rotate(180)">
+        <path d="M 0,0 C -12,-20 -24,-15 -20,2 C -16,18 0,22 0,0" fill="url(#leaf-grad-1)" />
+        <path d="M 0,0 C 12,-20 24,-15 20,2 C 16,18 0,22 0,0" fill="url(#leaf-grad-2)" />
+        <path d="M 0,0 L 0,-15" stroke="#1b5e20" stroke-width="1" opacity="0.3" stroke-linecap="round" />
+      </g>
+
+      <!-- Cánh 4: Hướng sang trái (Xoay 270 độ) -->
+      <g transform="rotate(270)">
+        <path d="M 0,0 C -12,-20 -24,-15 -20,2 C -16,18 0,22 0,0" fill="url(#leaf-grad-1)" />
+        <path d="M 0,0 C 12,-20 24,-15 20,2 C 16,18 0,22 0,0" fill="url(#leaf-grad-2)" />
+        <path d="M 0,0 L 0,-15" stroke="#1b5e20" stroke-width="1" opacity="0.3" stroke-linecap="round" />
+      </g>
+      
+      <!-- Nhị hoa nhỏ ở tâm -->
+      <circle cx="0" cy="0" r="2" fill="#81c784" />
+    </g>
   </g>
+
+  <!-- Dòng chữ GOOD LUCK ở phía dưới giống ảnh mẫu -->
+  <text x="256" y="465" font-family="'Courier New', Courier, monospace, sans-serif" font-size="22" font-weight="bold" fill="#374151" text-anchor="middle" letter-spacing="4">GOOD LUCK</text>
 </svg>
