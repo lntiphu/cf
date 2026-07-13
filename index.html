@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Góc Quán Quen - Food & Cafe Tracker</title>
+    <!-- Nhúng Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Nhúng FontAwesome cho Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Ẩn scrollbar cho đẹp */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 min-h-screen">
+
+    <!-- Header (Thanh điều hướng trên cùng) -->
+    <header class="bg-orange-500 shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3 text-white">
+                <i class="fa-solid fa-mug-hot text-2xl"></i>
+                <h1 class="text-2xl font-bold tracking-tight">Góc Quán Quen</h1>
+            </div>
+            <button onclick="toggleModal(true)" class="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg font-semibold shadow transition duration-200 flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Khu vực Bộ lọc và Tiện ích -->
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
+                <!-- Lọc Thể loại -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <i class="fa-solid fa-filter text-gray-400"></i>
+                    <select id="filterCategory" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="Tất cả">Mọi thể loại</option>
+                        <option value="Cafe">Cafe</option>
+                        <option value="Quán ăn">Quán ăn</option>
+                    </select>
+                </div>
+                <!-- Lọc Khu vực -->
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <i class="fa-solid fa-map text-gray-400"></i>
+                    <select id="filterDistrict" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <option value="Tất cả">Tất cả khu vực</option>
+                        <option value="Quận 1">Quận 1</option>
+                        <option value="Quận 2">Quận 2</option>
+                        <option value="Quận 3">Quận 3</option>
+                        <option value="Quận 10">Quận 10</option>
+                        <option value="Quận Phú Nhuận">Quận Phú Nhuận</option>
+                        <option value="Quận Tân Bình">Quận Tân Bình</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Nút Lấy Vị Trí -->
+            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-blue-100 text-blue-700 hover:bg-blue-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-location-crosshairs" id="locationIcon"></i>
+                <span id="locationText">Tìm quán gần tôi</span>
+            </button>
+        </div>
+
+        <!-- Thông báo lỗi vị trí (nếu có) -->
+        <p id="locationError" class="text-red-500 text-sm mb-4 hidden text-center md:text-right"></p>
+
+        <!-- Danh sách Quán (Grid) -->
+        <div id="placesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Render bằng Javascript -->
+        </div>
+
+    </main>
+
+    <!-- Modal Thêm Quán Mới -->
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-800">Thêm Quán Mới</h2>
+                <button onclick="toggleModal(false)" class="text-gray-400 hover:text-red-500 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto no-scrollbar">
+                <form id="addForm" onsubmit="handleAddNewPlace(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
+                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại</label>
+                            <select id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                <option value="Cafe">Cafe</option>
+                                <option value="Quán ăn">Quán ăn</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực</label>
+                            <select id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                <option value="Quận 1">Quận 1</option>
+                                <option value="Quận 2">Quận 2</option>
+                                <option value="Quận 3">Quận 3</option>
+                                <option value="Quận 10">Quận 10</option>
+                                <option value="Quận Phú Nhuận">Quận Phú Nhuận</option>
+                                <option value="Quận Tân Bình">Quận Tân Bình</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
+                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Đánh giá (1-5 Sao)</label>
+                        <input type="number" id="inputRating" min="1" max="5" step="0.1" value="5" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
+                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                            Lưu Thông Tin Quán
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script xử lý Logic -->
+    <script>
+        // Dữ liệu mẫu (Mock Data)
+        let places = [
+            { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042 },
+            { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713 },
+            { id: 3, name: "The Workshop Coffee", category: "Cafe", district: "Quận 1", address: "27 Ngô Đức Kế, Bến Nghé", rating: 4.6, review: "Cà phê specialty xịn xò, không gian làm việc lý tưởng.", lat: 10.7741, lng: 106.7051 },
+            { id: 4, name: "Bún bò Huế Hạnh", category: "Quán ăn", district: "Quận Tân Bình", address: "135 Bành Văn Trân, Phường 7", rating: 4.4, review: "Nước dùng thanh, topping ngập tràn.", lat: 10.7878, lng: 106.6558 },
+            { id: 5, name: "Cheese Coffee - Sư Vạn Hạnh", category: "Cafe", district: "Quận 10", address: "747 Sư Vạn Hạnh, Phường 12", rating: 4.3, review: "Phong cách châu Âu hiện đại, đồ uống béo ngậy.", lat: 10.7745, lng: 106.6678 },
+            { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853 }
+        ];
+
+        let userLocation = null;
+
+        // Hàm tính khoảng cách (Haversine formula) - trả về km
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Bán kính trái đất (km)
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+            return (R * c).toFixed(1);
+        }
+
+        // Bật/Tắt Modal thêm quán
+        function toggleModal(show) {
+            const modal = document.getElementById('addModal');
+            if(show) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Khóa cuộn background
+            } else {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Lấy vị trí người dùng
+        function getUserLocation() {
+            const btn = document.getElementById('btnLocation');
+            const icon = document.getElementById('locationIcon');
+            const text = document.getElementById('locationText');
+            const errorText = document.getElementById('locationError');
+
+            errorText.classList.add('hidden');
+            icon.classList.add('fa-spin');
+            text.innerText = "Đang định vị...";
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        icon.classList.remove('fa-spin');
+                        icon.classList.replace('fa-location-crosshairs', 'fa-check');
+                        btn.classList.replace('bg-blue-100', 'bg-green-100');
+                        btn.classList.replace('text-blue-700', 'text-green-700');
+                        text.innerText = "Đã lấy vị trí (Ưu tiên gần nhất)";
+                        renderPlaces(); // Render lại danh sách
+                    },
+                    (error) => {
+                        icon.classList.remove('fa-spin');
+                        text.innerText = "Tìm quán gần tôi";
+                        errorText.innerText = "Không thể lấy vị trí. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.";
+                        errorText.classList.remove('hidden');
+                    }
+                );
+            } else {
+                icon.classList.remove('fa-spin');
+                text.innerText = "Tìm quán gần tôi";
+                errorText.innerText = "Trình duyệt của bạn không hỗ trợ định vị.";
+                errorText.classList.remove('hidden');
+            }
+        }
+
+        // Mở Google Map
+        function openGoogleMap(lat, lng, address, district) {
+            let url = '';
+            if (lat && lng && lat !== 'undefined' && lng !== 'undefined') {
+                url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+            } else {
+                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address + ' ' + district)}`;
+            }
+            window.open(url, '_blank');
+        }
+
+        // Hàm Thêm Quán Mới
+        function handleAddNewPlace(e) {
+            e.preventDefault();
+            
+            const newPlace = {
+                id: Date.now(),
+                name: document.getElementById('inputName').value,
+                category: document.getElementById('inputCategory').value,
+                district: document.getElementById('inputDistrict').value,
+                address: document.getElementById('inputAddress').value,
+                rating: parseFloat(document.getElementById('inputRating').value),
+                review: document.getElementById('inputReview').value,
+                // Quán do user thêm tự động chưa có tọa độ lat/lng chính xác
+                lat: null, 
+                lng: null
+            };
+
+            places.unshift(newPlace); // Đẩy lên đầu danh sách
+            toggleModal(false);
+            document.getElementById('addForm').reset();
+            renderPlaces();
+        }
+
+        // Render Danh sách lên HTML
+        function renderPlaces() {
+            const filterCat = document.getElementById('filterCategory').value;
+            const filterDist = document.getElementById('filterDistrict').value;
+            const grid = document.getElementById('placesGrid');
+
+            // 1. Lọc
+            let result = places.filter(p => {
+                const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
+                const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
+                return matchCat && matchDist;
+            });
+
+            // 2. Tính khoảng cách & Sắp xếp (nếu có vị trí)
+            if (userLocation) {
+                result = result.map(p => {
+                    if (p.lat && p.lng) {
+                        return { ...p, distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lng) };
+                    }
+                    return { ...p, distance: 9999 }; // Quán không có tọa độ đẩy xuống cuối
+                });
+                
+                result.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+            }
+
+            // 3. Render HTML
+            grid.innerHTML = '';
+
+            if (result.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">
+                    <i class="fa-solid fa-box-open text-4xl mb-3 opacity-50"></i>
+                    <p>Không tìm thấy quán nào phù hợp với bộ lọc hiện tại.</p>
+                </div>`;
+                return;
+            }
+
+            result.forEach(place => {
+                const badgeClass = place.category === 'Cafe' 
+                    ? 'bg-amber-100 text-amber-800' 
+                    : 'bg-rose-100 text-rose-800';
+
+                let distanceHTML = '';
+                if (place.distance && place.distance < 9999) {
+                    distanceHTML = `<div class="flex items-center gap-1 text-green-600 text-sm font-medium mt-2">
+                        <i class="fa-solid fa-location-arrow"></i> Cách bạn khoảng ${place.distance} km
+                    </div>`;
+                }
+
+                // Xây dựng card HTML
+                const card = `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
+                        
+                        <!-- Tag Thể Loại -->
+                        <div class="absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${badgeClass}">
+                            ${place.category}
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-xl text-gray-800 pr-16 leading-tight">${place.name}</h3>
+                            
+                            <div class="flex items-center gap-1 text-yellow-400 mt-1.5 mb-3">
+                                <i class="fa-solid fa-star"></i>
+                                <span class="text-sm font-bold text-gray-700">${place.rating}</span>
+                            </div>
+
+                            <div class="flex items-start gap-2 text-gray-600 text-sm">
+                                <i class="fa-solid fa-map-location-dot mt-0.5 text-orange-500 w-4 text-center"></i>
+                                <span>${place.address}, ${place.district}</span>
+                            </div>
+
+                            ${distanceHTML}
+
+                            ${place.review ? `
+                                <div class="mt-3 bg-gray-50 border-l-2 border-orange-300 p-2 text-sm text-gray-500 italic rounded-r">
+                                    "${place.review}"
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Nút Google Maps -->
+                        <button onclick="openGoogleMap('${place.lat}', '${place.lng}', '${place.address.replace(/'/g, "\\'")}', '${place.district}')" 
+                            class="mt-5 w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200">
+                            <i class="fa-solid fa-location-dot"></i> Mở Google Maps
+                        </button>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        // Khởi chạy render lần đầu
+        renderPlaces();
+
+    </script>
+</body>
+</html>
