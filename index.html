@@ -160,10 +160,6 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Maps)</label>
-                        <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none mb-3" placeholder="Dán link chia sẻ từ Google Map (Vd: https://maps.app.goo.gl/...)">
-                    </div>
-                    <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
                         <input type="text" id="inputLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
@@ -217,10 +213,6 @@
                         <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Maps)</label>
-                        <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none mb-3" placeholder="Dán link chia sẻ từ Google Map (Vd: https://maps.app.goo.gl/...)">
-                    </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
                         <input type="text" id="editLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
@@ -425,8 +417,7 @@
             document.getElementById('editDistrict').value = place.district;
             document.getElementById('editAddress').value = place.address;
             
-            // Hiện tọa độ hoặc map_link cũ ra 2 ô riêng biệt
-            document.getElementById('editMapLink').value = place.map_link || '';
+            // Hiện tọa độ GPS cũ ra ô nhập
             document.getElementById('editLatLng').value = (place.lat && place.lng) ? `${place.lat},${place.lng}` : '';
             document.getElementById('editReview').value = place.review || '';
 
@@ -603,22 +594,16 @@
             const category = document.getElementById('inputCategory').value.trim();
             const district = document.getElementById('inputDistrict').value.trim();
             const address = document.getElementById('inputAddress').value;
-            const map_link = document.getElementById('inputMapLink').value.trim();
             const latLngInput = document.getElementById('inputLatLng').value.trim();
             const review = document.getElementById('inputReview').value;
 
-            // Xử lý tọa độ GPS riêng biệt
+            // Xử lý tọa độ GPS
             let lat = null;
             let lng = null;
             const coords = extractLatLng(latLngInput);
             if (coords) {
                 lat = coords.lat;
                 lng = coords.lng;
-            } else if (extractLatLng(map_link)) {
-                // Fallback nếu người dùng lỡ dán tọa độ vào ô link bản đồ
-                const fallbackCoords = extractLatLng(map_link);
-                lat = fallbackCoords.lat;
-                lng = fallbackCoords.lng;
             }
 
             const newPlace = {
@@ -630,7 +615,7 @@
                 review,
                 lat,
                 lng,
-                map_link
+                map_link: "" // Không sử dụng cột link chia sẻ nữa
             };
 
             try {
@@ -671,22 +656,16 @@
             const category = document.getElementById('editCategory').value.trim();
             const district = document.getElementById('editDistrict').value.trim();
             const address = document.getElementById('editAddress').value;
-            const map_link = document.getElementById('editMapLink').value.trim();
             const latLngInput = document.getElementById('editLatLng').value.trim();
             const review = document.getElementById('editReview').value;
 
-            // Xử lý tọa độ GPS riêng biệt
+            // Xử lý tọa độ GPS
             let lat = null;
             let lng = null;
             const coords = extractLatLng(latLngInput);
             if (coords) {
                 lat = coords.lat;
                 lng = coords.lng;
-            } else if (extractLatLng(map_link)) {
-                // Fallback nếu người dùng lỡ dán tọa độ vào ô link bản đồ
-                const fallbackCoords = extractLatLng(map_link);
-                lat = fallbackCoords.lat;
-                lng = fallbackCoords.lng;
             }
 
             const updatedData = {
@@ -775,21 +754,14 @@
                     </div>`;
                 }
 
-                // Cấu hình Link chỉ đường tự động điền điểm đi và điểm đến
+                // Cấu hình Link chỉ đường luôn luôn dẫn tới Địa chỉ chữ cụ thể của quán ăn
                 let mapUrl = '';
                 let originParam = 'My+Location';
                 if (userLocation && userLocation.lat && userLocation.lng) {
-                    // Nếu đã định vị chính xác trên web, ta truyền thẳng tọa độ GPS thực của bạn sang Google Maps để tránh bị sai lệch
+                    // Nếu đã định vị chính xác trên web, truyền thẳng tọa độ GPS thực của bạn sang Google Maps để tránh sai lệch điểm đi
                     originParam = `${userLocation.lat},${userLocation.lng}`;
                 }
-
-                if (place.lat && place.lng) {
-                    // Ưu tiên chỉ đường bằng tọa độ số chính xác tuyệt đối
-                    mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${place.lat},${place.lng}`;
-                } else {
-                    // Fallback chỉ đường bằng tên và địa chỉ cụ thể của quán ăn
-                    mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
-                }
+                mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
@@ -817,9 +789,9 @@
                             <span class="hidden">${place.category}</span>
                         </div>
                         
-                        <div class="mt-2">
+                        <div class="mt-1">
                             <!-- Khung đánh giá sao click trực tiếp -->
-                            <div class="flex items-center gap-1 mb-3">
+                            <div class="flex items-center gap-1 mb-2">
                                 ${starsHTML}
                                 <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
