@@ -459,6 +459,7 @@
                     if (error) throw error;
                 } catch (err) {
                     console.error("Lỗi khi xóa trên Supabase:", err);
+                    alert("Lỗi Supabase khi xóa quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
                 }
 
                 places = places.filter(p => p.id !== placeToDeleteId);
@@ -555,6 +556,7 @@
         // Cập nhật Đánh giá Sao nhanh từ màn hình chính
         async function updateRating(id, newRating) {
             event.stopPropagation(); // Tránh kích hoạt các sự kiện click khác
+            const oldRating = (places.find(p => p.id === id) || {}).rating || 5;
             places = places.map(p => p.id === id ? { ...p, rating: newRating } : p);
             renderPlaces();
             localStorage.setItem('places', JSON.stringify(places));
@@ -567,6 +569,11 @@
                 if (error) throw error;
             } catch (err) {
                 console.error("Không thể lưu đánh giá mới lên Supabase:", err);
+                alert("Lỗi Supabase khi cập nhật sao: " + err.message + "\n(Vui lòng kiểm tra phân quyền RLS Policies trên database)");
+                // Hoàn tác lại rating cũ nếu lỗi
+                places = places.map(p => p.id === id ? { ...p, rating: oldRating } : p);
+                renderPlaces();
+                localStorage.setItem('places', JSON.stringify(places));
             }
         }
 
@@ -641,6 +648,7 @@
                 }
             } catch (err) {
                 console.error("Lỗi khi thêm mới lên Supabase, chuyển sang lưu tạm local:", err);
+                alert("Lỗi Supabase khi thêm quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
                 newPlace.id = Date.now();
                 places.unshift(newPlace);
             }
@@ -699,6 +707,7 @@
                 if (error) throw error;
             } catch (err) {
                 console.error("Lỗi khi cập nhật lên Supabase:", err);
+                alert("Lỗi Supabase khi cập nhật thông tin quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
             }
 
             toggleEditModal(false);
