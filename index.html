@@ -17,7 +17,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="hafu food">
-    <link rel="apple-touch-icon" href="pictures/hình 8.jpg">
+    <link rel="apple-touch-icon" href="pictures/hinh8.jpg">
 
     <!-- Nhúng thư viện Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -46,13 +46,13 @@
     <header class="bg-pink-100 shadow-md sticky top-0 z-40 border-b border-pink-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3 text-pink-800">
-                <img src="pictures/hình 8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-pink-300 shadow-sm">
+                <img src="pictures/hinh8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-pink-300 shadow-sm">
                 <h1 class="text-2xl font-bold tracking-tight">hafu food</h1>
             </div>
             <div class="flex items-center gap-2">
                 <!-- Nút lọc danh sách yêu thích cố định kích thước w-11 h-11, nền giống kính lúp -->
                 <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
-                    <img id="favFilterIcon" src="pictures/hình 5.jpg" class="w-7 h-7 object-contain transition duration-200" style="filter: grayscale(1); opacity: 0.5; mix-blend-mode: multiply;">
+                    <img id="favFilterIcon" src="pictures/hinh5.jpg" class="w-7 h-7 object-contain transition duration-200" style="filter: grayscale(1); opacity: 0.5; mix-blend-mode: multiply;">
                 </button>
                 <!-- Nút kính lúp tìm kiếm cố định kích thước w-11 h-11 -->
                 <button onclick="toggleSearch()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
@@ -83,14 +83,14 @@
             <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
                 <!-- Lọc Thể loại -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <img src="pictures/hình 2.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Thể loại">
+                    <img src="pictures/hinh2.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Thể loại">
                     <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <img src="pictures/hình 6.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Khu vực">
+                    <img src="pictures/hinh6.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Khu vực">
                     <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
@@ -743,8 +743,8 @@
                 let distanceHTML = '';
                 if (place.distance && place.distance < 9999) {
                     distanceHTML = `<div class="flex items-center gap-1.5 text-green-600 text-sm font-medium mt-2">
-                        <!-- Icon chỉ đường làm chỉ dẫn nhỏ (hình 3) -->
-                        <img src="pictures/hình 3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="mix-blend-mode: multiply;"> Cách bạn khoảng ${place.distance} km
+                        <!-- Icon chỉ đường làm chỉ dẫn nhỏ (hinh3.jpg) -->
+                        <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="mix-blend-mode: multiply;"> Cách bạn khoảng ${place.distance} km
                     </div>`;
                 }
 
@@ -766,7 +766,7 @@
                     starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-pink-400' : 'fa-regular text-gray-300 hover:text-pink-300'}"></i>`;
                 }
 
-                // Icon Yêu thích (Hình 5.jpg) - Tăng kích thước lên w-8 h-8 và hòa trộn nền
+                // Icon Yêu thích (hinh5.jpg) - Tăng kích thước lên w-8 h-8 và hòa trộn nền
                 const isFav = favoriteIds.includes(parseInt(place.id));
                 const favStyle = isFav ? 'mix-blend-mode: multiply;' : 'filter: grayscale(1); opacity: 0.35; mix-blend-mode: multiply;';
 
@@ -779,7 +779,7 @@
                                 ${place.name}
                             </h3>
                             <button onclick="toggleFavorite(${place.id})" class="transition flex items-center justify-center flex-shrink-0 bg-transparent" style="margin-top: -2px;" title="Yêu thích">
-                                <img src="pictures/hình 5.jpg" class="w-8 h-8 object-contain transition duration-200" style="${favStyle}">
+                                <img src="pictures/hinh5.jpg" class="w-8 h-8 object-contain transition duration-200" style="${favStyle}">
                             </button>
                             <!-- Badge phân loại ẩn đi theo yêu cầu, vẫn có dữ liệu để tìm kiếm/lọc -->
                             <span class="hidden">${place.category}</span>
@@ -792,9 +792,9 @@
                                 <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
 
-                            <!-- Icon map (Hình 7.jpg) - Đổi sang hình ghim vị trí maps và căn giữa -->
+                            <!-- Icon map (hinh7.jpg) - Đổi sang hình ghim vị trí maps và căn giữa -->
                             <div class="flex items-center gap-2 text-gray-600 text-sm">
-                                <img src="pictures/hình 7.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Map">
+                                <img src="pictures/hinh7.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Map">
                                 <span class="leading-none">${place.address}, ${place.district}</span>
                             </div>
                             ${distanceHTML}
@@ -806,15 +806,15 @@
                         </div>
                         
                         <div class="mt-5 flex gap-2">
-                            <!-- Nút chỉ đường dùng hình 3.jpg -->
+                            <!-- Nút chỉ đường dùng hinh3.jpg -->
                             <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
                                 class="flex-1 bg-pink-50 hover:bg-pink-100 text-pink-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
-                                <img src="pictures/hình 3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="mix-blend-mode: multiply;"> Chỉ đường
+                                <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="mix-blend-mode: multiply;"> Chỉ đường
                             </a>
-                            <!-- Nút xóa dùng hình 4.jpg - Hiệu ứng đồng bộ giống nút chỉ đường -->
+                            <!-- Nút xóa dùng hinh4.jpg - Hiệu ứng đồng bộ giống nút chỉ đường -->
                             <button onclick="deletePlace(${place.id})" 
                                 class="bg-pink-50 hover:bg-pink-100 px-2.5 py-1.5 rounded-lg transition duration-200 flex items-center justify-center" title="Xóa quán này">
-                                <img src="pictures/hinh 4.jpg" class="w-9 h-9 object-contain" style="mix-blend-mode: multiply;">
+                                <img src="pictures/hinh4.jpg" class="w-9 h-9 object-contain" style="mix-blend-mode: multiply;">
                             </button>
                         </div>
                     </div>
