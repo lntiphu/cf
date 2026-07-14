@@ -1,18 +1,12 @@
 {
-  "short_name": "Góc Quán Quen",
-  "name": "Góc Quán Quen - Food & Cafe Tracker",
+  "short_name": "È Fút",
+  "name": "È Fút - Food & Cafe Tracker",
   "icons": [
     {
-      "src": "icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
-      "purpose": "any"
-    },
-    {
-      "src": "icon.svg",
-      "type": "image/svg+xml",
+      "src": "pictures/hình 8.jpg",
+      "type": "image/jpeg",
       "sizes": "192x192 512x512",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
   "start_url": "index.html",

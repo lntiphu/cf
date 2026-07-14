@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Góc Quán Quen - Food & Cafe Tracker</title>
+    <title>È Fút</title>
     <!-- Nhúng Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Nhúng FontAwesome cho Icon -->
@@ -16,8 +16,8 @@
     <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Góc Quán Quen">
-    <link rel="apple-touch-icon" href="icon.svg">
+    <meta name="apple-mobile-web-app-title" content="È Fút">
+    <link rel="apple-touch-icon" href="pictures/hình 8.jpg">
 
     <!-- Nhúng thư viện Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -36,12 +36,16 @@
     </div>
 
     <header class="bg-orange-500 shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
             <div class="flex items-center gap-3 text-white">
-                <i class="fa-solid fa-mug-hot text-2xl"></i>
-                <h1 class="text-2xl font-bold tracking-tight">Góc Quán Quen</h1>
+                <img src="pictures/hình 8.jpg" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
+                <h1 class="text-2xl font-bold tracking-tight">È Fút</h1>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <!-- Nút lọc danh sách yêu thích dùng hình 5 -->
+                <button id="btnFavFilter" onclick="toggleFavFilter()" class="bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg shadow transition duration-200 flex items-center justify-center" title="Xem quán yêu thích">
+                    <img id="favFilterIcon" src="pictures/hình 5.jpg" class="w-6 h-6 object-contain transition duration-200" style="filter: brightness(0) invert(1);">
+                </button>
                 <!-- Nút kính lúp tìm kiếm -->
                 <button onclick="toggleSearch()" class="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-lg shadow transition duration-200 flex items-center justify-center" title="Tìm kiếm">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
@@ -252,9 +256,26 @@
         let places = [];
         let userLocation = null;
         let placeToDeleteId = null;
+        let showOnlyFavorites = false;
 
         // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage để đơn giản hóa database)
         let favoriteIds = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+
+        // Lọc theo quán yêu thích trên Header
+        function toggleFavFilter() {
+            showOnlyFavorites = !showOnlyFavorites;
+            const icon = document.getElementById('favFilterIcon');
+            const btn = document.getElementById('btnFavFilter');
+            if (showOnlyFavorites) {
+                icon.style.filter = "none";
+                btn.classList.replace('bg-orange-600', 'bg-orange-100');
+                btn.classList.replace('text-white', 'text-red-500');
+            } else {
+                icon.style.filter = "brightness(0) invert(1)";
+                btn.className = "bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg shadow transition duration-200 flex items-center justify-center";
+            }
+            renderPlaces();
+        }
 
         // Dữ liệu mẫu làm fallback dự phòng
         const defaultPlaces = [
@@ -311,6 +332,7 @@
 
         function clearSearch() {
             document.getElementById('inputSearch').value = '';
+            document.getElementById('searchContainer').classList.add('hidden');
             renderPlaces();
         }
 
@@ -655,7 +677,8 @@
                 const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                 const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
                 const matchSearch = p.name.toLowerCase().includes(searchQuery);
-                return matchCat && matchDist && matchSearch;
+                const matchFav = !showOnlyFavorites || favoriteIds.includes(parseInt(p.id));
+                return matchCat && matchDist && matchSearch && matchFav;
             });
 
             if (userLocation) {
@@ -686,7 +709,8 @@
                 let distanceHTML = '';
                 if (place.distance && place.distance < 9999) {
                     distanceHTML = `<div class="flex items-center gap-1 text-green-600 text-sm font-medium mt-2">
-                        <i class="fa-solid fa-location-arrow"></i> Cách bạn khoảng ${place.distance} km
+                        <!-- Icon chỉ đường làm chỉ dẫn nhỏ (hình 3) -->
+                        <img src="pictures/hình 3.jpg" class="w-4 h-4 object-contain inline-block mr-1"> Cách bạn khoảng ${place.distance} km
                     </div>`;
                 }
 
@@ -708,24 +732,26 @@
                     starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-300 hover:text-yellow-300'}"></i>`;
                 }
 
-                // Icon Yêu thích (Trái tim)
+                // Icon Yêu thích (Hình 5.jpg)
                 const isFav = favoriteIds.includes(parseInt(place.id));
-                const favClass = isFav ? 'fa-solid fa-heart text-red-500 scale-110' : 'fa-regular fa-heart text-gray-400 hover:text-red-500';
+                const favStyle = isFav ? '' : 'filter: grayscale(1); opacity: 0.35;';
 
                 const card = `
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group">
                         
-                        <!-- Nút yêu thích ở góc trái -->
-                        <button onclick="toggleFavorite(${place.id})" class="absolute top-3 left-3 z-10 bg-white bg-opacity-80 p-2 rounded-full shadow-sm hover:shadow transition duration-200" title="Yêu thích">
-                            <i class="${favClass}"></i>
-                        </button>
-
-                        <div class="absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${badgeClass}">
-                            ${place.category}
+                        <!-- Header Card chứa Thể loại và Trái tim yêu thích (hình 5) đặt cạnh nhau ở góc phải -->
+                        <div class="absolute top-0 right-0 flex items-center gap-1.5 p-2 bg-transparent z-10">
+                            <button onclick="toggleFavorite(${place.id})" class="bg-white bg-opacity-95 p-1.5 rounded-full shadow-sm hover:shadow transition flex items-center justify-center" title="Yêu thích">
+                                <img src="pictures/hình 5.jpg" class="w-6 h-6 object-contain transition duration-200" style="${favStyle}">
+                            </button>
+                            <div class="px-3 py-1 text-xs font-bold rounded-lg ${badgeClass}">
+                                ${place.category}
+                            </div>
                         </div>
                         
-                        <div class="mt-4">
-                            <h3 class="font-bold text-xl text-gray-800 pr-16 leading-tight">${place.name}</h3>
+                        <div class="mt-8">
+                            <!-- Bấm vào tên quán để sửa đổi trực tiếp -->
+                            <h3 onclick="openEditModal(${place.id})" class="font-bold text-xl text-gray-800 pr-24 leading-tight cursor-pointer hover:text-orange-600 transition duration-150" title="Bấm để chỉnh sửa thông tin quán">${place.name}</h3>
                             
                             <!-- Khung đánh giá sao click trực tiếp -->
                             <div class="flex items-center gap-1 mt-2 mb-3">
@@ -733,8 +759,9 @@
                                 <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
 
+                            <!-- Icon map (Hình 1.jpg) -->
                             <div class="flex items-start gap-2 text-gray-600 text-sm">
-                                <i class="fa-solid fa-map-location-dot mt-0.5 text-orange-500 w-4 text-center"></i>
+                                <img src="pictures/Hình 1.jpg" class="w-4 h-4 object-contain flex-shrink-0 mt-0.5" alt="Map">
                                 <span>${place.address}, ${place.district}</span>
                             </div>
                             ${distanceHTML}
@@ -746,18 +773,15 @@
                         </div>
                         
                         <div class="mt-5 flex gap-2">
-                            <!-- Sử dụng thẻ a target="_blank" để tránh crash PWA standalone trên iOS/Android -->
+                            <!-- Nút chỉ đường dùng hình 3.jpg -->
                             <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
                                 class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
-                                <i class="fa-solid fa-location-dot"></i> Chỉ đường
+                                <img src="pictures/hình 3.jpg" class="w-4 h-4 object-contain inline-block mr-0.5"> Chỉ đường
                             </a>
-                            <button onclick="openEditModal(${place.id})" 
-                                class="bg-gray-50 hover:bg-gray-100 text-gray-600 px-3.5 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Sửa thông tin">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
+                            <!-- Nút xóa dùng hình 4.jpg -->
                             <button onclick="deletePlace(${place.id})" 
                                 class="bg-red-50 hover:bg-red-100 text-red-600 px-3.5 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Xóa quán này">
-                                <i class="fa-solid fa-trash-can"></i>
+                                <img src="pictures/hinh 4.jpg" class="w-4 h-4 object-contain">
                             </button>
                         </div>
                     </div>
