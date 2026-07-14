@@ -339,12 +339,19 @@
             renderPlaces();
         }
 
-        // Tính khoảng cách (Haversine formula) - km
+        // Tính khoảng cách (Haversine formula) - km (Ép kiểu số an toàn tuyệt đối)
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * (Math.PI / 180);
-            const dLon = (lon2 - lon1) * (Math.PI / 180);
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+            const p1 = parseFloat(lat1);
+            const r1 = parseFloat(lon1);
+            const p2 = parseFloat(lat2);
+            const r2 = parseFloat(lon2);
+
+            if (isNaN(p1) || isNaN(r1) || isNaN(p2) || isNaN(r2)) return 9999;
+
+            const R = 6371; // Bán kính Trái Đất (km)
+            const dLat = (p2 - p1) * (Math.PI / 180);
+            const dLon = (r2 - r1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(p1 * (Math.PI / 180)) * Math.cos(p2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
             return (R * c).toFixed(1);
         }
@@ -479,21 +486,16 @@
             }
         }
 
-        // Trích xuất lat/lng từ link map hoặc tọa độ thủ công
+        // Trích xuất lat/lng từ link map hoặc tọa độ thủ công (Nhạy bén hơn với mọi kiểu copy-paste)
         function extractLatLng(input) {
             if (!input || input.trim() === '') return null;
             const text = input.trim();
-            // Định dạng: 10.7725,106.7042
-            const coordRegex = /^([-+]?\d+\.\d+),\s*([-+]?\d+\.\d+)$/;
+            
+            // 1. Tìm cặp số thực (vĩ độ, kinh độ) phân tách bằng dấu phẩy ở bất kỳ đâu trong chuỗi
+            const coordRegex = /([-+]?\d+\.\d+)\s*,\s*([-+]?\d+\.\d+)/;
             const coordMatch = text.match(coordRegex);
             if (coordMatch) {
                 return { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
-            }
-            // Định dạng link chứa @10.7725,106.7042
-            const urlRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
-            const urlMatch = text.match(urlRegex);
-            if (urlMatch) {
-                return { lat: parseFloat(urlMatch[1]), lng: parseFloat(urlMatch[2]) };
             }
             return null;
         }
