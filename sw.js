@@ -1,10 +1,11 @@
-const CACHE_NAME = 'coffee-tracker-v1';
+const CACHE_NAME = 'coffee-tracker-v2';
 const ASSETS = [
   'index.html',
   'manifest.json',
   'icon.svg',
   'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
 ];
 
 // Cài đặt service worker và lưu các tài nguyên tĩnh vào cache
@@ -33,13 +34,23 @@ self.addEventListener('activate', (e) => {
 
 // Phản hồi các yêu cầu fetch từ cache (offline-first)
 self.addEventListener('fetch', (e) => {
-  // Chỉ xử lý các yêu cầu HTTP/HTTPS thông thường (không xử lý các extension của Chrome, v.v.)
   if (!(e.request.url.indexOf('http') === 0)) return;
+
+  // Xử lý đặc biệt cho các yêu cầu điều hướng (khi reload trang hoặc mở lại app standalone)
+  // Luôn trả về index.html từ cache để tránh lỗi 404 hoặc trang trắng khi mất mạng/reload
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      caches.match('index.html').then((cachedResponse) => {
+        return cachedResponse || fetch(e.request);
+      })
+    );
+    return;
+  }
 
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Trả về kết quả từ cache nhưng vẫn tìm nạp cập nhật từ mạng ngầm (Stale-While-Revalidate)
+        // Trả về từ cache và cập nhật ngầm nếu có kết nối mạng
         fetch(e.request).then((networkResponse) => {
           if (networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse));
@@ -47,7 +58,6 @@ self.addEventListener('fetch', (e) => {
         }).catch(() => {/* Bỏ qua lỗi mạng khi chạy offline */});
         return cachedResponse;
       }
-      // Nếu không có trong cache, tải từ mạng
       return fetch(e.request);
     })
   );

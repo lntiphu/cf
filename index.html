@@ -30,17 +30,39 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 min-h-screen">
 
+    <!-- Bộ hiển thị Pull-to-refresh trên điện thoại -->
+    <div id="pullToRefreshIndicator" class="w-full text-center py-3 bg-orange-50 text-orange-600 font-semibold transition-all duration-200 overflow-hidden h-0 opacity-0 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
+    </div>
+
     <header class="bg-orange-500 shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3 text-white">
                 <i class="fa-solid fa-mug-hot text-2xl"></i>
                 <h1 class="text-2xl font-bold tracking-tight">Góc Quán Quen</h1>
             </div>
-            <button onclick="toggleModal(true)" class="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg font-semibold shadow transition duration-200 flex items-center gap-2">
-                <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
-            </button>
+            <div class="flex items-center gap-3">
+                <!-- Nút kính lúp tìm kiếm -->
+                <button onclick="toggleSearch()" class="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-lg shadow transition duration-200 flex items-center justify-center" title="Tìm kiếm">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </button>
+                <button onclick="toggleModal(true)" class="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2.5 rounded-lg font-semibold shadow transition duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
+                </button>
+            </div>
         </div>
     </header>
+
+    <!-- Khung nhập tìm kiếm ẩn/hiện -->
+    <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+            <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+            <input type="text" id="inputSearch" oninput="renderPlaces()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
+            <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+    </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
@@ -78,6 +100,7 @@
 
     </main>
 
+    <!-- Modal Thêm Quán Mới -->
     <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -111,8 +134,14 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Đánh giá (1-5 Sao)</label>
-                        <input type="number" id="inputRating" min="1" max="5" step="0.1" value="5" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg font-semibold border border-indigo-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
+                                <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
+                            </button>
+                        </div>
+                        <p id="geoStatusAdd" class="text-xs text-green-600 mt-1 hidden"></p>
                     </div>
 
                     <div>
@@ -130,6 +159,67 @@
         </div>
     </div>
 
+    <!-- Modal Chỉnh Sửa Quán -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-800">Chỉnh Sửa Quán</h2>
+                <button onclick="toggleEditModal(false)" class="text-gray-400 hover:text-red-500 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto no-scrollbar">
+                <form id="editForm" onsubmit="handleUpdatePlace(event)" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
+                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại *</label>
+                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực *</label>
+                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
+                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg font-semibold border border-indigo-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
+                                <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
+                            </button>
+                        </div>
+                        <p id="geoStatusEdit" class="text-xs text-green-600 mt-1 hidden"></p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
+                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                            Cập Nhật Thay Đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
             <div class="p-6 text-center">
@@ -138,13 +228,7 @@
                 <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không thể hoàn tác.</p>
             </div>
             <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
-                <button onclick="confirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa Quán</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semib    <script>
         // Đăng ký Service Worker cho PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -156,21 +240,24 @@
 
         // Cấu hình kết nối Supabase
         const SUPABASE_URL = "https://cqtqpejhcsjqpllhhsls.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdHFwZWpoY3NqcXBsbGhoc2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzMxOTYsImV4cCI6MjA5OTUwOTE5Nn0.gpA1BL8ccxli_l9lrWRpVjVYSysTMUDFI6wmpLwvbBk";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdHFwZWjoY3NqcXBsbGhoc2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzMxOTYsImV4cCI6MjA5OTUwOTE5Nn0.gpA1BL8ccxli_l9lrWRpVjVYSysTMUDFI6wmpLwvbBk";
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let places = [];
         let userLocation = null;
         let placeToDeleteId = null;
 
+        // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage để đơn giản hóa database)
+        let favoriteIds = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+
         // Dữ liệu mẫu làm fallback dự phòng
         const defaultPlaces = [
-            { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042 },
-            { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713 },
-            { id: 3, name: "The Workshop Coffee", category: "Cafe", district: "Quận 1", address: "27 Ngô Đức Kế, Bến Nghé", rating: 4.6, review: "Cà phê specialty xịn xò, không gian làm việc lý tưởng.", lat: 10.7741, lng: 106.7051 },
-            { id: 4, name: "Bún bò Huế Hạnh", category: "Quán ăn", district: "Quận Tân Bình", address: "135 Bành Văn Trân, Phường 7", rating: 4.4, review: "Nước dùng thanh, topping ngập tràn.", lat: 10.7878, lng: 106.6558 },
-            { id: 5, name: "Cheese Coffee - Sư Vạn Hạnh", category: "Cafe", district: "Quận 10", address: "747 Sư Vạn Hạnh, Phường 12", rating: 4.3, review: "Phong cách châu Âu hiện đại, đồ uống béo ngậy.", lat: 10.7745, lng: 106.6678 },
-            { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853 }
+            { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042, map_link: "" },
+            { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713, map_link: "" },
+            { id: 3, name: "The Workshop Coffee", category: "Cafe", district: "Quận 1", address: "27 Ngô Đức Kế, Bến Nghé", rating: 4.6, review: "Cà phê specialty xịn xò, không gian làm việc lý tưởng.", lat: 10.7741, lng: 106.7051, map_link: "" },
+            { id: 4, name: "Bún bò Huế Hạnh", category: "Quán ăn", district: "Quận Tân Bình", address: "135 Bành Văn Trân, Phường 7", rating: 4.4, review: "Nước dùng thanh, topping ngập tràn.", lat: 10.7878, lng: 106.6558, map_link: "" },
+            { id: 5, name: "Cheese Coffee - Sư Vạn Hạnh", category: "Cafe", district: "Quận 10", address: "747 Sư Vạn Hạnh, Phường 12", rating: 4.3, review: "Phong cách châu Âu hiện đại, đồ uống béo ngậy.", lat: 10.7745, lng: 106.6678, map_link: "" },
+            { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853, map_link: "" }
         ];
 
         // Hàm tải dữ liệu từ Supabase
@@ -203,16 +290,84 @@
             return (R * c).toFixed(1);
         }
 
+        // Ẩn/Hiện ô Tìm kiếm
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            const input = document.getElementById('inputSearch');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                input.focus();
+            } else {
+                container.classList.add('hidden');
+                clearSearch();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('inputSearch').value = '';
+            renderPlaces();
+        }
+
+        // Bật/Tắt Trạng thái Yêu thích
+        function toggleFavorite(id) {
+            id = parseInt(id);
+            if (favoriteIds.includes(id)) {
+                favoriteIds = favoriteIds.filter(favId => favId !== id);
+            } else {
+                favoriteIds.push(id);
+            }
+            localStorage.setItem('favoriteIds', JSON.stringify(favoriteIds));
+            renderPlaces();
+        }
+
         // Bật/Tắt Modal thêm quán
         function toggleModal(show) {
             const modal = document.getElementById('addModal');
             if(show) {
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden'; 
+                document.getElementById('geoStatusAdd').classList.add('hidden');
             } else {
                 modal.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }
+        }
+
+        // Bật/Tắt Modal chỉnh sửa quán
+        function toggleEditModal(show) {
+            const modal = document.getElementById('editModal');
+            if(show) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; 
+                document.getElementById('geoStatusEdit').classList.add('hidden');
+            } else {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        // Mở Modal chỉnh sửa và điền dữ liệu cũ
+        function openEditModal(id) {
+            const place = places.find(p => p.id === id);
+            if (!place) return;
+
+            document.getElementById('editId').value = place.id;
+            document.getElementById('editName').value = place.name;
+            document.getElementById('editCategory').value = place.category;
+            document.getElementById('editDistrict').value = place.district;
+            document.getElementById('editAddress').value = place.address;
+            
+            // Hiện tọa độ hoặc map_link cũ
+            let mapVal = '';
+            if (place.map_link) {
+                mapVal = place.map_link;
+            } else if (place.lat && place.lng) {
+                mapVal = `${place.lat},${place.lng}`;
+            }
+            document.getElementById('editMapLink').value = mapVal;
+            document.getElementById('editReview').value = place.review || '';
+
+            toggleEditModal(true);
         }
 
         // Bật/Tắt Modal Xóa
@@ -247,7 +402,52 @@
             }
         }
 
-        // Lấy vị trí
+        // Trích xuất lat/lng từ link map hoặc tọa độ thủ công
+        function extractLatLng(input) {
+            if (!input || input.trim() === '') return null;
+            const text = input.trim();
+            // Định dạng: 10.7725,106.7042
+            const coordRegex = /^([-+]?\d+\.\d+),\s*([-+]?\d+\.\d+)$/;
+            const coordMatch = text.match(coordRegex);
+            if (coordMatch) {
+                return { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+            }
+            // Định dạng link chứa @10.7725,106.7042
+            const urlRegex = /@([-+]?\d+\.\d+),([-+]?\d+\.\d+)/;
+            const urlMatch = text.match(urlRegex);
+            if (urlMatch) {
+                return { lat: parseFloat(urlMatch[1]), lng: parseFloat(urlMatch[2]) };
+            }
+            return null;
+        }
+
+        // Lấy tọa độ GPS thiết bị hiện tại của người dùng
+        function getCurrentCoordinates(mode) {
+            const statusElement = mode === 'add' ? document.getElementById('geoStatusAdd') : document.getElementById('geoStatusEdit');
+            const inputElement = mode === 'add' ? document.getElementById('inputMapLink') : document.getElementById('editMapLink');
+            
+            statusElement.innerText = "Đang lấy vị trí GPS hiện tại...";
+            statusElement.classList.remove('hidden');
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        inputElement.value = `${lat},${lng}`;
+                        statusElement.innerText = `Đã lấy tọa độ thành công: ${lat}, ${lng}`;
+                    },
+                    (error) => {
+                        statusElement.innerText = "Không thể lấy vị trí. Vui lòng cấp quyền hoặc nhập tay.";
+                    },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                statusElement.innerText = "Trình duyệt không hỗ trợ định vị.";
+            }
+        }
+
+        // Lấy vị trí người dùng để tính khoảng cách
         function getUserLocation() {
             const btn = document.getElementById('btnLocation');
             const icon = document.getElementById('locationIcon');
@@ -284,15 +484,22 @@
             }
         }
 
-        // Mở Maps
-        function openGoogleMap(lat, lng, address, district) {
-            let url = '';
-            if (lat && lng && lat !== 'undefined' && lng !== 'undefined') {
-                url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-            } else {
-                url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address + ' ' + district)}`;
+        // Cập nhật Đánh giá Sao nhanh từ màn hình chính
+        async function updateRating(id, newRating) {
+            event.stopPropagation(); // Tránh kích hoạt các sự kiện click khác
+            places = places.map(p => p.id === id ? { ...p, rating: newRating } : p);
+            renderPlaces();
+            localStorage.setItem('places', JSON.stringify(places));
+
+            try {
+                const { error } = await supabaseClient
+                    .from('places')
+                    .update({ rating: newRating })
+                    .eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Không thể lưu đánh giá mới lên Supabase:", err);
             }
-            window.open(url, '_blank');
         }
 
         // Hàm cập nhật Option cho Filter tự động
@@ -300,54 +507,134 @@
             const categorySelect = document.getElementById('filterCategory');
             const districtSelect = document.getElementById('filterDistrict');
 
-            // Lưu lại giá trị đang chọn
             const currentCat = categorySelect.value || 'Tất cả';
             const currentDist = districtSelect.value || 'Tất cả';
 
-            // Lấy danh sách duy nhất
             const categories = ['Tất cả', ...new Set(places.map(p => p.category))];
             const districts = ['Tất cả', ...new Set(places.map(p => p.district))];
 
-            // Render lại option
             categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c === 'Tất cả' ? 'Mọi thể loại' : c}</option>`).join('');
             districtSelect.innerHTML = districts.map(d => `<option value="${d}">${d === 'Tất cả' ? 'Tất cả khu vực' : d}</option>`).join('');
 
-            // Phục hồi giá trị đang chọn nếu còn tồn tại
             if (categories.includes(currentCat)) categorySelect.value = currentCat;
             if (districts.includes(currentDist)) districtSelect.value = currentDist;
         }
 
-        // Thêm mới quán
+        // Thêm mới quán (Không truyền id thủ công lên Supabase)
         async function handleAddNewPlace(e) {
             e.preventDefault();
             
+            const name = document.getElementById('inputName').value;
+            const category = document.getElementById('inputCategory').value.trim();
+            const district = document.getElementById('inputDistrict').value.trim();
+            const address = document.getElementById('inputAddress').value;
+            const mapInput = document.getElementById('inputMapLink').value.trim();
+            const review = document.getElementById('inputReview').value;
+
+            // Xử lý tọa độ và link bản đồ
+            let lat = null;
+            let lng = null;
+            let map_link = "";
+
+            const coords = extractLatLng(mapInput);
+            if (coords) {
+                lat = coords.lat;
+                lng = coords.lng;
+            } else if (mapInput.startsWith('http')) {
+                map_link = mapInput;
+            }
+
             const newPlace = {
-                id: Date.now(),
-                name: document.getElementById('inputName').value,
-                category: document.getElementById('inputCategory').value.trim(),
-                district: document.getElementById('inputDistrict').value.trim(),
-                address: document.getElementById('inputAddress').value,
-                rating: parseFloat(document.getElementById('inputRating').value),
-                review: document.getElementById('inputReview').value,
-                lat: null, 
-                lng: null
+                name,
+                category,
+                district,
+                address,
+                rating: 5, // Mặc định khi thêm mới là 5 sao, sửa sau ở ngoài
+                review,
+                lat,
+                lng,
+                map_link
             };
 
             try {
-                const { error } = await supabase
+                // Thêm vào Supabase và lấy về bản ghi có chứa ID tự động sinh
+                const { data, error } = await supabaseClient
                     .from('places')
-                    .insert([newPlace]);
+                    .insert([newPlace])
+                    .select();
+
                 if (error) throw error;
+                
+                if (data && data.length > 0) {
+                    places.unshift(data[0]); // Đẩy bản ghi thực tế từ Supabase (có id chuẩn) vào danh sách
+                } else {
+                    newPlace.id = Date.now();
+                    places.unshift(newPlace);
+                }
             } catch (err) {
-                console.error("Lỗi khi thêm mới trên Supabase:", err);
+                console.error("Lỗi khi thêm mới lên Supabase, chuyển sang lưu tạm local:", err);
+                newPlace.id = Date.now();
+                places.unshift(newPlace);
             }
 
-            places.unshift(newPlace);
             localStorage.setItem('places', JSON.stringify(places));
-
             toggleModal(false);
             document.getElementById('addForm').reset();
-            updateFilters(); // Cập nhật lại thanh lọc
+            updateFilters();
+            renderPlaces();
+        }
+
+        // Cập nhật thông tin quán
+        async function handleUpdatePlace(e) {
+            e.preventDefault();
+
+            const id = parseInt(document.getElementById('editId').value);
+            const name = document.getElementById('editName').value;
+            const category = document.getElementById('editCategory').value.trim();
+            const district = document.getElementById('editDistrict').value.trim();
+            const address = document.getElementById('editAddress').value;
+            const mapInput = document.getElementById('editMapLink').value.trim();
+            const review = document.getElementById('editReview').value;
+
+            let lat = null;
+            let lng = null;
+            let map_link = "";
+
+            const coords = extractLatLng(mapInput);
+            if (coords) {
+                lat = coords.lat;
+                lng = coords.lng;
+            } else if (mapInput.startsWith('http')) {
+                map_link = mapInput;
+            }
+
+            const updatedData = {
+                name,
+                category,
+                district,
+                address,
+                review,
+                lat,
+                lng,
+                map_link
+            };
+
+            // Tìm và cập nhật local
+            places = places.map(p => p.id === id ? { ...p, ...updatedData } : p);
+            localStorage.setItem('places', JSON.stringify(places));
+
+            try {
+                const { error } = await supabaseClient
+                    .from('places')
+                    .update(updatedData)
+                    .eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Lỗi khi cập nhật lên Supabase:", err);
+            }
+
+            toggleEditModal(false);
+            updateFilters();
             renderPlaces();
         }
 
@@ -355,12 +642,14 @@
         function renderPlaces() {
             const filterCat = document.getElementById('filterCategory').value;
             const filterDist = document.getElementById('filterDistrict').value;
+            const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
             const grid = document.getElementById('placesGrid');
 
             let result = places.filter(p => {
                 const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                 const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
-                return matchCat && matchDist;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                return matchCat && matchDist && matchSearch;
             });
 
             if (userLocation) {
@@ -395,17 +684,49 @@
                     </div>`;
                 }
 
+                // Cấu hình Link Google Map (Link chia sẻ hoặc Tọa độ hoặc Địa chỉ text)
+                let mapUrl = '';
+                if (place.map_link && place.map_link !== '') {
+                    mapUrl = place.map_link;
+                } else if (place.lat && place.lng) {
+                    mapUrl = `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`;
+                } else {
+                    mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
+                }
+
+                // Vẽ sao để click đánh giá trực tiếp
+                let starsHTML = '';
+                const currentRating = Math.round(place.rating || 5);
+                for (let i = 1; i <= 5; i++) {
+                    const isFilled = i <= currentRating;
+                    starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-300 hover:text-yellow-300'}"></i>`;
+                }
+
+                // Icon Yêu thích (Trái tim)
+                const isFav = favoriteIds.includes(parseInt(place.id));
+                const favClass = isFav ? 'fa-solid fa-heart text-red-500 scale-110' : 'fa-regular fa-heart text-gray-400 hover:text-red-500';
+
                 const card = `
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group">
+                        
+                        <!-- Nút yêu thích ở góc trái -->
+                        <button onclick="toggleFavorite(${place.id})" class="absolute top-3 left-3 z-10 bg-white bg-opacity-80 p-2 rounded-full shadow-sm hover:shadow transition duration-200" title="Yêu thích">
+                            <i class="${favClass}"></i>
+                        </button>
+
                         <div class="absolute top-0 right-0 px-3 py-1 text-xs font-bold rounded-bl-lg ${badgeClass}">
                             ${place.category}
                         </div>
-                        <div>
+                        
+                        <div class="mt-4">
                             <h3 class="font-bold text-xl text-gray-800 pr-16 leading-tight">${place.name}</h3>
-                            <div class="flex items-center gap-1 text-yellow-400 mt-1.5 mb-3">
-                                <i class="fa-solid fa-star"></i>
-                                <span class="text-sm font-bold text-gray-700">${place.rating}</span>
+                            
+                            <!-- Khung đánh giá sao click trực tiếp -->
+                            <div class="flex items-center gap-1 mt-2 mb-3">
+                                ${starsHTML}
+                                <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
+
                             <div class="flex items-start gap-2 text-gray-600 text-sm">
                                 <i class="fa-solid fa-map-location-dot mt-0.5 text-orange-500 w-4 text-center"></i>
                                 <span>${place.address}, ${place.district}</span>
@@ -417,13 +738,19 @@
                                 </div>
                             ` : ''}
                         </div>
+                        
                         <div class="mt-5 flex gap-2">
-                            <button onclick="openGoogleMap('${place.lat}', '${place.lng}', '${place.address.replace(/'/g, "\\'")}', '${place.district}')" 
-                                class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200">
+                            <!-- Sử dụng thẻ a target="_blank" để tránh crash PWA standalone trên iOS/Android -->
+                            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
+                                class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
                                 <i class="fa-solid fa-location-dot"></i> Chỉ đường
+                            </a>
+                            <button onclick="openEditModal(${place.id})" 
+                                class="bg-gray-50 hover:bg-gray-100 text-gray-600 px-3.5 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Sửa thông tin">
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                             <button onclick="deletePlace(${place.id})" 
-                                class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Xóa quán này">
+                                class="bg-red-50 hover:bg-red-100 text-red-600 px-3.5 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Xóa quán này">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
@@ -432,6 +759,56 @@
                 grid.innerHTML += card;
             });
         }
+
+        // Xử lý cơ chế kéo để reload (Pull-to-refresh) cho Mobile Standalone
+        let touchStart = 0;
+        let touchDecel = 0;
+        const ptrIndicator = document.getElementById('pullToRefreshIndicator');
+        const ptrText = document.getElementById('pullToRefreshText');
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                touchStart = e.touches[0].clientY;
+            } else {
+                touchStart = 0;
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (touchStart === 0) return;
+            const currentY = e.touches[0].clientY;
+            const distance = currentY - touchStart;
+
+            if (distance > 0 && distance < 180) {
+                ptrIndicator.style.height = `${distance}px`;
+                ptrIndicator.style.opacity = `${distance / 180}`;
+                if (distance > 100) {
+                    ptrText.innerText = "Thả tay để làm mới dữ liệu...";
+                } else {
+                    ptrText.innerText = "Kéo để làm mới...";
+                }
+            }
+        });
+
+        window.addEventListener('touchend', async (e) => {
+            if (touchStart === 0) return;
+            const currentY = e.changedTouches[0].clientY;
+            const distance = currentY - touchStart;
+
+            if (distance > 100) {
+                ptrText.innerText = "Đang cập nhật từ Supabase...";
+                ptrIndicator.style.height = '50px';
+                await loadPlaces();
+            }
+            
+            // Đóng indicator sau khi load xong hoặc hủy kéo
+            setTimeout(() => {
+                ptrIndicator.style.height = '0px';
+                ptrIndicator.style.opacity = '0';
+            }, 600);
+            
+            touchStart = 0;
+        });
 
         // Khởi chạy khi tải trang
         loadPlaces();
