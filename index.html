@@ -55,8 +55,8 @@
         </filter>
     </svg>
 
-    <!-- Bộ hiển thị Pull-to-refresh trên điện thoại -->
-    <div id="pullToRefreshIndicator" class="w-full text-center py-3 bg-pink-100 text-pink-700 font-semibold transition-all duration-200 overflow-hidden h-0 opacity-0 flex items-center justify-center gap-2 border-b border-pink-200">
+    <!-- Bộ hiển thị Pull-to-refresh trên điện thoại (Mặc định ẩn hoàn toàn không chiếm diện tích) -->
+    <div id="pullToRefreshIndicator" class="w-full text-center bg-pink-100 text-pink-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-pink-200" style="height: 0px; padding: 0px; border-bottom-width: 0px;">
         <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
     </div>
 
@@ -891,6 +891,9 @@
 
             if (distance > 0 && distance < 180) {
                 ptrIndicator.style.height = `${distance}px`;
+                ptrIndicator.style.paddingTop = '0.75rem';
+                ptrIndicator.style.paddingBottom = '0.75rem';
+                ptrIndicator.style.borderBottomWidth = '1px';
                 ptrIndicator.style.opacity = `${distance / 180}`;
                 if (distance > 100) {
                     ptrText.innerText = "Thả tay để làm mới dữ liệu...";
@@ -908,12 +911,18 @@
             if (distance > 100) {
                 ptrText.innerText = "Đang cập nhật từ Supabase...";
                 ptrIndicator.style.height = '50px';
+                ptrIndicator.style.paddingTop = '0.75rem';
+                ptrIndicator.style.paddingBottom = '0.75rem';
+                ptrIndicator.style.borderBottomWidth = '1px';
                 await loadPlaces();
             }
             
             // Đóng indicator sau khi load xong hoặc hủy kéo
             setTimeout(() => {
                 ptrIndicator.style.height = '0px';
+                ptrIndicator.style.paddingTop = '0px';
+                ptrIndicator.style.paddingBottom = '0px';
+                ptrIndicator.style.borderBottomWidth = '0px';
                 ptrIndicator.style.opacity = '0';
             }, 600);
             
