@@ -98,15 +98,13 @@
         <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
                 <!-- Lọc Thể loại -->
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <img src="pictures/hinh2.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="filter: url(#remove-white) saturate(1.3);" alt="Thể loại">
+                <div class="w-full sm:w-auto">
                     <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <img src="pictures/hinh6.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="filter: url(#remove-white) saturate(1.3);" alt="Khu vực">
+                <div class="w-full sm:w-auto">
                     <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
@@ -162,14 +160,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-lg font-semibold border border-orange-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
-                                <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
-                            </button>
-                        </div>
-                        <p id="geoStatusAdd" class="text-xs text-green-600 mt-1 hidden"></p>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Maps)</label>
+                        <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none mb-3" placeholder="Dán link chia sẻ từ Google Map (Vd: https://maps.app.goo.gl/...)">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
+                        <input type="text" id="inputLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
@@ -222,14 +218,12 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-lg font-semibold border border-orange-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
-                                <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
-                            </button>
-                        </div>
-                        <p id="geoStatusEdit" class="text-xs text-green-600 mt-1 hidden"></p>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Maps)</label>
+                        <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none mb-3" placeholder="Dán link chia sẻ từ Google Map (Vd: https://maps.app.goo.gl/...)">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
+                        <input type="text" id="editLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
@@ -424,14 +418,9 @@
             document.getElementById('editDistrict').value = place.district;
             document.getElementById('editAddress').value = place.address;
             
-            // Hiện tọa độ hoặc map_link cũ
-            let mapVal = '';
-            if (place.map_link) {
-                mapVal = place.map_link;
-            } else if (place.lat && place.lng) {
-                mapVal = `${place.lat},${place.lng}`;
-            }
-            document.getElementById('editMapLink').value = mapVal;
+            // Hiện tọa độ hoặc map_link cũ ra 2 ô riêng biệt
+            document.getElementById('editMapLink').value = place.map_link || '';
+            document.getElementById('editLatLng').value = (place.lat && place.lng) ? `${place.lat},${place.lng}` : '';
             document.getElementById('editReview').value = place.review || '';
 
             toggleEditModal(true);
@@ -509,32 +498,6 @@
             return null;
         }
 
-        // Lấy tọa độ GPS thiết bị hiện tại của người dùng
-        function getCurrentCoordinates(mode) {
-            const statusElement = mode === 'add' ? document.getElementById('geoStatusAdd') : document.getElementById('geoStatusEdit');
-            const inputElement = mode === 'add' ? document.getElementById('inputMapLink') : document.getElementById('editMapLink');
-            
-            statusElement.innerText = "Đang lấy vị trí GPS hiện tại...";
-            statusElement.classList.remove('hidden');
-
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const lat = position.coords.latitude.toFixed(6);
-                        const lng = position.coords.longitude.toFixed(6);
-                        inputElement.value = `${lat},${lng}`;
-                        statusElement.innerText = `Đã lấy tọa độ thành công: ${lat}, ${lng}`;
-                    },
-                    (error) => {
-                        statusElement.innerText = "Không thể lấy vị trí. Vui lòng cấp quyền hoặc nhập tay.";
-                    },
-                    { enableHighAccuracy: true }
-                );
-            } else {
-                statusElement.innerText = "Trình duyệt không hỗ trợ định vị.";
-            }
-        }
-
         // Lấy vị trí người dùng để tính khoảng cách (Cấu hình GPS độ chính xác cao)
         function getUserLocation() {
             const btn = document.getElementById('btnLocation');
@@ -554,7 +517,7 @@
                         icon.classList.replace('fa-location-crosshairs', 'fa-check');
                         btn.classList.replace('bg-orange-100', 'bg-green-100');
                         btn.classList.replace('text-orange-700', 'text-green-700');
-                        text.innerText = "Đã lấy vị trí (Ưu tiên gần nhất)";
+                        text.innerText = "Đã định vị";
                         renderPlaces(); 
                     },
                     (error) => {
@@ -627,20 +590,22 @@
             const category = document.getElementById('inputCategory').value.trim();
             const district = document.getElementById('inputDistrict').value.trim();
             const address = document.getElementById('inputAddress').value;
-            const mapInput = document.getElementById('inputMapLink').value.trim();
+            const map_link = document.getElementById('inputMapLink').value.trim();
+            const latLngInput = document.getElementById('inputLatLng').value.trim();
             const review = document.getElementById('inputReview').value;
 
-            // Xử lý tọa độ và link bản đồ
+            // Xử lý tọa độ GPS riêng biệt
             let lat = null;
             let lng = null;
-            let map_link = "";
-
-            const coords = extractLatLng(mapInput);
+            const coords = extractLatLng(latLngInput);
             if (coords) {
                 lat = coords.lat;
                 lng = coords.lng;
-            } else if (mapInput.startsWith('http')) {
-                map_link = mapInput;
+            } else if (extractLatLng(map_link)) {
+                // Fallback nếu người dùng lỡ dán tọa độ vào ô link bản đồ
+                const fallbackCoords = extractLatLng(map_link);
+                lat = fallbackCoords.lat;
+                lng = fallbackCoords.lng;
             }
 
             const newPlace = {
@@ -693,19 +658,22 @@
             const category = document.getElementById('editCategory').value.trim();
             const district = document.getElementById('editDistrict').value.trim();
             const address = document.getElementById('editAddress').value;
-            const mapInput = document.getElementById('editMapLink').value.trim();
+            const map_link = document.getElementById('editMapLink').value.trim();
+            const latLngInput = document.getElementById('editLatLng').value.trim();
             const review = document.getElementById('editReview').value;
 
+            // Xử lý tọa độ GPS riêng biệt
             let lat = null;
             let lng = null;
-            let map_link = "";
-
-            const coords = extractLatLng(mapInput);
+            const coords = extractLatLng(latLngInput);
             if (coords) {
                 lat = coords.lat;
                 lng = coords.lng;
-            } else if (mapInput.startsWith('http')) {
-                map_link = mapInput;
+            } else if (extractLatLng(map_link)) {
+                // Fallback nếu người dùng lỡ dán tọa độ vào ô link bản đồ
+                const fallbackCoords = extractLatLng(map_link);
+                lat = fallbackCoords.lat;
+                lng = fallbackCoords.lng;
             }
 
             const updatedData = {
@@ -794,14 +762,20 @@
                     </div>`;
                 }
 
-                // Cấu hình Link Google Map (Link chia sẻ hoặc Tọa độ hoặc Địa chỉ text)
+                // Cấu hình Link chỉ đường tự động điền điểm đi và điểm đến
                 let mapUrl = '';
-                if (place.map_link && place.map_link !== '') {
-                    mapUrl = place.map_link;
-                } else if (place.lat && place.lng) {
-                    mapUrl = `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}`;
+                let originParam = 'My+Location';
+                if (userLocation && userLocation.lat && userLocation.lng) {
+                    // Nếu đã định vị chính xác trên web, ta truyền thẳng tọa độ GPS thực của bạn sang Google Maps để tránh bị sai lệch
+                    originParam = `${userLocation.lat},${userLocation.lng}`;
+                }
+
+                if (place.lat && place.lng) {
+                    // Ưu tiên chỉ đường bằng tọa độ số chính xác tuyệt đối
+                    mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${place.lat},${place.lng}`;
                 } else {
-                    mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
+                    // Fallback chỉ đường bằng tên và địa chỉ cụ thể của quán ăn
+                    mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
                 }
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
@@ -837,9 +811,9 @@
                                 <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
 
-                            <!-- Icon map (hinh7.jpg) - Đổi sang hình ghim vị trí maps và căn giữa -->
+                            <!-- Icon map (google_pin.png) - Ghim vị trí Google Maps sắc nét và căn giữa -->
                             <div class="flex items-center gap-2 text-gray-600 text-sm">
-                                <img src="pictures/hinh7.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="filter: url(#remove-white) saturate(1.3);" alt="Map">
+                                <img src="pictures/google_pin.png" class="w-5 h-5 object-contain flex-shrink-0" alt="Map">
                                 <span class="leading-none">${place.address}, ${place.district}</span>
                             </div>
                             ${distanceHTML}
