@@ -8,10 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Nhúng FontAwesome cho Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Cấu hình PWA -->
+        <!-- Cấu hình PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#fce7f3">
+    <meta name="theme-color" content="#ff7b00">
     
     <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,7 +24,7 @@
     <style>
         /* Đồng bộ màu nền cho Safe Area ở trên cùng điện thoại (tai thỏ) */
         html {
-            background-color: #fce7f3; 
+            background-color: #ff7b00; 
         }
         header {
             padding-top: 0.75rem !important; /* Mặc định gọn gàng cho trình duyệt di động bình thường */
@@ -41,7 +40,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-pink-50 bg-opacity-20 font-sans text-gray-800 min-h-screen">
+<body class="font-sans text-gray-800 min-h-screen" style="background-color: #FFE4C4;">
 
     <!-- SVG Filter xóa hoàn toàn nền trắng của ảnh JPEG trên iOS Safari và các thiết bị di động -->
     <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
@@ -56,27 +55,27 @@
     </svg>
 
     <!-- Bộ hiển thị Pull-to-refresh trên điện thoại (Mặc định ẩn hoàn toàn không chiếm diện tích) -->
-    <div id="pullToRefreshIndicator" class="w-full text-center bg-pink-100 text-pink-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-pink-200" style="height: 0px; padding: 0px; border-bottom-width: 0px;">
+    <div id="pullToRefreshIndicator" class="w-full text-center bg-orange-100 text-orange-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-orange-200" style="height: 0px; padding: 0px; border-bottom-width: 0px;">
         <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
     </div>
 
-    <header class="bg-pink-100 shadow-md sticky top-0 z-40 border-b border-pink-200">
+    <header class="bg-[#ff7b00] shadow-md sticky top-0 z-40 border-b border-[#e66f00]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3 text-pink-800">
-                <img src="pictures/hinh8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-pink-300 shadow-sm">
+            <div class="flex items-center gap-3 text-white">
+                <img src="pictures/hinh8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-orange-200 border-opacity-40 shadow-sm">
                 <h1 class="text-2xl font-bold tracking-tight">hafu food</h1>
             </div>
             <div class="flex items-center gap-2">
                 <!-- Nút lọc danh sách yêu thích cố định kích thước w-11 h-11, nền giống kính lúp -->
-                <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
-                    <img id="favFilterIcon" src="pictures/hinh5.jpg" class="w-7 h-7 object-contain transition duration-200" style="filter: url(#remove-white) grayscale(1); opacity: 0.5;">
+                <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
+                    <i id="favFilterIcon" class="fa-solid fa-heart text-xl text-white opacity-60 transition duration-200"></i>
                 </button>
                 <!-- Nút kính lúp tìm kiếm cố định kích thước w-11 h-11 -->
-                <button onclick="toggleSearch()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
+                <button onclick="toggleSearch()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
                 <!-- Nút thêm quán cố định chiều cao h-11 -->
-                <button onclick="toggleModal(true)" class="h-11 bg-white text-pink-700 hover:bg-pink-50 px-4 rounded-lg font-semibold shadow-sm border border-pink-200 transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
+                <button onclick="toggleModal(true)" class="h-11 bg-white text-[#ff7b00] hover:bg-orange-50 px-4 rounded-lg font-semibold shadow-sm border border-transparent transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
                     <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
                 </button>
             </div>
@@ -87,7 +86,7 @@
     <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
-            <input type="text" id="inputSearch" oninput="handleFilterChange()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-700">
+            <input type="text" id="inputSearch" oninput="handleFilterChange()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
             <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -101,21 +100,20 @@
                 <!-- Lọc Thể loại -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <img src="pictures/hinh2.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="filter: url(#remove-white) saturate(1.3);" alt="Thể loại">
-                    <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                    <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
                     <img src="pictures/hinh6.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="filter: url(#remove-white) saturate(1.3);" alt="Khu vực">
-                    <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                    <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
             </div>
-
-            <!-- Nút Lấy Vị Trí đổi sang tông hồng -->
-            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-pink-100 text-pink-700 hover:bg-pink-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
+            <!-- Nút Lấy Vị Trí đổi sang tông cam -->
+            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-orange-100 text-orange-700 hover:bg-orange-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-location-crosshairs" id="locationIcon"></i>
                 <span id="locationText">Tìm quán gần tôi</span>
             </button>
@@ -144,30 +142,30 @@
                 <form id="addForm" onsubmit="handleAddNewPlace(event)" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
+                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập) *</label>
-                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập) *</label>
-                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
+                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg font-semibold border border-pink-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
+                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-lg font-semibold border border-orange-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
                                 <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
                             </button>
                         </div>
@@ -176,11 +174,11 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
+                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Lưu Thông Tin Quán
                         </button>
                     </div>
@@ -204,30 +202,30 @@
                     <input type="hidden" id="editId">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
+                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại *</label>
-                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
+                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực *</label>
-                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
+                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
+                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg font-semibold border border-pink-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
+                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-lg font-semibold border border-orange-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
                                 <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
                             </button>
                         </div>
@@ -236,11 +234,11 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none"></textarea>
+                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Cập Nhật Thay Đổi
                         </button>
                     </div>
@@ -296,8 +294,8 @@
             renderPlaces();
         }
 
-        // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage để đơn giản hóa database)
-        let favoriteIds = JSON.parse(localStorage.getItem('favoriteIds')) || [];
+        // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage, đồng bộ an toàn dạng chuỗi)
+        let favoriteIds = (JSON.parse(localStorage.getItem('favoriteIds')) || []).map(id => String(id));
 
         // Lọc theo quán yêu thích trên Header
         function toggleFavFilter() {
@@ -305,13 +303,11 @@
             const icon = document.getElementById('favFilterIcon');
             const btn = document.getElementById('btnFavFilter');
             if (showOnlyFavorites) {
-                icon.style.filter = "none";
-                icon.style.opacity = "1";
-                btn.className = "w-11 h-11 bg-pink-300 hover:bg-pink-400 text-pink-900 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
+                icon.className = "fa-solid fa-heart text-xl text-red-500 transition duration-200";
+                btn.className = "w-11 h-11 bg-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
             } else {
-                icon.style.filter = "grayscale(1)";
-                icon.style.opacity = "0.5";
-                btn.className = "w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
+                icon.className = "fa-solid fa-heart text-xl text-white opacity-60 transition duration-200";
+                btn.className = "w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
             }
             renderPlaces();
         }
@@ -375,13 +371,14 @@
             renderPlaces();
         }
 
-        // Bật/Tắt Trạng thái Yêu thích
+        // Bật/Tắt Trạng thái Yêu thích (So sánh chuỗi an toàn tuyệt đối)
         function toggleFavorite(id) {
-            id = parseInt(id);
-            if (favoriteIds.includes(id)) {
-                favoriteIds = favoriteIds.filter(favId => favId !== id);
+            if (!id) return;
+            const idStr = String(id);
+            if (favoriteIds.includes(idStr)) {
+                favoriteIds = favoriteIds.filter(favId => favId !== idStr);
             } else {
-                favoriteIds.push(id);
+                favoriteIds.push(idStr);
             }
             localStorage.setItem('favoriteIds', JSON.stringify(favoriteIds));
             renderPlaces();
@@ -413,9 +410,9 @@
             }
         }
 
-        // Mở Modal chỉnh sửa và điền dữ liệu cũ
+        // Mở Modal chỉnh sửa và điền dữ liệu cũ (So sánh chuỗi an toàn)
         function openEditModal(id) {
-            const place = places.find(p => p.id === id);
+            const place = places.find(p => String(p.id) === String(id));
             if (!place) return;
 
             document.getElementById('editId').value = place.id;
@@ -450,18 +447,29 @@
 
         async function confirmDelete() {
             if (placeToDeleteId !== null) {
-                try {
-                    const { error } = await supabaseClient
-                        .from('places')
-                        .delete()
-                        .eq('id', placeToDeleteId);
-                    if (error) throw error;
-                } catch (err) {
-                    console.error("Lỗi khi xóa trên Supabase:", err);
-                    alert("Lỗi Supabase khi xóa quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
+                const deleteTarget = String(placeToDeleteId).trim();
+                
+                // Nếu ID hợp lệ (không phải null, undefined hoặc trống)
+                if (deleteTarget !== "" && deleteTarget !== "null" && deleteTarget !== "undefined") {
+                    // Kiểm tra xem có phải ID tạm thời cục bộ tự tạo không (ID Date.now() dài 13 ký tự)
+                    const isTempId = deleteTarget.length > 10 || isNaN(Number(deleteTarget));
+                    
+                    if (!isTempId) {
+                        try {
+                            const { error } = await supabaseClient
+                                .from('places')
+                                .delete()
+                                .eq('id', parseInt(deleteTarget)); // Ép kiểu số chuẩn cho cột bigint của database
+                            if (error) throw error;
+                        } catch (err) {
+                            console.error("Lỗi khi xóa trên Supabase:", err);
+                            alert("Lỗi Supabase khi xóa quán: " + err.message);
+                        }
+                    }
                 }
 
-                places = places.filter(p => p.id !== placeToDeleteId);
+                // Luôn luôn lọc bỏ quán ăn ở localStorage để cập nhật ngay giao diện cục bộ
+                places = places.filter(p => String(p.id) !== deleteTarget);
                 localStorage.setItem('places', JSON.stringify(places));
 
                 updateFilters();
@@ -552,11 +560,11 @@
             }
         }
 
-        // Cập nhật Đánh giá Sao nhanh từ màn hình chính
+        // Cập nhật Đánh giá Sao nhanh từ màn hình chính (So sánh chuỗi an toàn)
         async function updateRating(id, newRating) {
             event.stopPropagation(); // Tránh kích hoạt các sự kiện click khác
-            const oldRating = (places.find(p => p.id === id) || {}).rating || 5;
-            places = places.map(p => p.id === id ? { ...p, rating: newRating } : p);
+            const oldRating = (places.find(p => String(p.id) === String(id)) || {}).rating || 5;
+            places = places.map(p => String(p.id) === String(id) ? { ...p, rating: newRating } : p);
             renderPlaces();
             localStorage.setItem('places', JSON.stringify(places));
 
@@ -570,7 +578,7 @@
                 console.error("Không thể lưu đánh giá mới lên Supabase:", err);
                 alert("Lỗi Supabase khi cập nhật sao: " + err.message + "\n(Vui lòng kiểm tra phân quyền RLS Policies trên database)");
                 // Hoàn tác lại rating cũ nếu lỗi
-                places = places.map(p => p.id === id ? { ...p, rating: oldRating } : p);
+                places = places.map(p => String(p.id) === String(id) ? { ...p, rating: oldRating } : p);
                 renderPlaces();
                 localStorage.setItem('places', JSON.stringify(places));
             }
@@ -639,7 +647,7 @@
 
                 if (error) throw error;
                 
-                if (data && data.length > 0) {
+                if (data && data.length > 0 && data[0].id) {
                     places.unshift(data[0]); // Đẩy bản ghi thực tế từ Supabase (có id chuẩn) vào danh sách
                 } else {
                     newPlace.id = Date.now();
@@ -694,8 +702,8 @@
                 map_link
             };
 
-            // Tìm và cập nhật local
-            places = places.map(p => p.id === id ? { ...p, ...updatedData } : p);
+            // Tìm và cập nhật local (So sánh chuỗi an toàn)
+            places = places.map(p => String(p.id) === String(id) ? { ...p, ...updatedData } : p);
             localStorage.setItem('places', JSON.stringify(places));
 
             try {
@@ -725,7 +733,7 @@
                 const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                 const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
                 const matchSearch = p.name.toLowerCase().includes(searchQuery);
-                const matchFav = !showOnlyFavorites || favoriteIds.includes(parseInt(p.id));
+                const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
                 return matchCat && matchDist && matchSearch && matchFav;
             });
 
@@ -779,28 +787,27 @@
                     mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
                 }
 
-                // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao hồng phấn
+                // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
                 const currentRating = Math.round(place.rating || 5);
                 for (let i = 1; i <= 5; i++) {
                     const isFilled = i <= currentRating;
-                    starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-pink-400' : 'fa-regular text-gray-300 hover:text-pink-300'}"></i>`;
+                    starsHTML += `<i onclick="updateRating('${place.id}', ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-orange-400' : 'fa-regular text-gray-300 hover:text-orange-300'}"></i>`;
                 }
 
-                // Icon Yêu thích (hinh5.jpg) - Dùng SVG Filter xóa nền đục
-                const isFav = favoriteIds.includes(parseInt(place.id));
-                const favStyle = isFav ? 'filter: url(#remove-white);' : 'filter: url(#remove-white) grayscale(1); opacity: 0.35;';
+                // Icon Yêu thích (Trái tim đỏ FontAwesome - So sánh chuỗi an toàn)
+                const isFav = favoriteIds.includes(String(place.id));
 
                 const card = `
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group">
                         
                         <!-- Hàng trên cùng: Tên quán bên trái, Trái tim dịch ra góc ngoài cùng bên phải (Badge phân loại ẩn) -->
                         <div class="flex items-start justify-between gap-3">
-                            <h3 onclick="openEditModal(${place.id})" class="font-bold text-xl text-gray-800 leading-snug cursor-pointer hover:text-pink-600 transition duration-150 flex-1" title="Bấm để chỉnh sửa thông tin quán">
+                            <h3 onclick="openEditModal('${place.id}')" class="font-bold text-xl text-gray-800 leading-snug cursor-pointer hover:text-orange-600 transition duration-150 flex-1" title="Bấm để chỉnh sửa thông tin quán">
                                 ${place.name}
                             </h3>
-                            <button onclick="toggleFavorite(${place.id})" class="transition flex items-center justify-center flex-shrink-0 bg-transparent" style="margin-top: -2px;" title="Yêu thích">
-                                <img src="pictures/hinh5.jpg" class="w-8 h-8 object-contain transition duration-200" style="${favStyle}">
+                            <button onclick="toggleFavorite('${place.id}')" class="transition flex items-center justify-center flex-shrink-0 bg-transparent text-2xl" style="margin-top: -2px;" title="Yêu thích">
+                                <i class="fa-heart transition duration-200 ${isFav ? 'fa-solid text-red-500 scale-110' : 'fa-regular text-gray-300 hover:text-red-400'}"></i>
                             </button>
                             <!-- Badge phân loại ẩn đi theo yêu cầu, vẫn có dữ liệu để tìm kiếm/lọc -->
                             <span class="hidden">${place.category}</span>
@@ -820,7 +827,7 @@
                             </div>
                             ${distanceHTML}
                             ${place.review ? `
-                                <div class="mt-3 bg-gray-50 border-l-2 border-pink-300 p-2 text-sm text-gray-500 italic rounded-r">
+                                <div class="mt-3 bg-gray-50 border-l-2 border-orange-300 p-2 text-sm text-gray-500 italic rounded-r">
                                     "${place.review}"
                                 </div>
                             ` : ''}
@@ -829,12 +836,12 @@
                         <div class="mt-5 flex gap-2">
                             <!-- Nút chỉ đường dùng hinh3.jpg -->
                             <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
-                                class="flex-1 bg-pink-50 hover:bg-pink-100 text-pink-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
+                                class="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
                                 <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="filter: url(#remove-white);"> Chỉ đường
                             </a>
                             <!-- Nút xóa dùng hinh4.jpg - Hiệu ứng đồng bộ giống nút chỉ đường -->
-                            <button onclick="deletePlace(${place.id})" 
-                                class="bg-pink-50 hover:bg-pink-100 px-2.5 py-1.5 rounded-lg transition duration-200 flex items-center justify-center" title="Xóa quán này">
+                            <button onclick="deletePlace('${place.id}')" 
+                                class="bg-orange-50 hover:bg-orange-100 px-2.5 py-1.5 rounded-lg transition duration-200 flex items-center justify-center" title="Xóa quán này">
                                 <img src="pictures/hinh4.jpg" class="w-9 h-9 object-contain" style="filter: url(#remove-white);">
                             </button>
                         </div>
@@ -848,7 +855,7 @@
                 let paginationHTML = `
                     <div class="col-span-full flex justify-center items-center gap-2 mt-8 mb-4">
                         <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
-                            class="px-3.5 py-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
                             <i class="fa-solid fa-chevron-left text-xs"></i> Trước
                         </button>
                 `;
@@ -857,7 +864,7 @@
                     const isActive = i === currentPage;
                     paginationHTML += `
                         <button onclick="changePage(${i})" 
-                            class="w-9 h-9 rounded-lg transition duration-200 text-sm font-bold shadow-sm ${isActive ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}">
+                            class="w-9 h-9 rounded-lg transition duration-200 text-sm font-bold shadow-sm ${isActive ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}">
                             ${i}
                         </button>
                     `;
@@ -865,7 +872,7 @@
 
                 paginationHTML += `
                         <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
-                            class="px-3.5 py-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
                             Sau <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
