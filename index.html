@@ -535,7 +535,7 @@
             }
         }
 
-        // Lấy vị trí người dùng để tính khoảng cách
+        // Lấy vị trí người dùng để tính khoảng cách (Cấu hình GPS độ chính xác cao)
         function getUserLocation() {
             const btn = document.getElementById('btnLocation');
             const icon = document.getElementById('locationIcon');
@@ -552,8 +552,8 @@
                         userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
                         icon.classList.remove('fa-spin');
                         icon.classList.replace('fa-location-crosshairs', 'fa-check');
-                        btn.classList.replace('bg-blue-100', 'bg-green-100');
-                        btn.classList.replace('text-blue-700', 'text-green-700');
+                        btn.classList.replace('bg-orange-100', 'bg-green-100');
+                        btn.classList.replace('text-orange-700', 'text-green-700');
                         text.innerText = "Đã lấy vị trí (Ưu tiên gần nhất)";
                         renderPlaces(); 
                     },
@@ -562,6 +562,11 @@
                         text.innerText = "Tìm quán gần tôi";
                         errorText.innerText = "Không thể lấy vị trí. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.";
                         errorText.classList.remove('hidden');
+                    },
+                    { 
+                        enableHighAccuracy: true, // Bắt buộc bật chíp GPS thật của điện thoại để lấy vị trí chính xác nhất
+                        timeout: 10000,           // Thời gian chờ tối đa 10 giây
+                        maximumAge: 0             // Không sử dụng vị trí lưu trong bộ nhớ đệm cũ
                     }
                 );
             } else {
