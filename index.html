@@ -228,7 +228,13 @@
                 <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không thể hoàn tác.</p>
             </div>
             <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semib    <script>
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa Quán</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // Đăng ký Service Worker cho PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
