@@ -457,26 +457,37 @@
             if (placeToDeleteId !== null) {
                 const deleteTarget = String(placeToDeleteId).trim();
                 
-                // Nếu ID hợp lệ (không phải null, undefined hoặc trống)
-                if (deleteTarget !== "" && deleteTarget !== "null" && deleteTarget !== "undefined") {
-                    // Kiểm tra xem có phải ID tạm thời cục bộ tự tạo không (ID Date.now() dài 13 ký tự)
-                    const isTempId = deleteTarget.length > 10 || isNaN(Number(deleteTarget));
+                // Chốt chặn 1: Nếu ID trống hoặc không hợp lệ, đóng modal và thoát ngay lập tức
+                if (deleteTarget === "" || deleteTarget === "null" || deleteTarget === "undefined") {
+                    closeDeleteModal();
+                    return;
+                }
+
+                // Kiểm tra xem có phải ID tạm thời cục bộ tự tạo không (ID Date.now() dài 13 ký tự)
+                const isTempId = deleteTarget.length > 10 || isNaN(Number(deleteTarget));
+                
+                if (!isTempId) {
+                    const idInt = parseInt(deleteTarget);
                     
-                    if (!isTempId) {
+                    // Chốt chặn 2: Bảo vệ cơ sở dữ liệu. Nếu idInt là NaN hoặc không hợp lệ, chặn đứng lệnh gửi lên Supabase.
+                    // Điều này ngăn chặn việc Supabase nhận giá trị undefined/NaN trong bộ lọc và xóa sạch toàn bộ bảng!
+                    if (!isNaN(idInt) && idInt > 0) {
                         try {
                             const { error } = await supabaseClient
                                 .from('places')
                                 .delete()
-                                .eq('id', parseInt(deleteTarget)); // Ép kiểu số chuẩn cho cột bigint của database
+                                .eq('id', idInt);
                             if (error) throw error;
                         } catch (err) {
                             console.error("Lỗi khi xóa trên Supabase:", err);
                             alert("Lỗi Supabase khi xóa quán: " + err.message);
                         }
+                    } else {
+                        console.warn("Chặn lệnh xóa Supabase để bảo vệ bảng do ID không hợp lệ:", idInt);
                     }
                 }
 
-                // Luôn luôn lọc bỏ quán ăn ở localStorage để cập nhật ngay giao diện cục bộ
+                // Lọc bỏ quán ăn ở localStorage để cập nhật ngay giao diện cục bộ
                 places = places.filter(p => String(p.id) !== deleteTarget);
                 localStorage.setItem('places', JSON.stringify(places));
 
