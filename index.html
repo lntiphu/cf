@@ -237,8 +237,11 @@
                         <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
                     </div>
 
-                    <div class="pt-4">
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" onclick="deleteFromEditModal()" class="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg border border-red-200 transition duration-200 flex items-center justify-center gap-1.5" title="Xóa quán ăn này">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                        </button>
+                        <button type="submit" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Cập Nhật Thay Đổi
                         </button>
                     </div>
@@ -432,6 +435,15 @@
             document.getElementById('editReview').value = place.review || '';
 
             toggleEditModal(true);
+        }
+
+        // Xử lý kích hoạt xóa từ Modal chỉnh sửa
+        function deleteFromEditModal() {
+            const id = document.getElementById('editId').value;
+            if (id) {
+                toggleEditModal(false); // Đóng modal chỉnh sửa
+                deletePlace(id); // Mở modal xác nhận xóa
+            }
         }
 
         // Bật/Tắt Modal Xóa
@@ -832,18 +844,12 @@
                                 </div>
                             ` : ''}
                         </div>
-                        
-                        <div class="mt-5 flex gap-2">
-                            <!-- Nút chỉ đường dùng hinh3.jpg -->
+                        <div class="mt-5">
+                            <!-- Nút chỉ đường dùng hinh3.jpg (Kéo dài toàn bộ chiều ngang card) -->
                             <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
-                                class="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
+                                class="w-full bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
                                 <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="filter: url(#remove-white);"> Chỉ đường
                             </a>
-                            <!-- Nút xóa dùng hinh4.jpg - Hiệu ứng đồng bộ giống nút chỉ đường -->
-                            <button onclick="deletePlace('${place.id}')" 
-                                class="bg-orange-50 hover:bg-orange-100 px-2.5 py-1.5 rounded-lg transition duration-200 flex items-center justify-center" title="Xóa quán này">
-                                <img src="pictures/hinh4.jpg" class="w-9 h-9 object-contain" style="filter: url(#remove-white);">
-                            </button>
                         </div>
                     </div>
                 `;
