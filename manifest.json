@@ -1,6 +1,6 @@
 {
-  "short_name": "È Fút",
-  "name": "È Fút - Food & Cafe Tracker",
+  "short_name": "hafu food",
+  "name": "hafu food - Food & Cafe Tracker",
   "icons": [
     {
       "src": "pictures/hình 8.jpg",
@@ -10,8 +10,8 @@
     }
   ],
   "start_url": "index.html",
-  "background_color": "#f3f4f6",
-  "theme_color": "#ea580c",
+  "background_color": "#fff5f5",
+  "theme_color": "#fce7f3",
   "display": "standalone",
   "orientation": "portrait"
 }

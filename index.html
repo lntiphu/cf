@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>È Fút</title>
+    <title>hafu food</title>
     <!-- Nhúng Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Nhúng FontAwesome cho Icon -->
@@ -11,46 +11,55 @@
     
     <!-- Cấu hình PWA -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ea580c">
+    <meta name="theme-color" content="#fce7f3">
     
     <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="È Fút">
+    <meta name="apple-mobile-web-app-title" content="hafu food">
     <link rel="apple-touch-icon" href="pictures/hình 8.jpg">
 
     <!-- Nhúng thư viện Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
+        /* Đồng bộ màu nền cho Safe Area ở trên cùng điện thoại (tai thỏ) */
+        html {
+            background-color: #fce7f3; 
+        }
+        header {
+            /* Tự động chừa khoảng trống cho thanh trạng thái hệ thống trên iOS/Android */
+            padding-top: calc(env(safe-area-inset-top, 0px) + 0.75rem) !important;
+        }
         /* Ẩn scrollbar cho đẹp */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 min-h-screen">
+<body class="bg-pink-50 bg-opacity-20 font-sans text-gray-800 min-h-screen">
 
     <!-- Bộ hiển thị Pull-to-refresh trên điện thoại -->
-    <div id="pullToRefreshIndicator" class="w-full text-center py-3 bg-orange-50 text-orange-600 font-semibold transition-all duration-200 overflow-hidden h-0 opacity-0 flex items-center justify-center gap-2">
+    <div id="pullToRefreshIndicator" class="w-full text-center py-3 bg-pink-100 text-pink-700 font-semibold transition-all duration-200 overflow-hidden h-0 opacity-0 flex items-center justify-center gap-2 border-b border-pink-200">
         <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
     </div>
 
-    <header class="bg-orange-500 shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center">
-            <div class="flex items-center gap-3 text-white">
-                <img src="pictures/hình 8.jpg" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm">
-                <h1 class="text-2xl font-bold tracking-tight">È Fút</h1>
+    <header class="bg-pink-100 shadow-md sticky top-0 z-40 border-b border-pink-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3 text-pink-800">
+                <img src="pictures/hình 8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-pink-300 shadow-sm">
+                <h1 class="text-2xl font-bold tracking-tight">hafu food</h1>
             </div>
             <div class="flex items-center gap-2">
-                <!-- Nút lọc danh sách yêu thích dùng hình 5 -->
-                <button id="btnFavFilter" onclick="toggleFavFilter()" class="bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg shadow transition duration-200 flex items-center justify-center" title="Xem quán yêu thích">
-                    <img id="favFilterIcon" src="pictures/hình 5.jpg" class="w-6 h-6 object-contain transition duration-200" style="filter: brightness(0) invert(1);">
+                <!-- Nút lọc danh sách yêu thích cố định kích thước w-11 h-11, nền giống kính lúp -->
+                <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
+                    <img id="favFilterIcon" src="pictures/hình 5.jpg" class="w-7 h-7 object-contain transition duration-200" style="filter: grayscale(1); opacity: 0.5; mix-blend-mode: multiply;">
                 </button>
-                <!-- Nút kính lúp tìm kiếm -->
-                <button onclick="toggleSearch()" class="bg-orange-600 hover:bg-orange-700 text-white p-2.5 rounded-lg shadow transition duration-200 flex items-center justify-center" title="Tìm kiếm">
+                <!-- Nút kính lúp tìm kiếm cố định kích thước w-11 h-11 -->
+                <button onclick="toggleSearch()" class="w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
-                <button onclick="toggleModal(true)" class="bg-white text-orange-600 hover:bg-orange-50 px-4 py-2.5 rounded-lg font-semibold shadow transition duration-200 flex items-center gap-2">
+                <!-- Nút thêm quán cố định chiều cao h-11 -->
+                <button onclick="toggleModal(true)" class="h-11 bg-white text-pink-700 hover:bg-pink-50 px-4 rounded-lg font-semibold shadow-sm border border-pink-200 transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
                     <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
                 </button>
             </div>
@@ -61,7 +70,7 @@
     <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
-            <input type="text" id="inputSearch" oninput="renderPlaces()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
+            <input type="text" id="inputSearch" oninput="handleFilterChange()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-700">
             <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -74,22 +83,22 @@
             <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
                 <!-- Lọc Thể loại -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <i class="fa-solid fa-filter text-gray-400"></i>
-                    <select id="filterCategory" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <img src="pictures/hình 2.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Thể loại">
+                    <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <i class="fa-solid fa-map text-gray-400"></i>
-                    <select id="filterDistrict" onchange="renderPlaces()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <img src="pictures/hình 6.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Khu vực">
+                    <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
             </div>
 
-            <!-- Nút Lấy Vị Trí -->
-            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-blue-100 text-blue-700 hover:bg-blue-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
+            <!-- Nút Lấy Vị Trí đổi sang tông hồng -->
+            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-pink-100 text-pink-700 hover:bg-pink-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-location-crosshairs" id="locationIcon"></i>
                 <span id="locationText">Tìm quán gần tôi</span>
             </button>
@@ -118,30 +127,30 @@
                 <form id="addForm" onsubmit="handleAddNewPlace(event)" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
+                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập) *</label>
-                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập) *</label>
-                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
+                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg font-semibold border border-indigo-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
+                            <input type="text" id="inputMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('add')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg font-semibold border border-pink-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại của tôi làm tọa độ quán">
                                 <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
                             </button>
                         </div>
@@ -150,11 +159,11 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
+                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Lưu Thông Tin Quán
                         </button>
                     </div>
@@ -178,30 +187,30 @@
                     <input type="hidden" id="editId">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại *</label>
-                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực *</label>
-                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Vị trí bản đồ (Link chia sẻ Google Map hoặc tọa độ Lat, Lng)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
-                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg font-semibold border border-indigo-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
+                            <input type="text" id="editMapLink" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none flex-1" placeholder="Dán link Maps hoặc tọa độ (Vd: 10.772,106.704)">
+                            <button type="button" onclick="getCurrentCoordinates('edit')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 px-3 py-2 rounded-lg font-semibold border border-pink-200 transition flex items-center justify-center gap-1 text-sm" title="Lấy vị trí hiện tại làm tọa độ quán">
                                 <i class="fa-solid fa-location-dot"></i> <span class="hidden sm:inline">Lấy tọa độ</span>
                             </button>
                         </div>
@@ -210,11 +219,11 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
+                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-pink-500 focus:outline-none"></textarea>
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Cập Nhật Thay Đổi
                         </button>
                     </div>
@@ -257,6 +266,19 @@
         let userLocation = null;
         let placeToDeleteId = null;
         let showOnlyFavorites = false;
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 6;
+
+        function changePage(page) {
+            currentPage = page;
+            renderPlaces();
+            document.getElementById('placesGrid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function handleFilterChange() {
+            currentPage = 1;
+            renderPlaces();
+        }
 
         // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage để đơn giản hóa database)
         let favoriteIds = JSON.parse(localStorage.getItem('favoriteIds')) || [];
@@ -268,11 +290,12 @@
             const btn = document.getElementById('btnFavFilter');
             if (showOnlyFavorites) {
                 icon.style.filter = "none";
-                btn.classList.replace('bg-orange-600', 'bg-orange-100');
-                btn.classList.replace('text-white', 'text-red-500');
+                icon.style.opacity = "1";
+                btn.className = "w-11 h-11 bg-pink-300 hover:bg-pink-400 text-pink-900 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
             } else {
-                icon.style.filter = "brightness(0) invert(1)";
-                btn.className = "bg-orange-600 hover:bg-orange-700 text-white p-2 rounded-lg shadow transition duration-200 flex items-center justify-center";
+                icon.style.filter = "grayscale(1)";
+                icon.style.opacity = "0.5";
+                btn.className = "w-11 h-11 bg-pink-200 hover:bg-pink-300 text-pink-800 rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
             }
             renderPlaces();
         }
@@ -701,16 +724,27 @@
                 return;
             }
 
-            result.forEach(place => {
+            // Logic Phân Trang
+            const totalItems = result.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedResult = result.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+            paginatedResult.forEach(place => {
                 const badgeClass = place.category.toLowerCase().includes('cafe') 
                     ? 'bg-amber-100 text-amber-800' 
                     : 'bg-rose-100 text-rose-800';
 
                 let distanceHTML = '';
                 if (place.distance && place.distance < 9999) {
-                    distanceHTML = `<div class="flex items-center gap-1 text-green-600 text-sm font-medium mt-2">
+                    distanceHTML = `<div class="flex items-center gap-1.5 text-green-600 text-sm font-medium mt-2">
                         <!-- Icon chỉ đường làm chỉ dẫn nhỏ (hình 3) -->
-                        <img src="pictures/hình 3.jpg" class="w-4 h-4 object-contain inline-block mr-1"> Cách bạn khoảng ${place.distance} km
+                        <img src="pictures/hình 3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="mix-blend-mode: multiply;"> Cách bạn khoảng ${place.distance} km
                     </div>`;
                 }
 
@@ -724,49 +758,48 @@
                     mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
                 }
 
-                // Vẽ sao để click đánh giá trực tiếp
+                // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao hồng phấn
                 let starsHTML = '';
                 const currentRating = Math.round(place.rating || 5);
                 for (let i = 1; i <= 5; i++) {
                     const isFilled = i <= currentRating;
-                    starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-yellow-400' : 'fa-regular text-gray-300 hover:text-yellow-300'}"></i>`;
+                    starsHTML += `<i onclick="updateRating(${place.id}, ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-pink-400' : 'fa-regular text-gray-300 hover:text-pink-300'}"></i>`;
                 }
 
-                // Icon Yêu thích (Hình 5.jpg)
+                // Icon Yêu thích (Hình 5.jpg) - Tăng kích thước lên w-8 h-8 và hòa trộn nền
                 const isFav = favoriteIds.includes(parseInt(place.id));
-                const favStyle = isFav ? '' : 'filter: grayscale(1); opacity: 0.35;';
+                const favStyle = isFav ? 'mix-blend-mode: multiply;' : 'filter: grayscale(1); opacity: 0.35; mix-blend-mode: multiply;';
 
                 const card = `
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group">
                         
-                        <!-- Header Card chứa Thể loại và Trái tim yêu thích (hình 5) đặt cạnh nhau ở góc phải -->
-                        <div class="absolute top-0 right-0 flex items-center gap-1.5 p-2 bg-transparent z-10">
-                            <button onclick="toggleFavorite(${place.id})" class="bg-white bg-opacity-95 p-1.5 rounded-full shadow-sm hover:shadow transition flex items-center justify-center" title="Yêu thích">
-                                <img src="pictures/hình 5.jpg" class="w-6 h-6 object-contain transition duration-200" style="${favStyle}">
+                        <!-- Hàng trên cùng: Tên quán bên trái, Trái tim dịch ra góc ngoài cùng bên phải (Badge phân loại ẩn) -->
+                        <div class="flex items-start justify-between gap-3">
+                            <h3 onclick="openEditModal(${place.id})" class="font-bold text-xl text-gray-800 leading-snug cursor-pointer hover:text-pink-600 transition duration-150 flex-1" title="Bấm để chỉnh sửa thông tin quán">
+                                ${place.name}
+                            </h3>
+                            <button onclick="toggleFavorite(${place.id})" class="transition flex items-center justify-center flex-shrink-0 bg-transparent" style="margin-top: -2px;" title="Yêu thích">
+                                <img src="pictures/hình 5.jpg" class="w-8 h-8 object-contain transition duration-200" style="${favStyle}">
                             </button>
-                            <div class="px-3 py-1 text-xs font-bold rounded-lg ${badgeClass}">
-                                ${place.category}
-                            </div>
+                            <!-- Badge phân loại ẩn đi theo yêu cầu, vẫn có dữ liệu để tìm kiếm/lọc -->
+                            <span class="hidden">${place.category}</span>
                         </div>
                         
-                        <div class="mt-8">
-                            <!-- Bấm vào tên quán để sửa đổi trực tiếp -->
-                            <h3 onclick="openEditModal(${place.id})" class="font-bold text-xl text-gray-800 pr-24 leading-tight cursor-pointer hover:text-orange-600 transition duration-150" title="Bấm để chỉnh sửa thông tin quán">${place.name}</h3>
-                            
+                        <div class="mt-2">
                             <!-- Khung đánh giá sao click trực tiếp -->
-                            <div class="flex items-center gap-1 mt-2 mb-3">
+                            <div class="flex items-center gap-1 mb-3">
                                 ${starsHTML}
                                 <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
                             </div>
 
-                            <!-- Icon map (Hình 1.jpg) -->
-                            <div class="flex items-start gap-2 text-gray-600 text-sm">
-                                <img src="pictures/Hình 1.jpg" class="w-4 h-4 object-contain flex-shrink-0 mt-0.5" alt="Map">
-                                <span>${place.address}, ${place.district}</span>
+                            <!-- Icon map (Hình 7.jpg) - Đổi sang hình ghim vị trí maps và căn giữa -->
+                            <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                <img src="pictures/hình 7.jpg" class="w-6 h-6 object-contain flex-shrink-0" style="mix-blend-mode: multiply; filter: contrast(1.8) brightness(1.05) saturate(1.4);" alt="Map">
+                                <span class="leading-none">${place.address}, ${place.district}</span>
                             </div>
                             ${distanceHTML}
                             ${place.review ? `
-                                <div class="mt-3 bg-gray-50 border-l-2 border-orange-300 p-2 text-sm text-gray-500 italic rounded-r">
+                                <div class="mt-3 bg-gray-50 border-l-2 border-pink-300 p-2 text-sm text-gray-500 italic rounded-r">
                                     "${place.review}"
                                 </div>
                             ` : ''}
@@ -775,19 +808,49 @@
                         <div class="mt-5 flex gap-2">
                             <!-- Nút chỉ đường dùng hình 3.jpg -->
                             <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
-                                class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
-                                <img src="pictures/hình 3.jpg" class="w-4 h-4 object-contain inline-block mr-0.5"> Chỉ đường
+                                class="flex-1 bg-pink-50 hover:bg-pink-100 text-pink-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
+                                <img src="pictures/hình 3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="mix-blend-mode: multiply;"> Chỉ đường
                             </a>
-                            <!-- Nút xóa dùng hình 4.jpg -->
+                            <!-- Nút xóa dùng hình 4.jpg - Hiệu ứng đồng bộ giống nút chỉ đường -->
                             <button onclick="deletePlace(${place.id})" 
-                                class="bg-red-50 hover:bg-red-100 text-red-600 px-3.5 py-2.5 rounded-lg text-sm transition duration-200 flex items-center justify-center" title="Xóa quán này">
-                                <img src="pictures/hinh 4.jpg" class="w-4 h-4 object-contain">
+                                class="bg-pink-50 hover:bg-pink-100 px-2.5 py-1.5 rounded-lg transition duration-200 flex items-center justify-center" title="Xóa quán này">
+                                <img src="pictures/hinh 4.jpg" class="w-9 h-9 object-contain" style="mix-blend-mode: multiply;">
                             </button>
                         </div>
                     </div>
                 `;
                 grid.innerHTML += card;
             });
+
+            // Vẽ các nút phân trang nếu có nhiều hơn 1 trang
+            if (totalPages > 1) {
+                let paginationHTML = `
+                    <div class="col-span-full flex justify-center items-center gap-2 mt-8 mb-4">
+                        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                            class="px-3.5 py-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-chevron-left text-xs"></i> Trước
+                        </button>
+                `;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const isActive = i === currentPage;
+                    paginationHTML += `
+                        <button onclick="changePage(${i})" 
+                            class="w-9 h-9 rounded-lg transition duration-200 text-sm font-bold shadow-sm ${isActive ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700 hover:bg-pink-200'}">
+                            ${i}
+                        </button>
+                    `;
+                }
+
+                paginationHTML += `
+                        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                            class="px-3.5 py-2 rounded-lg bg-pink-100 text-pink-700 hover:bg-pink-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            Sau <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                grid.innerHTML += paginationHTML;
+            }
         }
 
         // Xử lý cơ chế kéo để reload (Pull-to-refresh) cho Mobile Standalone
