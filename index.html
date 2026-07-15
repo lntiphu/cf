@@ -250,6 +250,32 @@
         </div>
     </div>
 
+    <!-- Modal Nhập mã bảo mật (Hiển thị đè lên trên cùng) -->
+    <div id="securityModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-orange-500"></i> Xác thực quyền hạn
+            </h3>
+            <p class="text-sm text-gray-500 mb-4">Vui lòng nhập mã bảo mật để xác nhận thực hiện hành động này.</p>
+            
+            <div class="mb-5">
+                <input type="password" id="confirmSecurityCode" 
+                    onkeydown="if(event.key === 'Enter') verifySecurityCode()"
+                    class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-center text-lg tracking-widest focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+                    placeholder="••••••">
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="button" onclick="cancelSecurityModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-lg transition duration-200 text-sm">
+                    Hủy
+                </button>
+                <button type="button" onclick="verifySecurityCode()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-sm">
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Đăng ký Service Worker cho PWA
         if ('serviceWorker' in navigator) {
@@ -268,6 +294,7 @@
         let places = [];
         let userLocation = null;
         let placeToDeleteId = null;
+        let pendingAction = null; // Lưu hành động chờ xác thực: { type: 'delete'|'update', data: ... }
         let showOnlyFavorites = false;
         let currentPage = 1;
         const ITEMS_PER_PAGE = 6;
@@ -383,26 +410,32 @@
         // Bật/Tắt Modal thêm quán
         function toggleModal(show) {
             const modal = document.getElementById('addModal');
-            if(show) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; 
-                document.getElementById('geoStatusAdd').classList.add('hidden');
-            } else {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
+            if (modal) {
+                if(show) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                    const geoStatus = document.getElementById('geoStatusAdd');
+                    if (geoStatus) geoStatus.classList.add('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
             }
         }
 
         // Bật/Tắt Modal chỉnh sửa quán
         function toggleEditModal(show) {
             const modal = document.getElementById('editModal');
-            if(show) {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; 
-                document.getElementById('geoStatusEdit').classList.add('hidden');
-            } else {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
+            if (modal) {
+                if(show) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                    const geoStatus = document.getElementById('geoStatusEdit');
+                    if (geoStatus) geoStatus.classList.add('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
             }
         }
 
@@ -429,7 +462,7 @@
             const id = document.getElementById('editId').value;
             if (id) {
                 toggleEditModal(false); // Đóng modal chỉnh sửa
-                deletePlace(id); // Mở modal xác nhận xóa
+                openSecurityModal('delete', id); // Mở THẲNG modal nhập code bảo mật, không hỏi lại
             }
         }
 
@@ -444,13 +477,84 @@
             document.getElementById('deleteModal').classList.add('hidden');
         }
 
-        async function confirmDelete() {
-            if (placeToDeleteId !== null) {
-                const deleteTarget = String(placeToDeleteId).trim();
+        // Bật/Tắt Modal nhập mã bảo mật (Hiển thị đè lên trên cùng)
+        function openSecurityModal(type, data) {
+            pendingAction = { type, data };
+            document.getElementById('confirmSecurityCode').value = '';
+            document.getElementById('securityModal').classList.remove('hidden');
+            document.getElementById('confirmSecurityCode').focus();
+        }
+
+        function closeSecurityModal() {
+            document.getElementById('securityModal').classList.add('hidden');
+        }
+
+        function cancelSecurityModal() {
+            pendingAction = null;
+            closeSecurityModal();
+        }
+
+        function djb2Hash(str) {
+            let hash = 5381;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                hash = hash & 0xFFFFFFFF;
+            }
+            return (hash >>> 0).toString(16);
+        }
+
+        function verifySecurityCode() {
+            try {
+                const inputVal = document.getElementById('confirmSecurityCode').value.trim();
                 
-                // Chốt chặn 1: Nếu ID trống hoặc không hợp lệ, đóng modal và thoát ngay lập tức
+                // Băm mật khẩu người dùng nhập vào
+                const hash = djb2Hash(inputVal);
+                
+                // Đối chiếu với mã băm đã lưu
+                if (hash === "7de1d77c") {
+                    executePendingAction(); // Thực thi trước để lấy pendingAction
+                    closeSecurityModal();   // Đóng modal sau
+                } else {
+                    alert("Mã bảo mật không chính xác! Vui lòng thử lại.");
+                }
+            } catch (err) {
+                alert("Lỗi xác thực: " + err.message);
+            }
+        }
+
+        async function executePendingAction() {
+            try {
+                if (!pendingAction) return;
+                const actionType = pendingAction.type;
+                const actionData = pendingAction.data;
+                
+                // Xóa biến chờ trước khi thực thi
+                pendingAction = null;
+
+                if (actionType === 'delete') {
+                    await proceedDelete(actionData);
+                } else if (actionType === 'update') {
+                    await proceedUpdate(actionData);
+                }
+            } catch (err) {
+                alert("Lỗi thực thi hành động: " + err.message);
+            }
+        }
+
+        function confirmDelete() {
+            if (placeToDeleteId !== null) {
+                const targetId = placeToDeleteId;
+                // Mở Modal bảo mật đè lên trên deleteModal (giữ nguyên deleteModal ở phía dưới)
+                openSecurityModal('delete', targetId);
+            }
+        }
+
+        async function proceedDelete(deleteId) {
+            if (deleteId !== null) {
+                const deleteTarget = String(deleteId).trim();
+                
+                // Chốt chặn 1: Nếu ID trống hoặc không hợp lệ, thoát ngay lập tức
                 if (deleteTarget === "" || deleteTarget === "null" || deleteTarget === "undefined") {
-                    closeDeleteModal();
                     return;
                 }
 
@@ -461,7 +565,6 @@
                     const idInt = parseInt(deleteTarget);
                     
                     // Chốt chặn 2: Bảo vệ cơ sở dữ liệu. Nếu idInt là NaN hoặc không hợp lệ, chặn đứng lệnh gửi lên Supabase.
-                    // Điều này ngăn chặn việc Supabase nhận giá trị undefined/NaN trong bộ lọc và xóa sạch toàn bộ bảng!
                     if (!isNaN(idInt) && idInt > 0) {
                         try {
                             const { error } = await supabaseClient
@@ -484,7 +587,6 @@
 
                 updateFilters();
                 renderPlaces();
-                closeDeleteModal();
             }
         }
 
@@ -646,8 +748,8 @@
             renderPlaces();
         }
 
-        // Cập nhật thông tin quán
-        async function handleUpdatePlace(e) {
+        // Cập nhật thông tin quán (Kích hoạt yêu cầu mã bảo mật, giữ form mở ở phía dưới)
+        function handleUpdatePlace(e) {
             e.preventDefault();
 
             const id = parseInt(document.getElementById('editId').value);
@@ -657,6 +759,17 @@
             const address = document.getElementById('editAddress').value;
             const latLngInput = document.getElementById('editLatLng').value.trim();
             const review = document.getElementById('editReview').value;
+
+            const updateData = { id, name, category, district, address, latLngInput, review };
+
+            // Mở modal bảo mật đè lên trên editModal (giữ nguyên editModal ở phía dưới)
+            openSecurityModal('update', updateData);
+        }
+
+        // Thực hiện cập nhật thực tế sau khi xác thực thành công
+        async function proceedUpdate(updateData) {
+            if (!updateData) return;
+            const { id, name, category, district, address, latLngInput, review } = updateData;
 
             // Xử lý tọa độ GPS
             let lat = null;
@@ -689,10 +802,9 @@
                 if (error) throw error;
             } catch (err) {
                 console.error("Lỗi khi cập nhật lên Supabase:", err);
-                alert("Lỗi Supabase khi cập nhật thông tin quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
+                alert("Lỗi Supabase khi cập nhật thông tin quán: " + err.message);
             }
 
-            toggleEditModal(false);
             updateFilters();
             renderPlaces();
         }
