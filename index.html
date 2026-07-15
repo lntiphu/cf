@@ -302,7 +302,18 @@
         function changePage(page) {
             currentPage = page;
             renderPlaces();
-            document.getElementById('placesGrid').scrollIntoView({ behavior: 'smooth' });
+            
+            const grid = document.getElementById('placesGrid');
+            if (grid) {
+                // Tính toán tọa độ cuộn trừ đi khoảng trống Header cố định (100px) để không bị che khuất quán đầu tiên
+                const elementPosition = grid.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - 100;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function handleFilterChange() {
