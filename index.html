@@ -585,6 +585,7 @@
                 places = places.filter(p => String(p.id) !== deleteTarget);
                 localStorage.setItem('places', JSON.stringify(places));
 
+                toggleEditModal(false); // Đóng modal chỉnh sửa
                 updateFilters();
                 renderPlaces();
             }
@@ -805,6 +806,7 @@
                 alert("Lỗi Supabase khi cập nhật thông tin quán: " + err.message);
             }
 
+            toggleEditModal(false); // Đóng modal chỉnh sửa
             updateFilters();
             renderPlaces();
         }
@@ -858,9 +860,9 @@
             paginatedResult.forEach(place => {
                 let distanceHTML = '';
                 if (place.distance && place.distance < 9999) {
-                    distanceHTML = `<div class="flex items-center gap-1.5 text-green-600 text-sm font-medium mt-2">
-                        <!-- Icon chỉ đường làm chỉ dẫn nhỏ (hinh3.jpg) -->
-                        <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="filter: url(#remove-white);"> Cách bạn khoảng ${place.distance} km
+                    distanceHTML = `<div class="flex items-center gap-1.5 text-green-600 text-sm font-medium mt-1.5">
+                        <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="filter: url(#remove-white);" alt="Distance">
+                        <span>Cách bạn khoảng ${place.distance} km</span>
                     </div>`;
                 }
 
@@ -909,7 +911,13 @@
                             <!-- Icon map (google_pin.png) - Ghim vị trí Google Maps sắc nét và căn giữa -->
                             <div class="flex items-center gap-2 text-gray-600 text-sm">
                                 <img src="pictures/google_pin.png" class="w-5 h-5 object-contain flex-shrink-0" alt="Map">
-                                <span class="leading-none">${place.address}, ${place.district}</span>
+                                <span class="leading-none">${place.address}</span>
+                            </div>
+
+                            <!-- Dòng Quận có icon mèo đáng yêu (placeholder.png) -->
+                            <div class="flex items-center gap-2 text-gray-600 text-sm mt-1.5">
+                                <img src="pictures/placeholder.png" class="w-5 h-5 object-contain flex-shrink-0" style="filter: url(#remove-white);" alt="Quận">
+                                <span class="leading-none">${place.district}</span>
                             </div>
                             ${distanceHTML}
                             ${place.review ? `
