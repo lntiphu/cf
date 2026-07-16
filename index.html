@@ -145,12 +145,14 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập) *</label>
-                            <input required type="text" id="inputCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="inputCategory" list="existingCategories" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <datalist id="existingCategories"></datalist>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập) *</label>
-                            <input required type="text" id="inputDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="inputDistrict" list="existingDistricts" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <datalist id="existingDistricts"></datalist>
                         </div>
                     </div>
 
@@ -199,12 +201,14 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại *</label>
-                            <input required type="text" id="editCategory" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="editCategory" list="existingCategoriesEdit" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <datalist id="existingCategoriesEdit"></datalist>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực *</label>
-                            <input required type="text" id="editDistrict" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="editDistrict" list="existingDistrictsEdit" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <datalist id="existingDistrictsEdit"></datalist>
                         </div>
                     </div>
 
@@ -698,6 +702,28 @@
 
             if (categories.includes(currentCat)) categorySelect.value = currentCat;
             if (districts.includes(currentDist)) districtSelect.value = currentDist;
+
+            // Đồng bộ luôn cả datalist gợi ý trong modal thêm/sửa
+            updateDatalists();
+        }
+
+        // Tự động cập nhật danh sách các Thể loại và Khu vực đã có sẵn để gợi ý khi nhập
+        function updateDatalists() {
+            const categories = [...new Set(places.map(p => p.category).filter(Boolean))];
+            const districts = [...new Set(places.map(p => p.district).filter(Boolean))];
+
+            const catListAdd = document.getElementById('existingCategories');
+            const distListAdd = document.getElementById('existingDistricts');
+            const catListEdit = document.getElementById('existingCategoriesEdit');
+            const distListEdit = document.getElementById('existingDistrictsEdit');
+
+            const catOptionsHTML = categories.map(c => `<option value="${c}"></option>`).join('');
+            const distOptionsHTML = districts.map(d => `<option value="${d}"></option>`).join('');
+
+            if (catListAdd) catListAdd.innerHTML = catOptionsHTML;
+            if (distListAdd) distListAdd.innerHTML = distOptionsHTML;
+            if (catListEdit) catListEdit.innerHTML = catOptionsHTML;
+            if (distListEdit) distListEdit.innerHTML = distOptionsHTML;
         }
 
         // Thêm mới quán (Không truyền id thủ công lên Supabase)
