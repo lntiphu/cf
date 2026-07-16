@@ -903,14 +903,14 @@
                     </div>`;
                 }
 
-                // Cấu hình Link chỉ đường luôn luôn dẫn tới Địa chỉ chữ cụ thể của quán ăn
+                // Cấu hình Link chỉ đường luôn luôn dẫn tới Địa chỉ chữ cụ thể của quán ăn (Chỉ lấy duy nhất địa chỉ cụ thể)
                 let mapUrl = '';
                 let originParam = 'My+Location';
                 if (userLocation && userLocation.lat && userLocation.lng) {
                     // Nếu đã định vị chính xác trên web, truyền thẳng tọa độ GPS thực của bạn sang Google Maps để tránh sai lệch điểm đi
                     originParam = `${userLocation.lat},${userLocation.lng}`;
                 }
-                mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.name + ' ' + place.address + ' ' + place.district)}`;
+                mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.address)}`;
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
