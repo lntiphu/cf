@@ -1000,32 +1000,79 @@
 
             // Vẽ các nút phân trang nếu có nhiều hơn 1 trang
             if (totalPages > 1) {
-                let paginationHTML = `
-                    <div class="col-span-full flex justify-center items-center gap-2 mt-8 mb-4">
+                // Khối 1: Rút gọn tối đa cho MOBILE (Không bao giờ tràn)
+                let mobilePaginationHTML = `
+                    <div class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-4 px-4 w-full bg-white bg-opacity-70 backdrop-blur-md rounded-2xl py-3 border border-gray-100 shadow-sm">
+                        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                            class="w-10 h-10 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-100">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+                        
+                        <div class="flex-1 flex flex-col items-center gap-1.5 px-2">
+                            <span class="text-xs font-extrabold tracking-wider text-orange-600 uppercase select-none">
+                                Trang ${currentPage} / ${totalPages}
+                            </span>
+                            <div class="w-full h-1.5 bg-orange-100 rounded-full overflow-hidden relative">
+                                <div class="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-300" style="width: ${(currentPage / totalPages) * 100}%"></div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                            class="w-10 h-10 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-100">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Khối 2: Phân trang thông minh cho DESKTOP (Có dấu ba chấm rút gọn)
+                let desktopPaginationHTML = `
+                    <div class="col-span-full hidden sm:flex justify-center items-center gap-2 mt-8 mb-4">
                         <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
                             class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
                             <i class="fa-solid fa-chevron-left text-xs"></i> Trước
                         </button>
                 `;
 
+                // Thuật toán rút gọn dấu ba chấm (Ellipsis Pager)
+                const range = [];
+                const delta = 2; // Số trang lân cận muốn hiển thị trên desktop
+                const left = currentPage - delta;
+                const right = currentPage + delta + 1;
+                let l;
+
                 for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= left && i < right)) {
+                        range.push(i);
+                    }
+                }
+
+                for (let i of range) {
+                    if (l) {
+                        if (i - l === 2) {
+                            desktopPaginationHTML += `<span class="px-2 text-gray-400 font-semibold select-none">...</span>`;
+                        } else if (i - l > 2) {
+                            desktopPaginationHTML += `<span class="px-2 text-gray-400 font-semibold select-none">...</span>`;
+                        }
+                    }
                     const isActive = i === currentPage;
-                    paginationHTML += `
+                    desktopPaginationHTML += `
                         <button onclick="changePage(${i})" 
                             class="w-9 h-9 rounded-lg transition duration-200 text-sm font-bold shadow-sm ${isActive ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}">
                             ${i}
                         </button>
                     `;
+                    l = i;
                 }
 
-                paginationHTML += `
+                desktopPaginationHTML += `
                         <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
                             class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
                             Sau <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
                 `;
-                grid.innerHTML += paginationHTML;
+
+                grid.innerHTML += mobilePaginationHTML + desktopPaginationHTML;
             }
         }
 
