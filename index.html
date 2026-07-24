@@ -313,6 +313,77 @@
         let currentPage = 1;
         const ITEMS_PER_PAGE = 6;
 
+        // Quản lý vuốt chuyển trang trên di động ở khu vực giữa
+        let swipeStartX = 0;
+        let swipeCurrentX = 0;
+        let isSwipingPage = false;
+
+        function handleSwipeStart(e) {
+            swipeStartX = e.touches[0].clientX;
+            isSwipingPage = true;
+            
+            const container = document.getElementById('pageSwipeContainer');
+            if (container) {
+                container.classList.remove('transition-all', 'duration-150');
+            }
+        }
+
+        function handleSwipeMove(e) {
+            if (!isSwipingPage) return;
+            swipeCurrentX = e.touches[0].clientX;
+            const diffX = swipeCurrentX - swipeStartX;
+            
+            // Giới hạn trượt tối đa 60px để giữ thẩm mỹ
+            const limitedDiff = Math.max(-60, Math.min(60, diffX));
+            
+            const container = document.getElementById('pageSwipeContainer');
+            if (container) {
+                container.style.transform = `translateX(${limitedDiff}px)`;
+                container.style.opacity = (1 - Math.abs(limitedDiff) / 120).toString();
+            }
+        }
+
+        function handleSwipeEnd(e) {
+            if (!isSwipingPage) return;
+            isSwipingPage = false;
+            
+            const diffX = swipeCurrentX - swipeStartX;
+            const threshold = 40; // Kích hoạt chuyển trang khi vuốt quá 40px
+            
+            const container = document.getElementById('pageSwipeContainer');
+            if (container) {
+                container.classList.add('transition-all', 'duration-150');
+                container.style.transform = '';
+                container.style.opacity = '';
+            }
+
+            if (diffX > threshold) {
+                // Vuốt sang PHẢI -> Về trang trước
+                if (currentPage > 1) {
+                    changePage(currentPage - 1);
+                }
+            } else if (diffX < -threshold) {
+                // Vuốt sang TRÁI -> Sang trang sau
+                const totalPages = Math.ceil(places.filter(p => {
+                    const filterCat = document.getElementById('filterCategory').value;
+                    const filterDist = document.getElementById('filterDistrict').value;
+                    const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
+                    const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
+                    const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
+                    const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                    const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
+                    return matchCat && matchDist && matchSearch && matchFav;
+                }).length / ITEMS_PER_PAGE);
+
+                if (currentPage < totalPages) {
+                    changePage(currentPage + 1);
+                }
+            }
+            
+            swipeStartX = 0;
+            swipeCurrentX = 0;
+        }
+
         function changePage(page) {
             currentPage = page;
             renderPlaces();
@@ -1008,7 +1079,11 @@
                             <i class="fa-solid fa-chevron-left text-sm"></i>
                         </button>
                         
-                        <div class="flex-1 flex flex-col items-center gap-1.5 px-2">
+                        <div id="pageSwipeContainer" 
+                            ontouchstart="handleSwipeStart(event)" 
+                            ontouchmove="handleSwipeMove(event)" 
+                            ontouchend="handleSwipeEnd(event)" 
+                            class="flex-1 flex flex-col items-center gap-1.5 px-2 cursor-grab active:cursor-grabbing select-none transition-all duration-150">
                             <!-- Nút chọn số trang dạng Dropdown Pill tinh tế -->
                             <div class="relative flex items-center justify-center bg-orange-50 bg-opacity-80 px-3 py-1 rounded-full border border-orange-100 shadow-sm cursor-pointer hover:bg-orange-100 transition duration-200">
                                 <select onchange="changePage(parseInt(this.value))" 
