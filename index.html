@@ -1009,9 +1009,16 @@
                         </button>
                         
                         <div class="flex-1 flex flex-col items-center gap-1.5 px-2">
-                            <span class="text-xs font-extrabold tracking-wider text-orange-600 uppercase select-none">
-                                Trang ${currentPage} / ${totalPages}
-                            </span>
+                            <!-- Nút chọn số trang dạng Dropdown Pill tinh tế -->
+                            <div class="relative flex items-center justify-center bg-orange-50 bg-opacity-80 px-3 py-1 rounded-full border border-orange-100 shadow-sm cursor-pointer hover:bg-orange-100 transition duration-200">
+                                <select onchange="changePage(parseInt(this.value))" 
+                                    class="bg-transparent text-xs font-extrabold tracking-wider text-orange-600 uppercase focus:outline-none cursor-pointer appearance-none text-center pr-3.5 leading-none">
+                                    ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
+                                        <option value="${p}" ${p === currentPage ? 'selected' : ''}>Trang ${p} / ${totalPages}</option>
+                                    `).join('')}
+                                </select>
+                                <i class="fa-solid fa-chevron-down text-[9px] text-orange-500 pointer-events-none absolute right-2.5"></i>
+                            </div>
                             <div class="w-full h-1.5 bg-orange-100 rounded-full overflow-hidden relative">
                                 <div class="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-300" style="width: ${(currentPage / totalPages) * 100}%"></div>
                             </div>
