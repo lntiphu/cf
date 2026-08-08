@@ -989,14 +989,24 @@
                     </div>`;
                 }
 
-                // Cấu hình Link chỉ đường luôn luôn dẫn tới Địa chỉ chữ cụ thể của quán ăn (Chỉ lấy duy nhất địa chỉ cụ thể)
-                let mapUrl = '';
+                // Cấu hình Link chỉ đường tối ưu (Tránh lưu vết Protobuf token/local-place-viewer vào thanh tìm kiếm Chrome)
                 let originParam = 'My+Location';
                 if (userLocation && userLocation.lat && userLocation.lng) {
-                    // Nếu đã định vị chính xác trên web, truyền thẳng tọa độ GPS thực của bạn sang Google Maps để tránh sai lệch điểm đi
                     originParam = `${userLocation.lat},${userLocation.lng}`;
                 }
-                mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${originParam}&destination=${encodeURIComponent(place.address)}`;
+
+                let destinationParam = '';
+                if (place.lat && place.lng) {
+                    // Ưu tiên dùng tọa độ GPS thực để Google Maps mở thẳng vị trí, không qua tìm kiếm chuỗi
+                    destinationParam = `${place.lat},${place.lng}`;
+                } else {
+                    // Nếu chưa có tọa độ GPS, ghép tên quán và địa chỉ sạch
+                    const fullQuery = (place.name ? place.name + ', ' : '') + (place.address || '');
+                    destinationParam = encodeURIComponent(fullQuery.trim());
+                }
+
+                // Dùng maps.google.com với tham số saddr/daddr để mở ứng dụng Google Maps trực tiếp trên thiết bị
+                const mapUrl = `https://maps.google.com/maps?saddr=${originParam}&daddr=${destinationParam}`;
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
