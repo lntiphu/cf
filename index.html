@@ -3,584 +3,1229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="KNOWLEDGE - Tạp chí & Không gian lưu trữ tri thức hiện đại 2026">
-    <title>KNOWLEDGE</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Reading Progress Bar -->
-    <div id="reading-progress-bar" class="reading-progress-bar"></div>
+    <title>hafu food</title>
+    <!-- Nhúng Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Nhúng FontAwesome cho Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Cấu hình PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff7b00">
+    
+    <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="hafu food">
+    <link rel="apple-touch-icon" href="pictures/hinh8.jpg">
 
-    <!-- Organic Ambient Background Shapes -->
-    <div class="bg-shapes">
-        <div class="shape shape-top-right"></div>
-        <div class="shape shape-bottom-left"></div>
-        <div class="shape shape-center-glow"></div>
+    <!-- Nhúng thư viện Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* Đồng bộ màu nền cho Safe Area ở trên cùng điện thoại (tai thỏ) */
+        html {
+            background-color: #ff7b00; 
+        }
+        header {
+            padding-top: 0.75rem !important; /* Mặc định gọn gàng cho trình duyệt di động bình thường */
+        }
+        @media (display-mode: standalone) {
+            header {
+                /* Chỉ chừa khoảng trống khi chạy ở chế độ app PWA độc lập toàn màn hình */
+                padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem) !important;
+            }
+        }
+        /* Ẩn scrollbar cho đẹp */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 min-h-screen" style="background-color: #FFE4C4;">
+
+    <!-- SVG Filter xóa hoàn toàn nền trắng của ảnh JPEG trên iOS Safari và các thiết bị di động -->
+    <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+        <filter id="remove-white">
+            <feColorMatrix type="matrix" values="
+                1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                -1 -1 -1 3 0
+            "/>
+        </filter>
+    </svg>
+
+    <!-- Bộ hiển thị Pull-to-refresh trên điện thoại (Mặc định ẩn hoàn toàn không chiếm diện tích) -->
+    <div id="pullToRefreshIndicator" class="w-full text-center bg-orange-100 text-orange-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-orange-200" style="height: 0px; padding: 0px; border-bottom-width: 0px;">
+        <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
     </div>
 
-    <!-- Main Navigation Bar with Both Top 5 Dropdowns on Left -->
-    <header class="main-nav-bar">
-        <div class="nav-content">
-            <!-- Left Group: Top 5 Chủ đề + Top 5 Xem nhiều nhất Side-by-Side -->
-            <div class="nav-left-group" style="display: none;">
-                <div class="nav-dropdown-wrapper" id="categories-section">
-                    <button type="button" class="nav-pill-btn nav-dropdown-trigger" id="toggle-top-cats" title="Bấm để xem Top 5 Chủ đề">
-                        <span>🔥 Top 5 Chủ đề</span>
-                    </button>
-                    <div class="nav-dropdown-menu" id="dropdown-top-cats">
-                        <div class="top-categories-list" id="categories-grid">
-                            <!-- Top 5 Categories rendered dynamically by JS -->
-                        </div>
-                        <button type="button" class="btn-link-all-cats" id="btn-see-all-cats-sidebar">
-                            <span>Xem tất cả chủ đề</span> ➔
-                        </button>
-                    </div>
-                </div>
-
-                <div class="nav-dropdown-wrapper top-views-box">
-                    <button type="button" class="nav-pill-btn nav-dropdown-trigger" id="toggle-top-views" title="Bấm để xem Top 5 Xem nhiều nhất">
-                        <span>👁️ Top 5 Xem nhiều nhất</span>
-                    </button>
-                    <div class="nav-dropdown-menu" id="dropdown-top-views">
-                        <div class="top-views-list" id="top-views-container">
-                            <!-- Top 5 Most Viewed Articles rendered dynamically by JS -->
-                        </div>
-                    </div>
-                </div>
+    <header class="bg-[#ff7b00] shadow-md sticky top-0 z-40 border-b border-[#e66f00]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3 text-white">
+                <img src="pictures/hinh8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-orange-200 border-opacity-40 shadow-sm">
+                <h1 class="text-2xl font-bold tracking-tight">hafu food</h1>
             </div>
-            
-            <!-- Center Group: Navigation Menu -->
-            <div class="nav-center-menu">
-                <div class="nav-active-pill-bg" id="nav-active-pill-bg"></div>
-                <button class="nav-menu-item active" id="nav-item-landing">Giới thiệu</button>
-                <button class="nav-menu-item" id="nav-item-home">Trang chủ</button>
-                <button class="nav-menu-item" id="nav-item-categories">Chủ đề</button>
-            </div>
-
-            <!-- Right Group: Viết bài mới Action Button -->
-            <div class="nav-right-group" style="display: none;">
-                <button class="btn-create-post-nav" id="btn-create-post">
-                    <span class="plus-icon">+</span>
-                    <span>Viết bài mới</span>
+            <div class="flex items-center gap-2">
+                <!-- Nút lọc danh sách yêu thích cố định kích thước w-11 h-11, nền giống kính lúp -->
+                <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
+                    <i id="favFilterIcon" class="fa-solid fa-heart text-xl text-white opacity-60 transition duration-200"></i>
+                </button>
+                <!-- Nút kính lúp tìm kiếm cố định kích thước w-11 h-11 -->
+                <button onclick="toggleSearch()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </button>
+                <!-- Nút thêm quán cố định chiều cao h-11 -->
+                <button onclick="toggleModal(true)" class="h-11 bg-white text-[#ff7b00] hover:bg-orange-50 px-4 rounded-lg font-semibold shadow-sm border border-transparent transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <div class="app-container">
-        <!-- ========== TRANG 0: LANDING PAGE HIỆN ĐẠI BENTO GRID 2026 ========== -->
-        <div id="view-landing" class="page-view active">
-            <!-- Modern Hero Section -->
-            <section class="modern-landing-hero">
-                <h1 class="modern-hero-headline">
-                    Giao Diện Tương Lai.<br>
-                    <span class="hero-gradient-text">Không Gian Tri Thức Không Giới Hạn.</span>
-                </h1>
+    <!-- Khung nhập tìm kiếm ẩn/hiện -->
+    <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+            <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+            <input type="text" id="inputSearch" oninput="handleFilterChange()" 
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
+            <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+    </div>
 
-                <p class="modern-hero-subtext">
-                    Lưu trữ bài viết, sáng tạo nội dung chuyên sâu và kết nối cộng đồng tri thức với trải nghiệm đọc & viết mượt mà tuyệt đối.
-                </p>
-
-                <!-- Modern Dual CTAs -->
-                <div class="modern-cta-row">
-                    <button type="button" class="btn-modern-dark" id="btn-enter-app-hero">
-                        <span>Bắt đầu khám phá ngay</span>
-                        <span class="arrow-icon">➔</span>
-                    </button>
-                    <button type="button" class="btn-modern-glass" id="btn-create-post-landing">
-                        <span class="plus-icon">+</span>
-                        <span>Tạo bài viết mới</span>
-                    </button>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
+                <!-- Lọc Thể loại -->
+                <div class="w-full sm:w-auto">
+                    <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <!-- Render tự động -->
+                    </select>
                 </div>
+                <!-- Lọc Khu vực -->
+                <div class="w-full sm:w-auto">
+                    <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                        <!-- Render tự động -->
+                    </select>
+                </div>
+            </div>
+            <!-- Nút Lấy Vị Trí đổi sang tông cam -->
+            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-orange-100 text-orange-700 hover:bg-orange-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-location-crosshairs" id="locationIcon"></i>
+                <span id="locationText">Tìm quán gần tôi</span>
+            </button>
+        </div>
 
-                <!-- Modern Interactive App Showcase Frame -->
-                <div class="modern-app-frame">
-                    <div class="frame-top-bar">
-                        <div class="frame-window-controls">
-                            <span class="control-dot close"></span>
-                            <span class="control-dot minimize"></span>
-                            <span class="control-dot expand"></span>
-                        </div>
-                        <div class="frame-tab-switcher">
-                            <span class="frame-tab active">🌐 knowledge-journal-2026.app</span>
-                        </div>
-                        <div class="frame-status-badge">
-                            <span class="live-pulse-dot"></span>
-                            <span>Realtime Sync</span>
-                        </div>
+        <p id="locationError" class="text-red-500 text-sm mb-4 hidden text-center md:text-right"></p>
+
+        <!-- Danh sách Quán (Grid) -->
+        <div id="placesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Render bằng Javascript -->
+        </div>
+
+    </main>
+
+    <!-- Modal Thêm Quán Mới -->
+    <div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-800">Thêm Quán Mới</h2>
+                <button onclick="toggleModal(false)" class="text-gray-400 hover:text-red-500 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto no-scrollbar">
+                <form id="addForm" onsubmit="handleAddNewPlace(event)" autocomplete="off" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
+                        <input required type="text" id="inputName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
                     </div>
                     
-                    <div class="frame-inner-content">
-                        <div class="mockup-hero-card">
-                            <div class="mockup-header-meta">
-                                <span class="mockup-pill-badge">🔥 TẠP CHÍ NỔI BẬT</span>
-                                <span class="mockup-pill-cat">🧠 Triết Học & Cuộc Sống</span>
-                                <span class="mockup-read-time">⏱️ 3 phút đọc</span>
-                            </div>
-                            <h2>Chủ Nghĩa Hư Vô Nihilism & Hành Trình Kiến Tạo Ý Nghĩa Cuộc Sống 2026</h2>
-                            <p>Khám phá triết lý hiện sinh, vượt qua sự trống rỗng để tìm thấy mục đích sống chân thực giữa kỷ nguyên công nghệ phát triển vượt bậc...</p>
-                            <div class="mockup-bottom-meta">
-                                <div class="mockup-author-info">
-                                    <div class="author-avatar">K</div>
-                                    <span class="author-name">Blogger Knowledge</span>
-                                </div>
-                                <div class="mockup-interaction-badges">
-                                    <span class="badge-item">❤️ 128 Thích</span>
-                                    <span class="badge-item">💬 42 Bình luận</span>
-                                </div>
-                            </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="inputCategory" list="existingCategories" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <datalist id="existingCategories"></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="inputDistrict" list="existingDistricts" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <datalist id="existingDistricts"></datalist>
                         </div>
                     </div>
-                </div>
 
-                <!-- Live Metrics Bar -->
-                <div class="modern-metrics-bar">
-                    <div class="metric-box">
-                        <div class="metric-number" id="landing-stat-articles">0</div>
-                        <div class="metric-label">Bài viết tri thức</div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
+                        <input required type="text" id="inputAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
                     </div>
-                    <div class="metric-divider"></div>
-                    <div class="metric-box">
-                        <div class="metric-number" id="landing-stat-categories">0</div>
-                        <div class="metric-label">Chủ đề phong phú</div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
+                        <input type="text" id="inputOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00 hoặc Mở cả ngày">
                     </div>
-                    <div class="metric-divider"></div>
-                    <div class="metric-box">
-                        <div class="metric-number" id="landing-stat-comments">0</div>
-                        <div class="metric-label">Bình luận tương tác</div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
+                        <input type="text" id="inputLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
-                </div>
-            </section>
-        </div>
 
-        <!-- ========== TRANG 1: TRANG CHỦ CHUYÊN NGHIỆP (MAGAZINE BLOGGER HOME) ========== -->
-        <div id="view-home" class="page-view">
-            <!-- Hero Banner -->
-            <header class="hero-center">
-                <h1 class="hero-giant-title">
-                    Best <span class="highlight-dark">Knowledge</span> in <span class="highlight-sage">2026</span>
-                </h1>
-
-                <div class="subtitle-divider">
-                    <span class="div-line"></span>
-                    <span class="div-text">Khám phá tri thức theo chủ đề</span>
-                    <span class="div-line"></span>
-                </div>
-            </header>
-
-            <!-- Thống kê nhanh (Stats Bar) -->
-            <div class="blog-stats-bar">
-                <div class="stat-card">
-                    <span class="stat-num" id="stat-total-articles">0</span>
-                    <span class="stat-label">Bài viết</span>
-                </div>
-                <span class="stat-divider"></span>
-                <div class="stat-card">
-                    <span class="stat-num" id="stat-total-categories">0</span>
-                    <span class="stat-label">Chủ đề</span>
-                </div>
-                <span class="stat-divider"></span>
-                <div class="stat-card">
-                    <span class="stat-num" id="stat-total-comments">0</span>
-                    <span class="stat-label">Bình luận</span>
-                </div>
-            </div>
-
-            <!-- Bài viết tiêu điểm (Spotlight Featured Article) -->
-            <div id="featured-post-container" class="featured-spotlight-container" style="display:none; margin-top: 2.5rem;">
-                <!-- Featured Article Rendered Dynamically -->
-            </div>
-
-            <!-- Tất cả bài viết mới nhất (Recent Articles Feed) -->
-            <div class="section-header-row margin-top-lg">
-                <h2>Bài viết gần đây</h2>
-                <div class="search-input-box home-search">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-home-input" placeholder="Tìm kiếm tất cả bài viết...">
-                </div>
-            </div>
-
-            <main class="articles-grid" id="home-articles-grid">
-                <!-- All posts rendered here -->
-            </main>
-
-
-        </div>
-
-        <!-- ========== TRANG TẤT CẢ CHỦ ĐỀ (DEDICATED ALL CATEGORIES VIEW) ========== -->
-        <div id="view-all-categories" class="page-view">
-            <header class="nav-bar-header">
-                <button class="btn-nav-back" id="btn-back-home-from-all-cats">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                    <span>Trang chủ</span>
-                </button>
-
-                <div class="category-header-title">
-                    <span class="cat-icon-badge">📂</span>
-                    <h2>Khám Phá Tất Cả Chủ Đề</h2>
-                </div>
-
-                <div class="category-header-actions">
-                    <button class="btn-create-post-nav" id="btn-add-cat-from-all">
-                        <span class="plus-icon">+</span>
-                        <span>Tạo chủ đề mới</span>
-                    </button>
-                </div>
-            </header>
-
-            <!-- Search & Subtitle Section -->
-            <div class="categories-search-section">
-                <p class="categories-subhead">Không gian tổng hợp và phân loại toàn bộ kiến thức theo chủ đề chuyên sâu</p>
-                <div class="search-category-row">
-                    <div class="search-input-box">
-                        <span class="search-icon">🔍</span>
-                        <input type="text" id="search-all-cats-input" placeholder="Nhập tên chủ đề cần tìm kiếm...">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
+                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
                     </div>
-                </div>
-            </div>
 
-            <!-- Categories Grid -->
-            <div class="all-categories-grid" id="all-categories-full-grid">
-                <!-- All category cards rendered dynamically by JS -->
-            </div>
-        </div>
-
-        <!-- ========== TRANG 2: DANH SÁCH BÀI VIẾT THEO CHỦ ĐỀ ========== -->
-        <div id="view-category-articles" class="page-view">
-            <header class="nav-bar-header">
-                <button class="btn-nav-back" id="btn-back-home">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                    <span>Trang chủ</span>
-                </button>
-                <div class="category-header-title clickable" id="cat-header-title-btn" title="Bấm để chỉnh sửa hoặc xóa chủ đề">
-                    <span class="cat-icon-badge" id="cat-badge-emoji">📖</span>
-                    <h2 id="cat-title-name">Chủ đề</h2>
-                    <span class="cat-edit-indicator" title="Bấm để quản lý chủ đề">⚙️</span>
-                </div>
-                <div class="category-header-actions">
-                    <button class="btn-plus-action" id="btn-add-article-in-cat" title="Tạo bài viết mới trong chủ đề này">
-                        <span class="plus-icon">+</span>
-                    </button>
-                </div>
-            </header>
-
-            <div class="search-category-row">
-                <div class="search-input-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-cat-input" placeholder="Tìm bài viết trong chủ đề này...">
-                </div>
-            </div>
-
-            <main class="articles-grid" id="articles-grid">
-                <!-- Articles rendered by JS -->
-            </main>
-
-            <div class="empty-articles-state" id="empty-articles" style="display:none;">
-                <div class="empty-emoji">📄</div>
-                <h3>Chưa có bài viết nào trong chủ đề này</h3>
-                <p>Hãy là người đầu tiên tạo bài viết mới!</p>
-                <button class="btn-primary" id="btn-add-first-article">+ Tạo bài viết mới</button>
-            </div>
-        </div>
-
-        <!-- ========== TRANG 3: CHI TIẾT BÀI VIẾT ĐẦY ĐỦ (FULL READER VIEW) ========== -->
-        <div id="view-article-detail" class="page-view">
-            <header class="nav-bar-header">
-                <button class="btn-nav-back" id="btn-back-cat-articles">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-                    <span>Quay lại</span>
-                </button>
-                <div class="article-actions-top">
-                    <button class="btn-action-icon" id="btn-pin-current-article" title="Đánh dấu bài viết nổi bật">
-                        <span>🔥</span>
-                        <span id="pin-btn-text">Nổi bật</span>
-                    </button>
-                    <button class="btn-action-icon" id="btn-edit-current-article" title="Chỉnh sửa bài viết">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                        <span>Sửa</span>
-                    </button>
-                    <button class="btn-action-icon btn-danger" id="btn-delete-current-article" title="Xóa bài viết">
-                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                        <span>Xóa</span>
-                    </button>
-                </div>
-            </header>
-
-            <article class="reader-container">
-                <div class="reader-meta-bar">
-                    <span class="cat-pill-badge" id="reader-cat-badge">Thể loại</span>
-                    <span class="reader-date" id="reader-date">10/08/2026</span>
-                    <span class="read-time-chip" id="reader-read-time">⏱️ 3 phút đọc</span>
-                </div>
-
-                <h1 class="reader-title" id="reader-title">Tiêu đề bài viết đầy đủ</h1>
-
-                <div class="reader-author-bar">
-                    <div class="author-avatar-sm">K</div>
-                    <div class="author-info-text">
-                        <span class="author-name">Blogger Knowledge</span>
-                        <span class="author-role">Tác giả</span>
-                    </div>
-                    <div class="reader-actions-right">
-                        <button type="button" class="btn-like-badge" id="btn-like-article">
-                            <span class="like-icon">❤️</span>
-                            <span id="like-count">0</span>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                            Lưu Thông Tin Quán
                         </button>
                     </div>
-                </div>
-
-                <div class="reader-tags-row" id="reader-tags">
-                    <!-- Tag chips rendered here -->
-                </div>
-
-                <div class="reader-content-body" id="reader-content">
-                    <!-- Full Article Body Rendered here -->
-                </div>
-
-                <!-- ========== CHỨC NĂNG BÌNH LUẬN (COMMENTS) ========== -->
-                <section class="comments-section">
-                    <div class="comments-header">
-                        <h3>💬 Bình luận <span id="comment-count-badge">(0)</span></h3>
-                    </div>
-
-                    <!-- Form nhập bình luận mới -->
-                    <div class="add-comment-box">
-                        <div class="comment-input-row">
-                            <input type="text" id="comment-author-name" placeholder="Tên của bạn (mặc định: Khách)..." maxlength="40">
-                        </div>
-                        <div class="comment-input-row">
-                            <textarea id="comment-content-input" rows="3" placeholder="Viết bình luận suy nghĩ của bạn về bài viết này..."></textarea>
-                        </div>
-                        <div class="comment-submit-row">
-                            <button type="button" class="btn-primary-sm" id="btn-submit-comment">
-                                <span>Gửi bình luận</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Danh sách bình luận -->
-                    <div class="comments-list" id="comments-list">
-                        <!-- Comments dynamically rendered by JS -->
-                    </div>
-                </section>
-            </article>
-        </div>
-
-        <!-- Application Footer -->
-        <footer class="app-footer">
-            <div class="footer-content">
-                <p class="copyright-text">© corp elodies.io.vn</p>
+                </form>
             </div>
-        </footer>
+        </div>
     </div>
 
-    <!-- ========== MODAL: TẠO / SỬA BÀI VIẾT MỚI (VỚI THANH CÔNG CỤ WORD) ========== -->
-    <div id="modal-article" class="modal-overlay">
-        <div class="modal modal-lg">
-            <div class="modal-header">
-                <h2 id="modal-article-title">Tạo bài viết mới</h2>
-                <button class="modal-close" data-close="modal-article">&times;</button>
+    <!-- Modal Chỉnh Sửa Quán -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-xl font-bold text-gray-800">Chỉnh Sửa Quán</h2>
+                <button onclick="toggleEditModal(false)" class="text-gray-400 hover:text-red-500 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="post-title">Tiêu đề bài viết</label>
-                    <input type="text" id="post-title" placeholder="VD: 10 Công cụ AI hỗ trợ lập trình 2026..." maxlength="120">
-                </div>
+            
+            <div class="p-6 overflow-y-auto no-scrollbar">
+                <form id="editForm" onsubmit="handleUpdatePlace(event)" autocomplete="off" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
+                        <input required type="text" id="editName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="editCategory" list="existingCategoriesEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <datalist id="existingCategoriesEdit"></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
+                            <input required type="text" id="editDistrict" list="existingDistrictsEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <datalist id="existingDistrictsEdit"></datalist>
+                        </div>
+                    </div>
 
-                <!-- Chọn thể loại có sẵn HOẶC Thêm thể loại mới -->
-                <div class="form-group">
-                    <label>Thể loại chủ đề</label>
-                    <div class="category-selection-box">
-                        <select id="post-category-select">
-                            <!-- Options populated by JS -->
-                        </select>
-                        <button type="button" class="btn-inline-secondary" id="btn-toggle-new-cat">
-                            + Thể loại mới
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
+                        <input required type="text" id="editAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
+                        <input type="text" id="editOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
+                        <input type="text" id="editLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
+                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" onclick="deleteFromEditModal()" class="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg border border-red-200 transition duration-200 flex items-center justify-center gap-1.5" title="Xóa quán ăn này">
+                            <i class="fa-solid fa-trash-can"></i> Xóa
+                        </button>
+                        <button type="submit" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                            Cập Nhật Thay Đổi
                         </button>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                <!-- Thể loại mới Form Input (Ẩn mặc định) -->
-                <div class="new-category-input-group" id="new-cat-box" style="display:none;">
-                    <div class="form-group">
-                        <label for="new-cat-name">Tên thể loại mới</label>
-                        <input type="text" id="new-cat-name" placeholder="VD: Lập trình, AI Tools, Sách hay...">
-                    </div>
-                    <div class="form-group">
-                        <label>Biểu tượng thể loại</label>
-                        <div class="emoji-picker" id="emoji-picker">
-                            <button type="button" class="emoji-option selected" data-emoji="🖊️">🖊️</button>
-                            <button type="button" class="emoji-option" data-emoji="🔍">🔍</button>
-                            <button type="button" class="emoji-option" data-emoji="🏔️">🏔️</button>
-                            <button type="button" class="emoji-option" data-emoji="▷">▷</button>
-                            <button type="button" class="emoji-option" data-emoji="🎛️">🎛️</button>
-                            <button type="button" class="emoji-option" data-emoji="🖌️">🖌️</button>
-                            <button type="button" class="emoji-option" data-emoji="⚙️">⚙️</button>
-                            <button type="button" class="emoji-option" data-emoji="💡">💡</button>
-                            <button type="button" class="emoji-option" data-emoji="💻">💻</button>
-                            <button type="button" class="emoji-option" data-emoji="📖">📖</button>
-                            <button type="button" class="emoji-option" data-emoji="🚀">🚀</button>
-                        </div>
-                        <input type="hidden" id="new-cat-emoji" value="🖊️">
-                    </div>
-                </div>
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-6 text-center">
+                <i class="fa-solid fa-circle-exclamation text-4xl text-red-500 mb-4"></i>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Xác nhận xóa</h3>
+                <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa Quán</button>
+            </div>
+        </div>
+    </div>
 
-                <div class="form-group">
-                    <label for="post-content">Nội dung bài viết đầy đủ</label>
-                    <div class="word-editor-toolbar" id="editor-toolbar">
-                        <!-- Chữ in hoa / In thường / Title Case -->
-                        <div class="toolbar-group">
-                            <button type="button" class="tb-btn" data-action="uppercase" title="IN HOA (UPPERCASE)">AA</button>
-                            <button type="button" class="tb-btn" data-action="lowercase" title="in thường (lowercase)">aa</button>
-                            <button type="button" class="tb-btn" data-action="titlecase" title="In Hoa Đầu Từ (Title Case)">Aa</button>
-                        </div>
-                        <span class="tb-divider"></span>
-                        <!-- Định dạng kiểu chữ: Bold, Italic, Underline, Strikethrough -->
-                        <div class="toolbar-group">
-                            <button type="button" class="tb-btn tb-bold" data-action="bold" title="In đậm (Ctrl+B)"><b>B</b></button>
-                            <button type="button" class="tb-btn tb-italic" data-action="italic" title="In nghiêng (Ctrl+I)"><i>I</i></button>
-                            <button type="button" class="tb-btn tb-underline" data-action="underline" title="Gạch chân (Ctrl+U)"><u>U</u></button>
-                            <button type="button" class="tb-btn tb-strike" data-action="strikethrough" title="Gạch ngang"><s>S</s></button>
-                        </div>
-                        <span class="tb-divider"></span>
-                        <!-- Tiêu đề Header -->
-                        <div class="toolbar-group">
-                            <button type="button" class="tb-btn" data-action="h1" title="Tiêu đề 1 (Lớn)">H1</button>
-                            <button type="button" class="tb-btn" data-action="h2" title="Tiêu đề 2 (Vừa)">H2</button>
-                            <button type="button" class="tb-btn" data-action="h3" title="Tiêu đề 3 (Nhỏ)">H3</button>
-                        </div>
-                        <span class="tb-divider"></span>
-                        <!-- Danh sách & Khối -->
-                        <div class="toolbar-group">
-                            <button type="button" class="tb-btn" data-action="ul" title="Danh sách chấm (Bullet list)">• List</button>
-                            <button type="button" class="tb-btn" data-action="ol" title="Danh sách số (Numbered list)">1. List</button>
-                            <button type="button" class="tb-btn" data-action="quote" title="Trích dẫn">“ ” Quote</button>
-                            <button type="button" class="tb-btn" data-action="card" title="Chèn Thẻ Khung Câu (Card Box)">📦 Thẻ Khung</button>
-                            <button type="button" class="tb-btn" data-action="code" title="Khối Code">&lt;/&gt;</button>
-                        </div>
-                    </div>
-                    <textarea id="post-content" rows="8" placeholder="Viết toàn bộ nội dung của bạn ở đây... Bạn cũng có thể dùng nút '+ Thêm khung câu mới' bên dưới để nhập mỗi câu 1 khung thẻ riêng biệt."></textarea>
+    <!-- Modal Nhập mã bảo mật (Hiển thị đè lên trên cùng) -->
+    <div id="securityModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-orange-500"></i> Xác thực quyền hạn
+            </h3>
+            <p class="text-sm text-gray-500 mb-4">Vui lòng nhập mã bảo mật để xác nhận thực hiện hành động này.</p>
+            
+            <div class="mb-5">
+                <input type="password" id="confirmSecurityCode" 
+                    onkeydown="if(event.key === 'Enter') verifySecurityCode()"
+                    autocomplete="new-password"
+                    class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-center text-lg tracking-widest focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+                    placeholder="••••••">
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="button" onclick="cancelSecurityModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-lg transition duration-200 text-sm">
+                    Hủy
+                </button>
+                <button type="button" onclick="verifySecurityCode()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-sm">
+                    Xác nhận
+                </button>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Layout Tạo Nhiều Khung Câu Độc Lập -->
-                    <div class="card-layout-builder-box">
-                        <div class="card-builder-header">
-                            <label style="margin-bottom:0; color:var(--text-dark); font-weight:800;">📦 Nhập Nhiều Khung Thẻ Câu (Mỗi câu 1 khung)</label>
-                            <button type="button" class="btn-sm-outline" id="btn-add-card-input">
-                                <span>+ Thêm khung câu mới</span>
-                            </button>
-                        </div>
-                        <p class="builder-desc">Tạo các khung thẻ trích dẫn riêng biệt. Mỗi ô bên dưới sẽ hiển thị thành 1 khung thẻ độc lập trong bài viết.</p>
+    <script>
+        // Đăng ký Service Worker cho PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker đã đăng ký thành công.', reg))
+                    .catch(err => console.log('Đăng ký Service Worker thất bại: ', err));
+            });
+        }
+
+        // Cấu hình kết nối Supabase
+        const SUPABASE_URL = "https://cqtqpejhcsjqpllhhsls.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxdHFwZWpoY3NqcXBsbGhoc2xzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM5MzMxOTYsImV4cCI6MjA5OTUwOTE5Nn0.gpA1BL8ccxli_l9lrWRpVjVYSysTMUDFI6wmpLwvbBk";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let places = [];
+        let userLocation = null;
+        let placeToDeleteId = null;
+        let pendingAction = null; // Lưu hành động chờ xác thực: { type: 'delete'|'update', data: ... }
+        let showOnlyFavorites = false;
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 6;
+
+        // Quản lý vuốt chuyển trang trên di động ở khu vực giữa
+        let swipeStartX = 0;
+        let swipeCurrentX = 0;
+        let isSwipingPage = false;
+
+        function handleSwipeStart(e) {
+            // Không vuốt nếu chạm vào nút hoặc select chọn trực tiếp
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'I') return;
+            
+            swipeStartX = e.touches[0].clientX;
+            isSwipingPage = true;
+            
+            const container = document.getElementById('mobilePaginationBar');
+            if (container) {
+                container.classList.remove('transition-all', 'duration-150');
+            }
+        }
+
+        function handleSwipeMove(e) {
+            if (!isSwipingPage) return;
+            swipeCurrentX = e.touches[0].clientX;
+            const diffX = swipeCurrentX - swipeStartX;
+            
+            // Ngăn chặn hành vi cuộn dọc mặc định của trình duyệt khi người dùng đang cố ý vuốt ngang chuyển trang
+            if (Math.abs(diffX) > 8) {
+                if (e.cancelable) e.preventDefault();
+            }
+            
+            // Giới hạn trượt tối đa 60px để giữ thẩm mỹ
+            const limitedDiff = Math.max(-60, Math.min(60, diffX));
+            
+            const container = document.getElementById('mobilePaginationBar');
+            if (container) {
+                container.style.transform = `translateX(${limitedDiff}px)`;
+                container.style.opacity = (1 - Math.abs(limitedDiff) / 240).toString();
+            }
+        }
+
+        function handleSwipeEnd(e) {
+            if (!isSwipingPage) return;
+            isSwipingPage = false;
+            
+            const diffX = swipeCurrentX - swipeStartX;
+            const threshold = 40; // Kích hoạt chuyển trang khi vuốt quá 40px
+            
+            const container = document.getElementById('mobilePaginationBar');
+            if (container) {
+                container.classList.add('transition-all', 'duration-150');
+                container.style.transform = '';
+                container.style.opacity = '';
+            }
+
+            if (diffX > threshold) {
+                // Vuốt sang PHẢI -> Sang trang sau (kế tiếp)
+                const totalPages = Math.ceil(places.filter(p => {
+                    const filterCat = document.getElementById('filterCategory').value;
+                    const filterDist = document.getElementById('filterDistrict').value;
+                    const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
+                    const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
+                    const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
+                    const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                    const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
+                    return matchCat && matchDist && matchSearch && matchFav;
+                }).length / ITEMS_PER_PAGE);
+
+                if (currentPage < totalPages) {
+                    changePage(currentPage + 1);
+                }
+            } else if (diffX < -threshold) {
+                // Vuốt sang TRÁI -> Về trang trước
+                if (currentPage > 1) {
+                    changePage(currentPage - 1);
+                }
+            }
+            
+            swipeStartX = 0;
+            swipeCurrentX = 0;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderPlaces();
+            
+            const grid = document.getElementById('placesGrid');
+            if (grid) {
+                // Tính toán tọa độ cuộn trừ đi khoảng trống Header cố định (100px) để không bị che khuất quán đầu tiên
+                const elementPosition = grid.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - 100;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function handleFilterChange() {
+            currentPage = 1;
+            renderPlaces();
+        }
+
+        // Quản lý trạng thái Yêu thích (Lưu cục bộ tại localStorage, đồng bộ an toàn dạng chuỗi)
+        let favoriteIds = (JSON.parse(localStorage.getItem('favoriteIds')) || []).map(id => String(id));
+
+        // Lọc theo quán yêu thích trên Header
+        function toggleFavFilter() {
+            showOnlyFavorites = !showOnlyFavorites;
+            const icon = document.getElementById('favFilterIcon');
+            const btn = document.getElementById('btnFavFilter');
+            if (showOnlyFavorites) {
+                icon.className = "fa-solid fa-heart text-xl text-red-500 transition duration-200";
+                btn.className = "w-11 h-11 bg-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
+            } else {
+                icon.className = "fa-solid fa-heart text-xl text-white opacity-60 transition duration-200";
+                btn.className = "w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0";
+            }
+            renderPlaces();
+        }
+
+        // Dữ liệu mẫu làm fallback dự phòng
+        const defaultPlaces = [
+            { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042, map_link: "" },
+            { id: 2, name: "Cơm Tấm Ba Ghiền", category: "Quán ăn", district: "Quận Phú Nhuận", address: "84 Đặng Văn Ngữ, Phường 10", rating: 4.5, review: "Miếng sườn to bằng cái đĩa, ướp đậm đà.", lat: 10.7936, lng: 106.6713, map_link: "" },
+            { id: 3, name: "The Workshop Coffee", category: "Cafe", district: "Quận 1", address: "27 Ngô Đức Kế, Bến Nghé", rating: 4.6, review: "Cà phê specialty xịn xò, không gian làm việc lý tưởng.", lat: 10.7741, lng: 106.7051, map_link: "" },
+            { id: 4, name: "Bún bò Huế Hạnh", category: "Quán ăn", district: "Quận Tân Bình", address: "135 Bành Văn Trân, Phường 7", rating: 4.4, review: "Nước dùng thanh, topping ngập tràn.", lat: 10.7878, lng: 106.6558, map_link: "" },
+            { id: 5, name: "Cheese Coffee - Sư Vạn Hạnh", category: "Cafe", district: "Quận 10", address: "747 Sư Vạn Hạnh, Phường 12", rating: 4.3, review: "Phong cách châu Âu hiện đại, đồ uống béo ngậy.", lat: 10.7745, lng: 106.6678, map_link: "" },
+            { id: 6, name: "Ốc Đào", category: "Quán ăn", district: "Quận 1", address: "Hẻm 212B Nguyễn Trãi, Nguyễn Cư Trinh", rating: 4.2, review: "Hương vị nêm nếm đậm chất Sài Gòn, giá hơi cao.", lat: 10.7634, lng: 106.6853, map_link: "" }
+        ];
+
+        // Hàm tải dữ liệu từ Supabase
+        async function loadPlaces() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('places')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+                places = data || [];
+                // Đồng bộ dự phòng sang localStorage
+                localStorage.setItem('places', JSON.stringify(places));
+            } catch (err) {
+                console.error("Lỗi khi tải dữ liệu từ Supabase (Chuyển sang dùng bộ nhớ cục bộ):", err);
+                places = JSON.parse(localStorage.getItem('places')) || defaultPlaces;
+            }
+            updateFilters();
+            renderPlaces();
+        }
+
+        // Tính khoảng cách (Haversine formula) - km (Ép kiểu số an toàn tuyệt đối)
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const p1 = parseFloat(lat1);
+            const r1 = parseFloat(lon1);
+            const p2 = parseFloat(lat2);
+            const r2 = parseFloat(lon2);
+
+            if (isNaN(p1) || isNaN(r1) || isNaN(p2) || isNaN(r2)) return 9999;
+
+            const R = 6371; // Bán kính Trái Đất (km)
+            const dLat = (p2 - p1) * (Math.PI / 180);
+            const dLon = (r2 - r1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(p1 * (Math.PI / 180)) * Math.cos(p2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+            return (R * c).toFixed(1);
+        }
+
+        // Ẩn/Hiện ô Tìm kiếm
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            const input = document.getElementById('inputSearch');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                input.focus();
+            } else {
+                container.classList.add('hidden');
+                clearSearch();
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('inputSearch').value = '';
+            document.getElementById('searchContainer').classList.add('hidden');
+            renderPlaces();
+        }
+
+        // Bật/Tắt Trạng thái Yêu thích (So sánh chuỗi an toàn tuyệt đối)
+        function toggleFavorite(id) {
+            if (!id) return;
+            const idStr = String(id);
+            if (favoriteIds.includes(idStr)) {
+                favoriteIds = favoriteIds.filter(favId => favId !== idStr);
+            } else {
+                favoriteIds.push(idStr);
+            }
+            localStorage.setItem('favoriteIds', JSON.stringify(favoriteIds));
+            renderPlaces();
+        }
+
+        // Bật/Tắt Modal thêm quán
+        function toggleModal(show) {
+            const modal = document.getElementById('addModal');
+            if (modal) {
+                if(show) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                    const geoStatus = document.getElementById('geoStatusAdd');
+                    if (geoStatus) geoStatus.classList.add('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+
+        // Bật/Tắt Modal chỉnh sửa quán
+        function toggleEditModal(show) {
+            const modal = document.getElementById('editModal');
+            if (modal) {
+                if(show) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden'; 
+                    const geoStatus = document.getElementById('geoStatusEdit');
+                    if (geoStatus) geoStatus.classList.add('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        }
+
+        // Mở Modal chỉnh sửa và điền dữ liệu cũ (So sánh chuỗi an toàn)
+        function openEditModal(id) {
+            const place = places.find(p => String(p.id) === String(id));
+            if (!place) return;
+
+            document.getElementById('editId').value = place.id;
+            document.getElementById('editName').value = place.name;
+            document.getElementById('editCategory').value = place.category;
+            document.getElementById('editDistrict').value = place.district;
+            document.getElementById('editAddress').value = place.address;
+            document.getElementById('editOpeningHours').value = place.opening_hours || '';
+            
+            // Hiện tọa độ GPS cũ ra ô nhập
+            document.getElementById('editLatLng').value = (place.lat && place.lng) ? `${place.lat},${place.lng}` : '';
+            document.getElementById('editReview').value = place.review || '';
+
+            toggleEditModal(true);
+        }
+
+        // Xử lý kích hoạt xóa từ Modal chỉnh sửa
+        function deleteFromEditModal() {
+            const id = document.getElementById('editId').value;
+            if (id) {
+                toggleEditModal(false); // Đóng modal chỉnh sửa
+                openSecurityModal('delete', id); // Mở THẲNG modal nhập code bảo mật, không hỏi lại
+            }
+        }
+
+        // Bật/Tắt Modal Xóa
+        function deletePlace(id) {
+            placeToDeleteId = id;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            placeToDeleteId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        // Bật/Tắt Modal nhập mã bảo mật (Hiển thị đè lên trên cùng)
+        function openSecurityModal(type, data) {
+            pendingAction = { type, data };
+            document.getElementById('confirmSecurityCode').value = '';
+            document.getElementById('securityModal').classList.remove('hidden');
+            document.getElementById('confirmSecurityCode').focus();
+        }
+
+        function closeSecurityModal() {
+            document.getElementById('securityModal').classList.add('hidden');
+        }
+
+        function cancelSecurityModal() {
+            pendingAction = null;
+            closeSecurityModal();
+        }
+
+        function djb2Hash(str) {
+            let hash = 5381;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                hash = hash & 0xFFFFFFFF;
+            }
+            return (hash >>> 0).toString(16);
+        }
+
+        function verifySecurityCode() {
+            try {
+                const inputVal = document.getElementById('confirmSecurityCode').value.trim();
+                
+                // Băm mật khẩu người dùng nhập vào
+                const hash = djb2Hash(inputVal);
+                
+                // Đối chiếu với mã băm đã lưu
+                if (hash === "7de1d77c") {
+                    executePendingAction(); // Thực thi trước để lấy pendingAction
+                    closeSecurityModal();   // Đóng modal sau
+                } else {
+                    alert("Mã bảo mật không chính xác! Vui lòng thử lại.");
+                }
+            } catch (err) {
+                alert("Lỗi xác thực: " + err.message);
+            }
+        }
+
+        async function executePendingAction() {
+            try {
+                if (!pendingAction) return;
+                const actionType = pendingAction.type;
+                const actionData = pendingAction.data;
+                
+                // Xóa biến chờ trước khi thực thi
+                pendingAction = null;
+
+                if (actionType === 'delete') {
+                    await proceedDelete(actionData);
+                } else if (actionType === 'update') {
+                    await proceedUpdate(actionData);
+                }
+            } catch (err) {
+                alert("Lỗi thực thi hành động: " + err.message);
+            }
+        }
+
+        function confirmDelete() {
+            if (placeToDeleteId !== null) {
+                const targetId = placeToDeleteId;
+                // Mở Modal bảo mật đè lên trên deleteModal (giữ nguyên deleteModal ở phía dưới)
+                openSecurityModal('delete', targetId);
+            }
+        }
+
+        async function proceedDelete(deleteId) {
+            if (deleteId !== null) {
+                const deleteTarget = String(deleteId).trim();
+                
+                // Chốt chặn 1: Nếu ID trống hoặc không hợp lệ, thoát ngay lập tức
+                if (deleteTarget === "" || deleteTarget === "null" || deleteTarget === "undefined") {
+                    return;
+                }
+
+                // Kiểm tra xem có phải ID tạm thời cục bộ tự tạo không (ID Date.now() dài 13 ký tự)
+                const isTempId = deleteTarget.length > 10 || isNaN(Number(deleteTarget));
+                
+                if (!isTempId) {
+                    const idInt = parseInt(deleteTarget);
+                    
+                    // Chốt chặn 2: Bảo vệ cơ sở dữ liệu. Nếu idInt là NaN hoặc không hợp lệ, chặn đứng lệnh gửi lên Supabase.
+                    if (!isNaN(idInt) && idInt > 0) {
+                        try {
+                            const { error } = await supabaseClient
+                                .from('places')
+                                .delete()
+                                .eq('id', idInt);
+                            if (error) throw error;
+                        } catch (err) {
+                            console.error("Lỗi khi xóa trên Supabase:", err);
+                            alert("Lỗi Supabase khi xóa quán: " + err.message);
+                        }
+                    } else {
+                        console.warn("Chặn lệnh xóa Supabase để bảo vệ bảng do ID không hợp lệ:", idInt);
+                    }
+                }
+
+                // Lọc bỏ quán ăn ở localStorage để cập nhật ngay giao diện cục bộ
+                places = places.filter(p => String(p.id) !== deleteTarget);
+                localStorage.setItem('places', JSON.stringify(places));
+
+                toggleEditModal(false); // Đóng modal chỉnh sửa
+                updateFilters();
+                renderPlaces();
+            }
+        }
+
+        // Trích xuất lat/lng từ link map hoặc tọa độ thủ công (Nhạy bén hơn với mọi kiểu copy-paste)
+        function extractLatLng(input) {
+            if (!input || input.trim() === '') return null;
+            const text = input.trim();
+            
+            // 1. Tìm cặp số thực (vĩ độ, kinh độ) phân tách bằng dấu phẩy ở bất kỳ đâu trong chuỗi
+            const coordRegex = /([-+]?\d+\.\d+)\s*,\s*([-+]?\d+\.\d+)/;
+            const coordMatch = text.match(coordRegex);
+            if (coordMatch) {
+                return { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+            }
+            return null;
+        }
+
+        // Lấy vị trí người dùng để tính khoảng cách (Cấu hình GPS độ chính xác cao)
+        function getUserLocation() {
+            const btn = document.getElementById('btnLocation');
+            const icon = document.getElementById('locationIcon');
+            const text = document.getElementById('locationText');
+            const errorText = document.getElementById('locationError');
+
+            errorText.classList.add('hidden');
+            icon.classList.add('fa-spin');
+            text.innerText = "Đang định vị...";
+
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+                        icon.classList.remove('fa-spin');
+                        icon.classList.replace('fa-location-crosshairs', 'fa-check');
+                        btn.classList.replace('bg-orange-100', 'bg-green-100');
+                        btn.classList.replace('text-orange-700', 'text-green-700');
+                        text.innerText = "Đã định vị";
+                        renderPlaces(); 
+                    },
+                    (error) => {
+                        icon.classList.remove('fa-spin');
+                        text.innerText = "Tìm quán gần tôi";
+                        errorText.innerText = "Không thể lấy vị trí. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.";
+                        errorText.classList.remove('hidden');
+                    },
+                    { 
+                        enableHighAccuracy: true, // Bắt buộc bật chíp GPS thật của điện thoại để lấy vị trí chính xác nhất
+                        timeout: 10000,           // Thời gian chờ tối đa 10 giây
+                        maximumAge: 0             // Không sử dụng vị trí lưu trong bộ nhớ đệm cũ
+                    }
+                );
+            } else {
+                icon.classList.remove('fa-spin');
+                text.innerText = "Tìm quán gần tôi";
+                errorText.innerText = "Trình duyệt của bạn không hỗ trợ định vị.";
+                errorText.classList.remove('hidden');
+            }
+        }
+
+        // Cập nhật Đánh giá Sao nhanh từ màn hình chính (So sánh chuỗi an toàn)
+        async function updateRating(id, newRating) {
+            event.stopPropagation(); // Tránh kích hoạt các sự kiện click khác
+            const oldRating = (places.find(p => String(p.id) === String(id)) || {}).rating || 5;
+            places = places.map(p => String(p.id) === String(id) ? { ...p, rating: newRating } : p);
+            renderPlaces();
+            localStorage.setItem('places', JSON.stringify(places));
+
+            try {
+                const { error } = await supabaseClient
+                    .from('places')
+                    .update({ rating: newRating })
+                    .eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Không thể lưu đánh giá mới lên Supabase:", err);
+                alert("Lỗi Supabase khi cập nhật sao: " + err.message + "\n(Vui lòng kiểm tra phân quyền RLS Policies trên database)");
+                // Hoàn tác lại rating cũ nếu lỗi
+                places = places.map(p => String(p.id) === String(id) ? { ...p, rating: oldRating } : p);
+                renderPlaces();
+                localStorage.setItem('places', JSON.stringify(places));
+            }
+        }
+
+        // Hàm cập nhật Option cho Filter tự động
+        function updateFilters() {
+            const categorySelect = document.getElementById('filterCategory');
+            const districtSelect = document.getElementById('filterDistrict');
+
+            const currentCat = categorySelect.value || 'Tất cả';
+            const currentDist = districtSelect.value || 'Tất cả';
+
+            const categories = ['Tất cả', ...new Set(places.map(p => p.category))];
+            const districts = ['Tất cả', ...new Set(places.map(p => p.district))];
+
+            categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c === 'Tất cả' ? 'Mọi thể loại' : c}</option>`).join('');
+            districtSelect.innerHTML = districts.map(d => `<option value="${d}">${d === 'Tất cả' ? 'Tất cả khu vực' : d}</option>`).join('');
+
+            if (categories.includes(currentCat)) categorySelect.value = currentCat;
+            if (districts.includes(currentDist)) districtSelect.value = currentDist;
+
+            // Đồng bộ luôn cả datalist gợi ý trong modal thêm/sửa
+            updateDatalists();
+        }
+
+        // Tự động cập nhật danh sách các Thể loại và Khu vực đã có sẵn để gợi ý khi nhập
+        function updateDatalists() {
+            const categories = [...new Set(places.map(p => p.category).filter(Boolean))];
+            const districts = [...new Set(places.map(p => p.district).filter(Boolean))];
+
+            const catListAdd = document.getElementById('existingCategories');
+            const distListAdd = document.getElementById('existingDistricts');
+            const catListEdit = document.getElementById('existingCategoriesEdit');
+            const distListEdit = document.getElementById('existingDistrictsEdit');
+
+            const catOptionsHTML = categories.map(c => `<option value="${c}"></option>`).join('');
+            const distOptionsHTML = districts.map(d => `<option value="${d}"></option>`).join('');
+
+            if (catListAdd) catListAdd.innerHTML = catOptionsHTML;
+            if (distListAdd) distListAdd.innerHTML = distOptionsHTML;
+            if (catListEdit) catListEdit.innerHTML = catOptionsHTML;
+            if (distListEdit) distListEdit.innerHTML = distOptionsHTML;
+        }
+
+        // Thêm mới quán (Không truyền id thủ công lên Supabase)
+        async function handleAddNewPlace(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('inputName').value;
+            const category = document.getElementById('inputCategory').value.trim();
+            const district = document.getElementById('inputDistrict').value.trim();
+            const address = document.getElementById('inputAddress').value;
+            const opening_hours = document.getElementById('inputOpeningHours').value.trim();
+            const latLngInput = document.getElementById('inputLatLng').value.trim();
+            const review = document.getElementById('inputReview').value;
+
+            // Xử lý tọa độ GPS
+            let lat = null;
+            let lng = null;
+            const coords = extractLatLng(latLngInput);
+            if (coords) {
+                lat = coords.lat;
+                lng = coords.lng;
+            }
+
+            const newPlace = {
+                name,
+                category,
+                district,
+                address,
+                opening_hours: opening_hours || null,
+                rating: 5, // Mặc định khi thêm mới là 5 sao, sửa sau ở ngoài
+                review,
+                lat,
+                lng
+            };
+
+            try {
+                // Thêm vào Supabase và lấy về bản ghi có chứa ID tự động sinh
+                const { data, error } = await supabaseClient
+                    .from('places')
+                    .insert([newPlace])
+                    .select();
+
+                if (error) throw error;
+                
+                if (data && data.length > 0 && data[0].id) {
+                    places.unshift(data[0]); // Đẩy bản ghi thực tế từ Supabase (có id chuẩn) vào danh sách
+                } else {
+                    newPlace.id = Date.now();
+                    places.unshift(newPlace);
+                }
+            } catch (err) {
+                console.error("Lỗi khi thêm mới lên Supabase, chuyển sang lưu tạm local:", err);
+                alert("Lỗi Supabase khi thêm quán: " + err.message + "\n(Vui lòng kiểm tra RLS Policies trên Supabase dashboard)");
+                newPlace.id = Date.now();
+                places.unshift(newPlace);
+            }
+
+            localStorage.setItem('places', JSON.stringify(places));
+            toggleModal(false);
+            document.getElementById('addForm').reset();
+            updateFilters();
+            renderPlaces();
+        }
+
+        // Cập nhật thông tin quán (Kích hoạt yêu cầu mã bảo mật, giữ form mở ở phía dưới)
+        function handleUpdatePlace(e) {
+            e.preventDefault();
+
+            const id = parseInt(document.getElementById('editId').value);
+            const name = document.getElementById('editName').value;
+            const category = document.getElementById('editCategory').value.trim();
+            const district = document.getElementById('editDistrict').value.trim();
+            const address = document.getElementById('editAddress').value;
+            const opening_hours = document.getElementById('editOpeningHours').value.trim();
+            const latLngInput = document.getElementById('editLatLng').value.trim();
+            const review = document.getElementById('editReview').value;
+
+            const updateData = { id, name, category, district, address, opening_hours, latLngInput, review };
+
+            // Mở modal bảo mật đè lên trên editModal (giữ nguyên editModal ở phía dưới)
+            openSecurityModal('update', updateData);
+        }
+
+        // Thực hiện cập nhật thực tế sau khi xác thực thành công
+        async function proceedUpdate(updateData) {
+            if (!updateData) return;
+            const { id, name, category, district, address, opening_hours, latLngInput, review } = updateData;
+
+            // Xử lý tọa độ GPS
+            let lat = null;
+            let lng = null;
+            const coords = extractLatLng(latLngInput);
+            if (coords) {
+                lat = coords.lat;
+                lng = coords.lng;
+            }
+
+            const updatedData = {
+                name,
+                category,
+                district,
+                address,
+                opening_hours: opening_hours || null,
+                review,
+                lat,
+                lng
+            };
+
+            // Tìm và cập nhật local (So sánh chuỗi an toàn)
+            places = places.map(p => String(p.id) === String(id) ? { ...p, ...updatedData } : p);
+            localStorage.setItem('places', JSON.stringify(places));
+
+            try {
+                const { error } = await supabaseClient
+                    .from('places')
+                    .update(updatedData)
+                    .eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Lỗi khi cập nhật lên Supabase:", err);
+                alert("Lỗi Supabase khi cập nhật thông tin quán: " + err.message);
+            }
+
+            toggleEditModal(false); // Đóng modal chỉnh sửa
+            updateFilters();
+            renderPlaces();
+        }
+
+        // Render Cards
+        function renderPlaces() {
+            const filterCat = document.getElementById('filterCategory').value;
+            const filterDist = document.getElementById('filterDistrict').value;
+            const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
+            const grid = document.getElementById('placesGrid');
+
+            let result = places.filter(p => {
+                const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
+                const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
+                return matchCat && matchDist && matchSearch && matchFav;
+            });
+
+            if (userLocation) {
+                result = result.map(p => {
+                    if (p.lat && p.lng) {
+                        return { ...p, distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lng) };
+                    }
+                    return { ...p, distance: 9999 };
+                });
+                result.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+            }
+
+            grid.innerHTML = '';
+
+            if (result.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">
+                    <i class="fa-solid fa-box-open text-4xl mb-3 opacity-50"></i>
+                    <p>Không tìm thấy quán nào phù hợp với bộ lọc hiện tại.</p>
+                </div>`;
+                return;
+            }
+
+            // Logic Phân Trang
+            const totalItems = result.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedResult = result.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+            paginatedResult.forEach(place => {
+                let distanceHTML = '';
+                if (place.distance && place.distance < 9999) {
+                    distanceHTML = `<div class="flex items-center gap-1.5 text-green-600 text-sm font-medium mt-1.5">
+                        <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-0.5" style="filter: url(#remove-white);" alt="Distance">
+                        <span>Cách bạn khoảng ${place.distance} km</span>
+                    </div>`;
+                }
+
+                // Cấu hình Link chỉ đường: từ vị trí hiện tại động của thiết bị đến địa chỉ chữ cụ thể bạn đã nhập
+                const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.address)}`;
+
+                // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
+                let starsHTML = '';
+                const currentRating = Math.round(place.rating || 5);
+                for (let i = 1; i <= 5; i++) {
+                    const isFilled = i <= currentRating;
+                    starsHTML += `<i onclick="updateRating('${place.id}', ${i})" class="cursor-pointer text-lg p-0.5 fa-star ${isFilled ? 'fa-solid text-orange-400' : 'fa-regular text-gray-300 hover:text-orange-300'}"></i>`;
+                }
+
+                // Icon Yêu thích (Trái tim đỏ FontAwesome - So sánh chuỗi an toàn)
+                const isFav = favoriteIds.includes(String(place.id));
+
+                const card = `
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex flex-col justify-between hover:shadow-md transition-all relative overflow-hidden group">
                         
-                        <div id="card-inputs-list" class="card-inputs-list">
-                            <!-- Dynamic card input boxes generated by JS -->
+                        <!-- Hàng trên cùng: Tên quán bên trái, Trái tim dịch ra góc ngoài cùng bên phải (Badge phân loại ẩn) -->
+                        <div class="flex items-start justify-between gap-3">
+                            <h3 onclick="openEditModal('${place.id}')" class="font-bold text-xl text-gray-800 leading-snug cursor-pointer hover:text-orange-600 transition duration-150 flex-1" title="Bấm để chỉnh sửa thông tin quán">
+                                ${place.name}
+                            </h3>
+                            <button onclick="toggleFavorite('${place.id}')" class="transition flex items-center justify-center flex-shrink-0 bg-transparent text-2xl" style="margin-top: -2px;" title="Yêu thích">
+                                <i class="fa-heart transition duration-200 ${isFav ? 'fa-solid text-red-500 scale-110' : 'fa-regular text-gray-300 hover:text-red-400'}"></i>
+                            </button>
+                            <!-- Badge phân loại ẩn đi theo yêu cầu, vẫn có dữ liệu để tìm kiếm/lọc -->
+                            <span class="hidden">${place.category}</span>
+                        </div>
+                        
+                        <div class="mt-1">
+                            <!-- Khung đánh giá sao click trực tiếp -->
+                            <div class="flex items-center gap-1 mb-2">
+                                ${starsHTML}
+                                <span class="text-xs text-gray-500 ml-1">(${place.rating || 5})</span>
+                            </div>
+
+                            <!-- Icon map (google_pin.png) - Ghim vị trí Google Maps sắc nét và căn giữa -->
+                            <div class="flex items-center gap-2 text-gray-600 text-sm">
+                                <img src="pictures/google_pin.png" class="w-5 h-5 object-contain flex-shrink-0" alt="Map">
+                                <span class="leading-none">${place.address}</span>
+                            </div>
+
+                            <!-- Dòng Quận có icon mèo đáng yêu (placeholder.png) -->
+                            <div class="flex items-center gap-2 text-gray-600 text-sm mt-1.5">
+                                <img src="pictures/placeholder.png" class="w-5 h-5 object-contain flex-shrink-0" style="filter: url(#remove-white);" alt="Quận">
+                                <span class="leading-none">${place.district}</span>
+                            </div>
+
+                            <!-- Dòng Giờ mở cửa (Nếu có) -->
+                            ${place.opening_hours ? `
+                            <div class="flex items-center gap-2 text-gray-600 text-sm mt-1.5">
+                                <i class="fa-regular fa-clock text-gray-400 text-base flex-shrink-0 w-5 text-center"></i>
+                                <span class="leading-none">${place.opening_hours}</span>
+                            </div>
+                            ` : ''}
+                            ${distanceHTML}
+                            ${place.review ? `
+                                <div class="mt-3 bg-gray-50 border-l-2 border-orange-300 p-2 text-sm text-gray-500 italic rounded-r">
+                                    "${place.review}"
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="mt-5">
+                            <!-- Nút chỉ đường dùng hinh3.jpg (Kéo dài toàn bộ chiều ngang card) -->
+                            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
+                                class="w-full bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
+                                <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="filter: url(#remove-white);"> Chỉ đường
+                            </a>
                         </div>
                     </div>
-                </div>
+                `;
+                grid.innerHTML += card;
+            });
 
-                <div class="form-group">
-                    <label for="post-tags">Thẻ tag (phân cách bởi dấu phẩy)</label>
-                    <input type="text" id="post-tags" placeholder="VD: ai, tools, writing, coding">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" data-close="modal-article">Hủy</button>
-                <button class="btn-primary" id="btn-save-article">Lưu bài viết</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== MODAL: XÁC NHẬN XÓA ========== -->
-    <div id="modal-confirm" class="modal-overlay">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2>Xác nhận xóa</h2>
-                <button class="modal-close" data-close="modal-confirm">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p id="confirm-message" class="confirm-text">Bạn có chắc chắn muốn xóa bài viết này?</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" data-close="modal-confirm">Hủy</button>
-                <button class="btn-danger-fill" id="btn-confirm-delete">Xóa</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== MODAL: CHỈNH SỬA THỂ LOẠI / CHỦ ĐỀ ========== -->
-    <div id="modal-edit-cat" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h2>Chỉnh sửa chủ đề</h2>
-                <button class="modal-close" data-close="modal-edit-cat">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="edit-cat-name">Tên chủ đề</label>
-                    <input type="text" id="edit-cat-name" placeholder="VD: Writing, Lập trình, Design..." maxlength="50">
-                </div>
-                <div class="form-group">
-                    <label>Biểu tượng chủ đề</label>
-                    <div class="emoji-picker" id="edit-cat-emoji-picker">
-                        <button type="button" class="emoji-option" data-emoji="🖊️">🖊️</button>
-                        <button type="button" class="emoji-option" data-emoji="🔍">🔍</button>
-                        <button type="button" class="emoji-option" data-emoji="🏔️">🏔️</button>
-                        <button type="button" class="emoji-option" data-emoji="▷">▷</button>
-                        <button type="button" class="emoji-option" data-emoji="🎛️">🎛️</button>
-                        <button type="button" class="emoji-option" data-emoji="🖌️">🖌️</button>
-                        <button type="button" class="emoji-option" data-emoji="⚙️">⚙️</button>
-                        <button type="button" class="emoji-option" data-emoji="💡">💡</button>
-                        <button type="button" class="emoji-option" data-emoji="💻">💻</button>
-                        <button type="button" class="emoji-option" data-emoji="📖">📖</button>
-                        <button type="button" class="emoji-option" data-emoji="🚀">🚀</button>
-                        <button type="button" class="emoji-option" data-emoji="🧠">🧠</button>
-                        <button type="button" class="emoji-option" data-emoji="🎨">🎨</button>
+            // Vẽ các nút phân trang nếu có nhiều hơn 1 trang
+            if (totalPages > 1) {
+                // Khối 1: Rút gọn tối đa cho MOBILE (Không bao giờ tràn)
+                let mobilePaginationHTML = `
+                    <div id="mobilePaginationBar" 
+                        ontouchstart="handleSwipeStart(event)" 
+                        ontouchmove="handleSwipeMove(event)" 
+                        ontouchend="handleSwipeEnd(event)" 
+                        class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-4 px-4 w-full bg-white bg-opacity-70 backdrop-blur-md rounded-2xl py-3 border border-gray-100 shadow-sm transition-all duration-150">
+                        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                            class="w-10 h-10 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-100">
+                            <i class="fa-solid fa-chevron-left text-sm"></i>
+                        </button>
+                        
+                        <div id="pageSwipeContainer" 
+                            class="flex-1 flex flex-col items-center gap-1.5 px-2 select-none">
+                            <!-- Nút chọn số trang dạng Dropdown Pill tinh tế -->
+                            <div class="relative flex items-center justify-center bg-orange-50 bg-opacity-80 px-3 py-1 rounded-full border border-orange-100 shadow-sm cursor-pointer hover:bg-orange-100 transition duration-200">
+                                <select onchange="changePage(parseInt(this.value))" 
+                                    class="bg-transparent text-xs font-extrabold tracking-wider text-orange-600 uppercase focus:outline-none cursor-pointer appearance-none text-center pr-3.5 leading-none">
+                                    ${Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
+                                        <option value="${p}" ${p === currentPage ? 'selected' : ''}>Trang ${p} / ${totalPages}</option>
+                                    `).join('')}
+                                </select>
+                                <i class="fa-solid fa-chevron-down text-[9px] text-orange-500 pointer-events-none absolute right-2.5"></i>
+                            </div>
+                            <div class="w-28 h-1.5 bg-orange-100 rounded-full overflow-hidden relative mx-auto">
+                                <div class="h-full bg-gradient-to-r from-orange-400 to-orange-500 rounded-full transition-all duration-300" style="width: ${(currentPage / totalPages) * 100}%"></div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                            class="w-10 h-10 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-100">
+                            <i class="fa-solid fa-chevron-right text-sm"></i>
+                        </button>
                     </div>
-                    <input type="hidden" id="edit-cat-emoji-value" value="📖">
-                </div>
-            </div>
-            <div class="modal-footer" style="justify-content:space-between;">
-                <button class="btn-danger-fill" id="btn-delete-cat-in-modal">Xóa chủ đề</button>
-                <div style="display:flex;gap:0.5rem;">
-                    <button class="btn-secondary" data-close="modal-edit-cat">Hủy</button>
-                    <button class="btn-primary" id="btn-save-edit-cat">Lưu thay đổi</button>
-                </div>
-            </div>
-        </div>
-    </div>
+                `;
 
-    <!-- ========== MODAL: THAO TÁC THỂ LOẠI (EDIT & DELETE) ========== -->
-    <div id="modal-cat-manage" class="modal-overlay">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2 id="cat-manage-title">Tùy chọn chủ đề</h2>
-                <button class="modal-close" data-close="modal-cat-manage">&times;</button>
-            </div>
-            <div class="modal-body" style="display:flex;flex-direction:column;gap:0.75rem;">
-                <button class="btn-option-choice" id="btn-choice-edit-cat">
-                    <span class="choice-icon">✏️</span>
-                    <div class="choice-text">
-                        <span class="choice-title">Chỉnh sửa chủ đề</span>
-                        <span class="choice-desc">Đổi tên hoặc biểu tượng chủ đề</span>
+                // Khối 2: Phân trang thông minh cho DESKTOP (Có dấu ba chấm rút gọn)
+                let desktopPaginationHTML = `
+                    <div class="col-span-full hidden sm:flex justify-center items-center gap-2 mt-8 mb-4">
+                        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                            class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-chevron-left text-xs"></i> Trước
+                        </button>
+                `;
+
+                // Thuật toán rút gọn dấu ba chấm (Ellipsis Pager)
+                const range = [];
+                const delta = 2; // Số trang lân cận muốn hiển thị trên desktop
+                const left = currentPage - delta;
+                const right = currentPage + delta + 1;
+                let l;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || (i >= left && i < right)) {
+                        range.push(i);
+                    }
+                }
+
+                for (let i of range) {
+                    if (l) {
+                        if (i - l === 2) {
+                            desktopPaginationHTML += `<span class="px-2 text-gray-400 font-semibold select-none">...</span>`;
+                        } else if (i - l > 2) {
+                            desktopPaginationHTML += `<span class="px-2 text-gray-400 font-semibold select-none">...</span>`;
+                        }
+                    }
+                    const isActive = i === currentPage;
+                    desktopPaginationHTML += `
+                        <button onclick="changePage(${i})" 
+                            class="w-9 h-9 rounded-lg transition duration-200 text-sm font-bold shadow-sm ${isActive ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}">
+                            ${i}
+                        </button>
+                    `;
+                    l = i;
+                }
+
+                desktopPaginationHTML += `
+                        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                            class="px-3.5 py-2 rounded-lg bg-orange-100 text-orange-700 hover:bg-orange-200 disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                            Sau <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
                     </div>
-                </button>
-                <button class="btn-option-choice danger" id="btn-choice-delete-cat">
-                    <span class="choice-icon">🗑️</span>
-                    <div class="choice-text">
-                        <span class="choice-title">Xóa chủ đề</span>
-                        <span class="choice-desc">Xóa chủ đề này và tất cả bài viết thuộc về nó</span>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
+                `;
 
-    <!-- Toast Notifications -->
-    <div id="toast-container"></div>
+                grid.innerHTML += mobilePaginationHTML + desktopPaginationHTML;
+            }
+        }
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="app.js"></script>
+        // Xử lý cơ chế kéo để reload (Pull-to-refresh) cho Mobile Standalone
+        let touchStart = 0;
+        let touchDecel = 0;
+        const ptrIndicator = document.getElementById('pullToRefreshIndicator');
+        const ptrText = document.getElementById('pullToRefreshText');
+
+        window.addEventListener('touchstart', (e) => {
+            if (window.scrollY === 0) {
+                touchStart = e.touches[0].clientY;
+            } else {
+                touchStart = 0;
+            }
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (touchStart === 0) return;
+            const currentY = e.touches[0].clientY;
+            const distance = currentY - touchStart;
+
+            if (distance > 0 && distance < 180) {
+                ptrIndicator.style.height = `${distance}px`;
+                ptrIndicator.style.paddingTop = '0.75rem';
+                ptrIndicator.style.paddingBottom = '0.75rem';
+                ptrIndicator.style.borderBottomWidth = '1px';
+                ptrIndicator.style.opacity = `${distance / 180}`;
+                if (distance > 100) {
+                    ptrText.innerText = "Thả tay để làm mới dữ liệu...";
+                } else {
+                    ptrText.innerText = "Kéo để làm mới...";
+                }
+            }
+        });
+
+        window.addEventListener('touchend', async (e) => {
+            if (touchStart === 0) return;
+            const currentY = e.changedTouches[0].clientY;
+            const distance = currentY - touchStart;
+
+            if (distance > 100) {
+                ptrText.innerText = "Đang cập nhật từ Supabase...";
+                ptrIndicator.style.height = '50px';
+                ptrIndicator.style.paddingTop = '0.75rem';
+                ptrIndicator.style.paddingBottom = '0.75rem';
+                ptrIndicator.style.borderBottomWidth = '1px';
+                await loadPlaces();
+            }
+            
+            // Đóng indicator sau khi load xong hoặc hủy kéo
+            setTimeout(() => {
+                ptrIndicator.style.height = '0px';
+                ptrIndicator.style.paddingTop = '0px';
+                ptrIndicator.style.paddingBottom = '0px';
+                ptrIndicator.style.borderBottomWidth = '0px';
+                ptrIndicator.style.opacity = '0';
+            }, 600);
+            
+            touchStart = 0;
+        });
+
+        // Khởi chạy khi tải trang
+        loadPlaces();
+
+    </script>
 </body>
 </html>
