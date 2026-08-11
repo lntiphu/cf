@@ -361,12 +361,7 @@
             }
 
             if (diffX > threshold) {
-                // Vuốt sang PHẢI -> Về trang trước
-                if (currentPage > 1) {
-                    changePage(currentPage - 1);
-                }
-            } else if (diffX < -threshold) {
-                // Vuốt sang TRÁI -> Sang trang sau
+                // Vuốt sang PHẢI -> Sang trang sau (kế tiếp)
                 const totalPages = Math.ceil(places.filter(p => {
                     const filterCat = document.getElementById('filterCategory').value;
                     const filterDist = document.getElementById('filterDistrict').value;
@@ -380,6 +375,11 @@
 
                 if (currentPage < totalPages) {
                     changePage(currentPage + 1);
+                }
+            } else if (diffX < -threshold) {
+                // Vuốt sang TRÁI -> Về trang trước
+                if (currentPage > 1) {
+                    changePage(currentPage - 1);
                 }
             }
             
