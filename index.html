@@ -86,7 +86,9 @@
     <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
-            <input type="text" id="inputSearch" oninput="handleFilterChange()" placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
+            <input type="text" id="inputSearch" oninput="handleFilterChange()" 
+                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
             <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -137,38 +139,38 @@
             </div>
             
             <div class="p-6 overflow-y-auto no-scrollbar">
-                <form id="addForm" onsubmit="handleAddNewPlace(event)" class="space-y-4">
+                <form id="addForm" onsubmit="handleAddNewPlace(event)" autocomplete="off" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="inputName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
+                        <input required type="text" id="inputName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="inputCategory" list="existingCategories" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <input required type="text" id="inputCategory" list="existingCategories" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
                             <datalist id="existingCategories"></datalist>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="inputDistrict" list="existingDistricts" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <input required type="text" id="inputDistrict" list="existingDistricts" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
                             <datalist id="existingDistricts"></datalist>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="inputAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
+                        <input required type="text" id="inputAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
-                        <input type="text" id="inputOpeningHours" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00 hoặc Mở cả ngày">
+                        <input type="text" id="inputOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00 hoặc Mở cả ngày">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
-                        <input type="text" id="inputLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
+                        <input type="text" id="inputLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
@@ -197,39 +199,39 @@
             </div>
             
             <div class="p-6 overflow-y-auto no-scrollbar">
-                <form id="editForm" onsubmit="handleUpdatePlace(event)" class="space-y-4">
+                <form id="editForm" onsubmit="handleUpdatePlace(event)" autocomplete="off" class="space-y-4">
                     <input type="hidden" id="editId">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="editName" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="editCategory" list="existingCategoriesEdit" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <input required type="text" id="editCategory" list="existingCategoriesEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             <datalist id="existingCategoriesEdit"></datalist>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="editDistrict" list="existingDistrictsEdit" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <input required type="text" id="editDistrict" list="existingDistrictsEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             <datalist id="existingDistrictsEdit"></datalist>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="editAddress" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
-                        <input type="text" id="editOpeningHours" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00">
+                        <input type="text" id="editOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
-                        <input type="text" id="editLatLng" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
+                        <input type="text" id="editLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
@@ -275,6 +277,7 @@
             <div class="mb-5">
                 <input type="password" id="confirmSecurityCode" 
                     onkeydown="if(event.key === 'Enter') verifySecurityCode()"
+                    autocomplete="new-password"
                     class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-center text-lg tracking-widest focus:ring-2 focus:ring-orange-500 focus:outline-none" 
                     placeholder="••••••">
             </div>
@@ -989,24 +992,8 @@
                     </div>`;
                 }
 
-                // Cấu hình Link chỉ đường tối ưu (Tránh lưu vết Protobuf token/local-place-viewer vào thanh tìm kiếm Chrome)
-                let originParam = 'My+Location';
-                if (userLocation && userLocation.lat && userLocation.lng) {
-                    originParam = `${userLocation.lat},${userLocation.lng}`;
-                }
-
-                let destinationParam = '';
-                if (place.lat && place.lng) {
-                    // Ưu tiên dùng tọa độ GPS thực để Google Maps mở thẳng vị trí, không qua tìm kiếm chuỗi
-                    destinationParam = `${place.lat},${place.lng}`;
-                } else {
-                    // Nếu chưa có tọa độ GPS, ghép tên quán và địa chỉ sạch
-                    const fullQuery = (place.name ? place.name + ', ' : '') + (place.address || '');
-                    destinationParam = encodeURIComponent(fullQuery.trim());
-                }
-
-                // Dùng maps.google.com với tham số saddr/daddr để mở ứng dụng Google Maps trực tiếp trên thiết bị
-                const mapUrl = `https://maps.google.com/maps?saddr=${originParam}&daddr=${destinationParam}`;
+                // Cấu hình Link chỉ đường: từ vị trí hiện tại động của thiết bị đến địa chỉ chữ cụ thể bạn đã nhập
+                const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.address)}`;
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
