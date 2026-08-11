@@ -322,10 +322,13 @@
         let isSwipingPage = false;
 
         function handleSwipeStart(e) {
+            // Không vuốt nếu chạm vào nút hoặc select chọn trực tiếp
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'I') return;
+            
             swipeStartX = e.touches[0].clientX;
             isSwipingPage = true;
             
-            const container = document.getElementById('pageSwipeContainer');
+            const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.classList.remove('transition-all', 'duration-150');
             }
@@ -336,13 +339,18 @@
             swipeCurrentX = e.touches[0].clientX;
             const diffX = swipeCurrentX - swipeStartX;
             
+            // Ngăn chặn hành vi cuộn dọc mặc định của trình duyệt khi người dùng đang cố ý vuốt ngang chuyển trang
+            if (Math.abs(diffX) > 8) {
+                if (e.cancelable) e.preventDefault();
+            }
+            
             // Giới hạn trượt tối đa 60px để giữ thẩm mỹ
             const limitedDiff = Math.max(-60, Math.min(60, diffX));
             
-            const container = document.getElementById('pageSwipeContainer');
+            const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.style.transform = `translateX(${limitedDiff}px)`;
-                container.style.opacity = (1 - Math.abs(limitedDiff) / 120).toString();
+                container.style.opacity = (1 - Math.abs(limitedDiff) / 240).toString();
             }
         }
 
@@ -353,7 +361,7 @@
             const diffX = swipeCurrentX - swipeStartX;
             const threshold = 40; // Kích hoạt chuyển trang khi vuốt quá 40px
             
-            const container = document.getElementById('pageSwipeContainer');
+            const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.classList.add('transition-all', 'duration-150');
                 container.style.transform = '';
@@ -1070,17 +1078,18 @@
             if (totalPages > 1) {
                 // Khối 1: Rút gọn tối đa cho MOBILE (Không bao giờ tràn)
                 let mobilePaginationHTML = `
-                    <div class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-4 px-4 w-full bg-white bg-opacity-70 backdrop-blur-md rounded-2xl py-3 border border-gray-100 shadow-sm">
+                    <div id="mobilePaginationBar" 
+                        ontouchstart="handleSwipeStart(event)" 
+                        ontouchmove="handleSwipeMove(event)" 
+                        ontouchend="handleSwipeEnd(event)" 
+                        class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-4 px-4 w-full bg-white bg-opacity-70 backdrop-blur-md rounded-2xl py-3 border border-gray-100 shadow-sm transition-all duration-150">
                         <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
                             class="w-10 h-10 rounded-full bg-orange-50 hover:bg-orange-100 text-orange-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-orange-100">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
                         </button>
                         
                         <div id="pageSwipeContainer" 
-                            ontouchstart="handleSwipeStart(event)" 
-                            ontouchmove="handleSwipeMove(event)" 
-                            ontouchend="handleSwipeEnd(event)" 
-                            class="flex-1 flex flex-col items-center gap-1.5 px-2 cursor-grab active:cursor-grabbing select-none transition-all duration-150">
+                            class="flex-1 flex flex-col items-center gap-1.5 px-2 select-none">
                             <!-- Nút chọn số trang dạng Dropdown Pill tinh tế -->
                             <div class="relative flex items-center justify-center bg-orange-50 bg-opacity-80 px-3 py-1 rounded-full border border-orange-100 shadow-sm cursor-pointer hover:bg-orange-100 transition duration-200">
                                 <select onchange="changePage(parseInt(this.value))" 
