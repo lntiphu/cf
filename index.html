@@ -501,6 +501,37 @@
             renderPlaces();
         }
 
+        // Mở chỉ đường bằng ứng dụng Maps GỐC trên thiết bị di động
+        // GIẢI PHÁP CHỐNG KÝ TỰ RÁC: Mở app gốc qua URL scheme (maps:/geo:) thay vì mở Google Maps web.
+        // Khi mở app gốc, Chrome KHÔNG tạo lịch sử duyệt web → KHÔNG phát sinh ký tự mã hóa Base64 rác
+        // (ved/ei tracking params) trong gợi ý omnibox Chrome iOS.
+        function openDirections(placeId) {
+            const place = places.find(p => String(p.id) === String(placeId));
+            if (!place) return;
+
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            const hasCoords = place.lat && place.lng;
+
+            if (isIOS) {
+                // iOS: Mở Apple Maps trực tiếp qua URL scheme gốc hệ điều hành
+                // → Hoàn toàn BYPASS Chrome → Không tạo lịch sử → Không phát sinh ký tự rác
+                const dest = hasCoords ? `${place.lat},${place.lng}` : place.address;
+                window.location.href = `maps:?daddr=${encodeURIComponent(dest)}`;
+            } else if (isAndroid) {
+                // Android: Mở Google Maps app (hoặc app Maps mặc định) qua geo: intent
+                if (hasCoords) {
+                    window.location.href = `geo:${place.lat},${place.lng}?q=${place.lat},${place.lng}`;
+                } else {
+                    window.location.href = `geo:0,0?q=${encodeURIComponent(place.address)}`;
+                }
+            } else {
+                // Desktop: Mở Google Maps web trong tab mới (desktop không bị lỗi ký tự rác)
+                const query = hasCoords ? `${place.lat},${place.lng}` : place.address;
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer');
+            }
+        }
+
         // Bật/Tắt Trạng thái Yêu thích (So sánh chuỗi an toàn tuyệt đối)
         function toggleFavorite(id) {
             if (!id) return;
@@ -1000,8 +1031,7 @@
                     </div>`;
                 }
 
-                // Cấu hình Link chỉ đường: từ vị trí hiện tại động của thiết bị đến địa chỉ chữ cụ thể bạn đã nhập
-                const mapUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.address)}`;
+                // Link chỉ đường: xử lý bằng hàm openDirections() để mở app Maps gốc trên di động
 
                 // Vẽ sao để click đánh giá trực tiếp - đổi từ sao vàng sang sao cam sữa
                 let starsHTML = '';
@@ -1063,11 +1093,11 @@
                             ` : ''}
                         </div>
                         <div class="mt-5">
-                            <!-- Nút chỉ đường dùng hinh3.jpg (Kéo dài toàn bộ chiều ngang card) -->
-                            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer" 
-                                class="w-full bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center">
+                            <!-- Nút chỉ đường: mở app Maps gốc trên di động, tránh phát sinh ký tự rác Chrome -->
+                            <button type="button" onclick="openDirections('${place.id}')" 
+                                class="w-full bg-orange-50 hover:bg-orange-100 text-orange-700 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-200 text-center cursor-pointer border-0 outline-none">
                                 <img src="pictures/hinh3.jpg" class="w-6 h-6 object-contain inline-block mr-1" style="filter: url(#remove-white);"> Chỉ đường
-                            </a>
+                            </button>
                         </div>
                     </div>
                 `;
