@@ -502,7 +502,7 @@
         }
 
         // Mở chỉ đường bằng ứng dụng Maps GỐC trên thiết bị di động
-        // GIẢI PHÁP CHỐNG KÝ TỰ RÁC: Mở app gốc qua URL scheme (maps:/geo:) thay vì mở Google Maps web.
+        // GIẢI PHÁP CHỐNG KÝ TỰ RÁC: Mở app gốc qua URL scheme thay vì mở Google Maps web.
         // Khi mở app gốc, Chrome KHÔNG tạo lịch sử duyệt web → KHÔNG phát sinh ký tự mã hóa Base64 rác
         // (ved/ei tracking params) trong gợi ý omnibox Chrome iOS.
         function openDirections(placeId) {
@@ -512,12 +512,29 @@
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
             const hasCoords = place.lat && place.lng;
+            const dest = hasCoords ? `${place.lat},${place.lng}` : place.address;
+            const encodedDest = encodeURIComponent(dest);
 
             if (isIOS) {
-                // iOS: Mở Apple Maps trực tiếp qua URL scheme gốc hệ điều hành
+                // iOS: Ưu tiên mở GOOGLE MAPS APP trực tiếp qua URL scheme
                 // → Hoàn toàn BYPASS Chrome → Không tạo lịch sử → Không phát sinh ký tự rác
-                const dest = hasCoords ? `${place.lat},${place.lng}` : place.address;
-                window.location.href = `maps:?daddr=${encodeURIComponent(dest)}`;
+                const googleMapsAppUrl = `comgooglemaps://?daddr=${encodedDest}&directionsmode=driving`;
+
+                // Dự phòng: Nếu chưa cài Google Maps, 600ms sau tự chuyển sang Apple Maps
+                const fallbackTimer = setTimeout(() => {
+                    if (!document.hidden) {
+                        window.location.href = `maps:?daddr=${encodedDest}`;
+                    }
+                }, 600);
+
+                // Hủy fallback nếu Google Maps đã mở thành công (trang bị ẩn)
+                const cancelFallback = () => {
+                    clearTimeout(fallbackTimer);
+                    document.removeEventListener('visibilitychange', cancelFallback);
+                };
+                document.addEventListener('visibilitychange', cancelFallback);
+
+                window.location.href = googleMapsAppUrl;
             } else if (isAndroid) {
                 // Android: Mở Google Maps app (hoặc app Maps mặc định) qua geo: intent
                 if (hasCoords) {
