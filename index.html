@@ -653,8 +653,23 @@
 
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
             const isAndroid = /Android/i.test(navigator.userAgent);
-            const hasCoords = place.lat && place.lng;
-            const dest = hasCoords ? `${place.lat},${place.lng}` : place.address;
+
+            // Ưu tiên dùng chính ĐỊA CHỈ mà người dùng đã nhập làm điểm đến
+            // (không dùng tọa độ GPS để tránh bị nhảy sang / đề xuất địa chỉ khác).
+            let dest = (place.address || '').trim();
+            const districtText = (place.district || '').trim();
+
+            // Ghép thêm khu vực/quận (nếu địa chỉ chưa có) để Google Maps xác định đúng điểm đến,
+            // tránh tự động đề xuất các địa chỉ khác trùng tên.
+            if (dest && districtText && !dest.toLowerCase().includes(districtText.toLowerCase())) {
+                dest = `${dest}, ${districtText}`;
+            }
+
+            // Trường hợp bất khả kháng không có địa chỉ thì mới dùng tọa độ GPS.
+            if (!dest) {
+                dest = (place.lat && place.lng) ? `${place.lat},${place.lng}` : '';
+            }
+
             const encodedDest = encodeURIComponent(dest);
             const googleMapsWebUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
 
