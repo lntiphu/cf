@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-tracker-v4';
+const CACHE_NAME = 'coffee-tracker-v7';
 const ASSETS = [
   'index.html',
   'manifest.json',
@@ -36,13 +36,19 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (!(e.request.url.indexOf('http') === 0)) return;
 
-  // Xử lý đặc biệt cho các yêu cầu điều hướng (khi reload trang hoặc mở lại app standalone)
-  // Luôn trả về index.html từ cache để tránh lỗi 404 hoặc trang trắng khi mất mạng/reload
+  // Với tài liệu HTML, ưu tiên bản mới từ mạng để Chrome không giữ code cũ.
+  // Chỉ dùng cache khi offline hoặc máy chủ không phản hồi.
   if (e.request.mode === 'navigate') {
     e.respondWith(
-      caches.match('index.html').then((cachedResponse) => {
-        return cachedResponse || fetch(e.request);
-      })
+      fetch(e.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.ok) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put('index.html', responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match('index.html'))
     );
     return;
   }
@@ -55,7 +61,7 @@ self.addEventListener('fetch', (e) => {
           if (networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, networkResponse));
           }
-        }).catch(() => {/* Bỏ qua lỗi mạng khi chạy offline */});
+        }).catch(() => {/* Bỏ qua lỗi mạng khi chạy offline */ });
         return cachedResponse;
       }
       return fetch(e.request);

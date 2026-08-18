@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>hafu food</title>
     <!-- Nhúng Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Nhúng FontAwesome cho Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <!-- Cấu hình PWA -->
+    <!-- Cấu hình PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff7b00">
-    
+
     <!-- Hỗ trợ iOS (Apple Mobile Web App) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,22 +26,33 @@
     <style>
         /* Đồng bộ màu nền cho Safe Area ở trên cùng điện thoại (tai thỏ) */
         html {
-            background-color: #ff7b00; 
+            background-color: #ff7b00;
         }
+
         header {
-            padding-top: 0.75rem !important; /* Mặc định gọn gàng cho trình duyệt di động bình thường */
+            padding-top: 0.75rem !important;
+            /* Mặc định gọn gàng cho trình duyệt di động bình thường */
         }
+
         @media (display-mode: standalone) {
             header {
                 /* Chỉ chừa khoảng trống khi chạy ở chế độ app PWA độc lập toàn màn hình */
                 padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem) !important;
             }
         }
+
         /* Ẩn scrollbar cho đẹp */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
+
 <body class="font-sans text-gray-800 min-h-screen" style="background-color: #FFE4C4;">
 
     <!-- SVG Filter xóa hoàn toàn nền trắng của ảnh JPEG trên iOS Safari và các thiết bị di động -->
@@ -50,32 +63,41 @@
                 0 1 0 0 0
                 0 0 1 0 0
                 -1 -1 -1 3 0
-            "/>
+            " />
         </filter>
     </svg>
 
     <!-- Bộ hiển thị Pull-to-refresh trên điện thoại (Mặc định ẩn hoàn toàn không chiếm diện tích) -->
-    <div id="pullToRefreshIndicator" class="w-full text-center bg-orange-100 text-orange-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-orange-200" style="height: 0px; padding: 0px; border-bottom-width: 0px;">
+    <div id="pullToRefreshIndicator"
+        class="w-full text-center bg-orange-100 text-orange-700 font-semibold transition-all duration-200 overflow-hidden opacity-0 flex items-center justify-center gap-2 border-orange-200"
+        style="height: 0px; padding: 0px; border-bottom-width: 0px;">
         <i class="fa-solid fa-arrows-rotate fa-spin"></i> <span id="pullToRefreshText">Kéo để làm mới...</span>
     </div>
 
     <header class="bg-[#ff7b00] shadow-md sticky top-0 z-40 border-b border-[#e66f00]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3 text-white">
-                <img src="pictures/hinh8.jpg" class="w-11 h-11 rounded-full object-cover border-2 border-orange-200 border-opacity-40 shadow-sm">
+                <img src="pictures/hinh8.jpg"
+                    class="w-11 h-11 rounded-full object-cover border-2 border-orange-200 border-opacity-40 shadow-sm">
                 <h1 class="text-2xl font-bold tracking-tight">hafu food</h1>
             </div>
             <div class="flex items-center gap-2">
                 <!-- Nút lọc danh sách yêu thích cố định kích thước w-11 h-11, nền giống kính lúp -->
-                <button id="btnFavFilter" onclick="toggleFavFilter()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Xem quán yêu thích">
-                    <i id="favFilterIcon" class="fa-solid fa-heart text-xl text-white opacity-60 transition duration-200"></i>
+                <button id="btnFavFilter" onclick="toggleFavFilter()"
+                    class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0"
+                    title="Xem quán yêu thích">
+                    <i id="favFilterIcon"
+                        class="fa-solid fa-heart text-xl text-white opacity-60 transition duration-200"></i>
                 </button>
                 <!-- Nút kính lúp tìm kiếm cố định kích thước w-11 h-11 -->
-                <button onclick="toggleSearch()" class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0" title="Tìm kiếm">
+                <button onclick="toggleSearch()"
+                    class="w-11 h-11 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg shadow-sm transition duration-200 flex items-center justify-center flex-shrink-0"
+                    title="Tìm kiếm">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
                 <!-- Nút thêm quán cố định chiều cao h-11 -->
-                <button onclick="toggleModal(true)" class="h-11 bg-white text-[#ff7b00] hover:bg-orange-50 px-4 rounded-lg font-semibold shadow-sm border border-transparent transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
+                <button onclick="toggleModal(true)"
+                    class="h-11 bg-white text-[#ff7b00] hover:bg-orange-50 px-4 rounded-lg font-semibold shadow-sm border border-transparent transition duration-200 flex items-center justify-center gap-2 flex-shrink-0">
                     <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Thêm Quán</span>
                 </button>
             </div>
@@ -83,12 +105,15 @@
     </header>
 
     <!-- Khung nhập tìm kiếm ẩn/hiện -->
-    <div id="searchContainer" class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
+    <div id="searchContainer"
+        class="hidden bg-white border-b border-gray-200 py-3 shadow-inner transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
             <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
-            <input type="text" id="inputSearch" oninput="handleFilterChange()" 
-                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                placeholder="Nhập tên quán bạn cần tìm..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
+            <input type="search" id="inputSearch" name="hafu-place-filter" oninput="handleSearchInput(event)"
+                oncompositionend="handleSearchInput(event)" autocomplete="off" aria-autocomplete="none"
+                data-form-type="other" data-lpignore="true" data-1p-ignore="true" autocorrect="off" autocapitalize="off"
+                spellcheck="false" maxlength="100" readonly placeholder="Nhập tên quán bạn cần tìm..."
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-700">
             <button onclick="clearSearch()" class="text-gray-400 hover:text-red-500 p-2 transition">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -96,24 +121,28 @@
     </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <div class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+
+        <div
+            class="bg-white p-4 sm:p-6 rounded-xl shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
             <div class="flex flex-col sm:flex-row w-full md:w-auto gap-4">
                 <!-- Lọc Thể loại -->
                 <div class="w-full sm:w-auto">
-                    <select id="filterCategory" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <select id="filterCategory" onchange="handleFilterChange()"
+                        class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
                 <!-- Lọc Khu vực -->
                 <div class="w-full sm:w-auto">
-                    <select id="filterDistrict" onchange="handleFilterChange()" class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <select id="filterDistrict" onchange="handleFilterChange()"
+                        class="w-full sm:w-48 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <!-- Render tự động -->
                     </select>
                 </div>
             </div>
             <!-- Nút Lấy Vị Trí đổi sang tông cam -->
-            <button id="btnLocation" onclick="getUserLocation()" class="w-full md:w-auto bg-orange-100 text-orange-700 hover:bg-orange-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
+            <button id="btnLocation" onclick="getUserLocation()"
+                class="w-full md:w-auto bg-orange-100 text-orange-700 hover:bg-orange-200 px-5 py-2.5 rounded-lg font-semibold transition duration-200 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-location-crosshairs" id="locationIcon"></i>
                 <span id="locationText">Tìm quán gần tôi</span>
             </button>
@@ -137,49 +166,67 @@
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            
+
             <div class="p-6 overflow-y-auto no-scrollbar">
                 <form id="addForm" onsubmit="handleAddNewPlace(event)" autocomplete="off" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="inputName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Phê La Tôn Thất Đạm">
+                        <input required type="text" id="inputName" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Vd: Phê La Tôn Thất Đạm">
                     </div>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="inputCategory" list="existingCategories" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn)
+                                *</label>
+                            <input required type="text" id="inputCategory" list="existingCategories" autocomplete="off"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                                placeholder="Vd: Cafe, Quán ăn, Trà sữa...">
                             <datalist id="existingCategories"></datalist>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="inputDistrict" list="existingDistricts" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: Quận 1, Gò Vấp...">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn)
+                                *</label>
+                            <input required type="text" id="inputDistrict" list="existingDistricts" autocomplete="off"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                                placeholder="Vd: Quận 1, Gò Vấp...">
                             <datalist id="existingDistricts"></datalist>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="inputAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
+                        <input required type="text" id="inputAddress" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Vd: 125 Tôn Thất Đạm, Phường Bến Nghé">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
-                        <input type="text" id="inputOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00 hoặc Mở cả ngày">
+                        <input type="text" id="inputOpeningHours" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Vd: 07:00 - 22:00 hoặc Mở cả ngày">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
-                        <input type="text" id="inputLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách
+                            gần nhất)</label>
+                        <input type="text" id="inputLatLng" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="inputReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Không gian, món ngon..."></textarea>
+                        <textarea id="inputReview" rows="3"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Không gian, món ngon..."></textarea>
                     </div>
 
                     <div class="pt-4">
-                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit"
+                            class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Lưu Thông Tin Quán
                         </button>
                     </div>
@@ -197,53 +244,70 @@
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
-            
+
             <div class="p-6 overflow-y-auto no-scrollbar">
                 <form id="editForm" onsubmit="handleUpdatePlace(event)" autocomplete="off" class="space-y-4">
                     <input type="hidden" id="editId">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Tên quán *</label>
-                        <input required type="text" id="editName" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editName" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="editCategory" list="existingCategoriesEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Thể loại (Tự nhập hoặc chọn)
+                                *</label>
+                            <input required type="text" id="editCategory" list="existingCategoriesEdit"
+                                autocomplete="off"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             <datalist id="existingCategoriesEdit"></datalist>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn) *</label>
-                            <input required type="text" id="editDistrict" list="existingDistrictsEdit" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Khu vực (Tự nhập hoặc chọn)
+                                *</label>
+                            <input required type="text" id="editDistrict" list="existingDistrictsEdit"
+                                autocomplete="off"
+                                class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             <datalist id="existingDistrictsEdit"></datalist>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Địa chỉ cụ thể *</label>
-                        <input required type="text" id="editAddress" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        <input required type="text" id="editAddress" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Giờ mở cửa</label>
-                        <input type="text" id="editOpeningHours" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Vd: 07:00 - 22:00">
+                        <input type="text" id="editOpeningHours" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Vd: 07:00 - 22:00">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách gần nhất)</label>
-                        <input type="text" id="editLatLng" autocomplete="off" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none" placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tọa độ GPS (Để tính khoảng cách
+                            gần nhất)</label>
+                        <input type="text" id="editLatLng" autocomplete="off"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                            placeholder="Copy tọa độ của quán dán vào đây (Vd: 10.8229, 106.6894)">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Nhận xét của bạn</label>
-                        <textarea id="editReview" rows="3" class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
+                        <textarea id="editReview" rows="3"
+                            class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none"></textarea>
                     </div>
 
                     <div class="pt-4 flex gap-3">
-                        <button type="button" onclick="deleteFromEditModal()" class="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg border border-red-200 transition duration-200 flex items-center justify-center gap-1.5" title="Xóa quán ăn này">
+                        <button type="button" onclick="deleteFromEditModal()"
+                            class="px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 font-bold rounded-lg border border-red-200 transition duration-200 flex items-center justify-center gap-1.5"
+                            title="Xóa quán ăn này">
                             <i class="fa-solid fa-trash-can"></i> Xóa
                         </button>
-                        <button type="submit" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
+                        <button type="submit"
+                            class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition duration-200">
                             Cập Nhật Thay Đổi
                         </button>
                     </div>
@@ -257,36 +321,42 @@
             <div class="p-6 text-center">
                 <i class="fa-solid fa-circle-exclamation text-4xl text-red-500 mb-4"></i>
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Xác nhận xóa</h3>
-                <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không thể hoàn tác.</p>
+                <p class="text-sm text-gray-600">Bạn có chắc chắn muốn xóa quán này khỏi danh sách? Hành động này không
+                    thể hoàn tác.</p>
             </div>
             <div class="px-6 py-4 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
-                <button onclick="closeDeleteModal()" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
-                <button onclick="confirmDelete()" class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa Quán</button>
+                <button onclick="closeDeleteModal()"
+                    class="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-200">Hủy</button>
+                <button onclick="confirmDelete()"
+                    class="px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 transition duration-200">Xóa
+                    Quán</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Nhập mã bảo mật (Hiển thị đè lên trên cùng) -->
-    <div id="securityModal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
+    <div id="securityModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6">
             <h3 class="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
                 <i class="fa-solid fa-shield-halved text-orange-500"></i> Xác thực quyền hạn
             </h3>
             <p class="text-sm text-gray-500 mb-4">Vui lòng nhập mã bảo mật để xác nhận thực hiện hành động này.</p>
-            
+
             <div class="mb-5">
-                <input type="password" id="confirmSecurityCode" 
-                    onkeydown="if(event.key === 'Enter') verifySecurityCode()"
-                    autocomplete="new-password"
-                    class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-center text-lg tracking-widest focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+                <input type="password" id="confirmSecurityCode"
+                    onkeydown="if(event.key === 'Enter') verifySecurityCode()" autocomplete="new-password"
+                    class="w-full bg-gray-50 border border-gray-300 rounded-lg px-4 py-2.5 text-center text-lg tracking-widest focus:ring-2 focus:ring-orange-500 focus:outline-none"
                     placeholder="••••••">
             </div>
-            
+
             <div class="flex gap-3">
-                <button type="button" onclick="cancelSecurityModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-lg transition duration-200 text-sm">
+                <button type="button" onclick="cancelSecurityModal()"
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 rounded-lg transition duration-200 text-sm">
                     Hủy
                 </button>
-                <button type="button" onclick="verifySecurityCode()" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-sm">
+                <button type="button" onclick="verifySecurityCode()"
+                    class="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow transition duration-200 text-sm">
                     Xác nhận
                 </button>
             </div>
@@ -296,9 +366,19 @@
     <script>
         // Đăng ký Service Worker cho PWA
         if ('serviceWorker' in navigator) {
+            let isReloadingForNewServiceWorker = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (isReloadingForNewServiceWorker) return;
+                isReloadingForNewServiceWorker = true;
+                window.location.reload();
+            });
+
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker đã đăng ký thành công.', reg))
+                navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+                    .then(reg => {
+                        reg.update();
+                        console.log('Service Worker đã đăng ký thành công.', reg);
+                    })
                     .catch(err => console.log('Đăng ký Service Worker thất bại: ', err));
             });
         }
@@ -324,10 +404,10 @@
         function handleSwipeStart(e) {
             // Không vuốt nếu chạm vào nút hoặc select chọn trực tiếp
             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'I') return;
-            
+
             swipeStartX = e.touches[0].clientX;
             isSwipingPage = true;
-            
+
             const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.classList.remove('transition-all', 'duration-150');
@@ -338,15 +418,15 @@
             if (!isSwipingPage) return;
             swipeCurrentX = e.touches[0].clientX;
             const diffX = swipeCurrentX - swipeStartX;
-            
+
             // Ngăn chặn hành vi cuộn dọc mặc định của trình duyệt khi người dùng đang cố ý vuốt ngang chuyển trang
             if (Math.abs(diffX) > 8) {
                 if (e.cancelable) e.preventDefault();
             }
-            
+
             // Giới hạn trượt tối đa 60px để giữ thẩm mỹ
             const limitedDiff = Math.max(-60, Math.min(60, diffX));
-            
+
             const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.style.transform = `translateX(${limitedDiff}px)`;
@@ -357,10 +437,10 @@
         function handleSwipeEnd(e) {
             if (!isSwipingPage) return;
             isSwipingPage = false;
-            
+
             const diffX = swipeCurrentX - swipeStartX;
             const threshold = 40; // Kích hoạt chuyển trang khi vuốt quá 40px
-            
+
             const container = document.getElementById('mobilePaginationBar');
             if (container) {
                 container.classList.add('transition-all', 'duration-150');
@@ -373,10 +453,10 @@
                 const totalPages = Math.ceil(places.filter(p => {
                     const filterCat = document.getElementById('filterCategory').value;
                     const filterDist = document.getElementById('filterDistrict').value;
-                    const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
+                    const searchQuery = getSearchQuery();
                     const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                     const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
-                    const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                    const matchSearch = normalizeSearchText(p.name).includes(searchQuery);
                     const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
                     return matchCat && matchDist && matchSearch && matchFav;
                 }).length / ITEMS_PER_PAGE);
@@ -390,7 +470,7 @@
                     changePage(currentPage - 1);
                 }
             }
-            
+
             swipeStartX = 0;
             swipeCurrentX = 0;
         }
@@ -398,18 +478,52 @@
         function changePage(page) {
             currentPage = page;
             renderPlaces();
-            
+
             const grid = document.getElementById('placesGrid');
             if (grid) {
                 // Tính toán tọa độ cuộn trừ đi khoảng trống Header cố định (100px) để không bị che khuất quán đầu tiên
                 const elementPosition = grid.getBoundingClientRect().top + window.scrollY;
                 const offsetPosition = elementPosition - 100;
-                
+
                 window.scrollTo({
                     top: offsetPosition,
                     behavior: 'smooth'
                 });
             }
+        }
+
+        // Loại bỏ ký tự điều khiển/ký tự vô hình thường xuất hiện do autofill,
+        // copy-paste hoặc dữ liệu cũ bị lỗi, đồng thời chuẩn hóa Unicode tiếng Việt.
+        function sanitizeText(value) {
+            return String(value ?? '')
+                .normalize('NFC')
+                .replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, '');
+        }
+
+        // Chuẩn hóa riêng cho tìm kiếm: không phân biệt hoa/thường và dấu tiếng Việt.
+        function normalizeSearchText(value) {
+            return sanitizeText(value)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/Đ/g, 'D')
+                .toLocaleLowerCase('vi-VN')
+                .trim();
+        }
+
+        function getSearchQuery() {
+            const input = document.getElementById('inputSearch');
+            return normalizeSearchText(input ? input.value : '');
+        }
+
+        function handleSearchInput(event) {
+            const input = event.currentTarget;
+            // Không can thiệp giữa lúc bộ gõ tiếng Việt đang ghép ký tự.
+            if (!event.isComposing) {
+                const cleanValue = sanitizeText(input.value).slice(0, 100);
+                if (input.value !== cleanValue) input.value = cleanValue;
+            }
+            handleFilterChange();
         }
 
         function handleFilterChange() {
@@ -454,15 +568,29 @@
                     .order('id', { ascending: false });
 
                 if (error) throw error;
-                places = data || [];
+                places = (data || []).map(normalizePlaceTextFields);
                 // Đồng bộ dự phòng sang localStorage
                 localStorage.setItem('places', JSON.stringify(places));
             } catch (err) {
                 console.error("Lỗi khi tải dữ liệu từ Supabase (Chuyển sang dùng bộ nhớ cục bộ):", err);
-                places = JSON.parse(localStorage.getItem('places')) || defaultPlaces;
+                try {
+                    const storedPlaces = JSON.parse(localStorage.getItem('places'));
+                    places = (Array.isArray(storedPlaces) ? storedPlaces : defaultPlaces).map(normalizePlaceTextFields);
+                } catch (storageError) {
+                    console.warn("Dữ liệu localStorage không hợp lệ, dùng dữ liệu mặc định:", storageError);
+                    places = defaultPlaces.map(normalizePlaceTextFields);
+                }
             }
             updateFilters();
             renderPlaces();
+        }
+
+        function normalizePlaceTextFields(place) {
+            const normalized = { ...place };
+            ['name', 'category', 'district', 'address', 'opening_hours', 'review', 'map_link'].forEach(field => {
+                if (normalized[field] != null) normalized[field] = sanitizeText(normalized[field]).trim();
+            });
+            return normalized;
         }
 
         // Tính khoảng cách (Haversine formula) - km (Ép kiểu số an toàn tuyệt đối)
@@ -477,8 +605,8 @@
             const R = 6371; // Bán kính Trái Đất (km)
             const dLat = (p2 - p1) * (Math.PI / 180);
             const dLon = (r2 - r1) * (Math.PI / 180);
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(p1 * (Math.PI / 180)) * Math.cos(p2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2); 
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(p1 * (Math.PI / 180)) * Math.cos(p2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return (R * c).toFixed(1);
         }
 
@@ -488,7 +616,13 @@
             const input = document.getElementById('inputSearch');
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
-                input.focus();
+                // Giữ readonly khi tải trang để Chrome/password manager không tự điền
+                // token hoặc chuỗi Base64; chỉ mở khóa sau thao tác người dùng.
+                input.value = '';
+                requestAnimationFrame(() => {
+                    input.removeAttribute('readonly');
+                    input.focus({ preventScroll: true });
+                });
             } else {
                 container.classList.add('hidden');
                 clearSearch();
@@ -496,15 +630,23 @@
         }
 
         function clearSearch() {
-            document.getElementById('inputSearch').value = '';
+            const input = document.getElementById('inputSearch');
+            input.value = '';
+            input.setAttribute('readonly', 'readonly');
             document.getElementById('searchContainer').classList.add('hidden');
             renderPlaces();
         }
 
-        // Mở chỉ đường bằng ứng dụng Maps GỐC trên thiết bị di động
-        // GIẢI PHÁP CHỐNG KÝ TỰ RÁC: Mở app gốc qua URL scheme thay vì mở Google Maps web.
-        // Khi mở app gốc, Chrome KHÔNG tạo lịch sử duyệt web → KHÔNG phát sinh ký tự mã hóa Base64 rác
-        // (ved/ei tracking params) trong gợi ý omnibox Chrome iOS.
+        // Xóa giá trị Chrome có thể khôi phục khi quay lại bằng back/forward cache.
+        window.addEventListener('pageshow', () => {
+            const input = document.getElementById('inputSearch');
+            if (input) {
+                input.value = '';
+                input.setAttribute('readonly', 'readonly');
+            }
+        });
+
+        // Mở chỉ đường bằng Google Maps trên thiết bị di động hoặc desktop.
         function openDirections(placeId) {
             const place = places.find(p => String(p.id) === String(placeId));
             if (!place) return;
@@ -514,16 +656,16 @@
             const hasCoords = place.lat && place.lng;
             const dest = hasCoords ? `${place.lat},${place.lng}` : place.address;
             const encodedDest = encodeURIComponent(dest);
+            const googleMapsWebUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedDest}&travelmode=driving`;
 
             if (isIOS) {
-                // iOS: Ưu tiên mở GOOGLE MAPS APP trực tiếp qua URL scheme
-                // → Hoàn toàn BYPASS Chrome → Không tạo lịch sử → Không phát sinh ký tự rác
+                // iOS: Ưu tiên mở Google Maps app trực tiếp qua URL scheme.
                 const googleMapsAppUrl = `comgooglemaps://?daddr=${encodedDest}&directionsmode=driving`;
 
-                // Dự phòng: Nếu chưa cài Google Maps, 600ms sau tự chuyển sang Apple Maps
+                // Nếu chưa cài Google Maps, mở Google Maps web thay vì Apple Maps.
                 const fallbackTimer = setTimeout(() => {
                     if (!document.hidden) {
-                        window.location.href = `maps:?daddr=${encodedDest}`;
+                        window.location.href = googleMapsWebUrl;
                     }
                 }, 600);
 
@@ -536,16 +678,23 @@
 
                 window.location.href = googleMapsAppUrl;
             } else if (isAndroid) {
-                // Android: Mở Google Maps app (hoặc app Maps mặc định) qua geo: intent
-                if (hasCoords) {
-                    window.location.href = `geo:${place.lat},${place.lng}?q=${place.lat},${place.lng}`;
-                } else {
-                    window.location.href = `geo:0,0?q=${encodeURIComponent(place.address)}`;
-                }
+                // Android: Dùng scheme riêng của Google Maps, không dùng geo:
+                // vì geo: có thể giao cho ứng dụng bản đồ mặc định của thiết bị.
+                const googleMapsAndroidUrl = `google.navigation:q=${encodedDest}&mode=d`;
+                const fallbackTimer = setTimeout(() => {
+                    if (!document.hidden) {
+                        window.location.href = googleMapsWebUrl;
+                    }
+                }, 700);
+                const cancelFallback = () => {
+                    clearTimeout(fallbackTimer);
+                    document.removeEventListener('visibilitychange', cancelFallback);
+                };
+                document.addEventListener('visibilitychange', cancelFallback);
+                window.location.href = googleMapsAndroidUrl;
             } else {
-                // Desktop: Mở Google Maps web trong tab mới (desktop không bị lỗi ký tự rác)
-                const query = hasCoords ? `${place.lat},${place.lng}` : place.address;
-                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer');
+                // Desktop: Mở Google Maps web trong tab mới.
+                window.open(googleMapsWebUrl, '_blank', 'noopener,noreferrer');
             }
         }
 
@@ -566,9 +715,9 @@
         function toggleModal(show) {
             const modal = document.getElementById('addModal');
             if (modal) {
-                if(show) {
+                if (show) {
                     modal.classList.remove('hidden');
-                    document.body.style.overflow = 'hidden'; 
+                    document.body.style.overflow = 'hidden';
                     const geoStatus = document.getElementById('geoStatusAdd');
                     if (geoStatus) geoStatus.classList.add('hidden');
                 } else {
@@ -582,9 +731,9 @@
         function toggleEditModal(show) {
             const modal = document.getElementById('editModal');
             if (modal) {
-                if(show) {
+                if (show) {
                     modal.classList.remove('hidden');
-                    document.body.style.overflow = 'hidden'; 
+                    document.body.style.overflow = 'hidden';
                     const geoStatus = document.getElementById('geoStatusEdit');
                     if (geoStatus) geoStatus.classList.add('hidden');
                 } else {
@@ -605,7 +754,7 @@
             document.getElementById('editDistrict').value = place.district;
             document.getElementById('editAddress').value = place.address;
             document.getElementById('editOpeningHours').value = place.opening_hours || '';
-            
+
             // Hiện tọa độ GPS cũ ra ô nhập
             document.getElementById('editLatLng').value = (place.lat && place.lng) ? `${place.lat},${place.lng}` : '';
             document.getElementById('editReview').value = place.review || '';
@@ -662,10 +811,10 @@
         function verifySecurityCode() {
             try {
                 const inputVal = document.getElementById('confirmSecurityCode').value.trim();
-                
+
                 // Băm mật khẩu người dùng nhập vào
                 const hash = djb2Hash(inputVal);
-                
+
                 // Đối chiếu với mã băm đã lưu
                 if (hash === "7de1d77c") {
                     executePendingAction(); // Thực thi trước để lấy pendingAction
@@ -683,7 +832,7 @@
                 if (!pendingAction) return;
                 const actionType = pendingAction.type;
                 const actionData = pendingAction.data;
-                
+
                 // Xóa biến chờ trước khi thực thi
                 pendingAction = null;
 
@@ -708,7 +857,7 @@
         async function proceedDelete(deleteId) {
             if (deleteId !== null) {
                 const deleteTarget = String(deleteId).trim();
-                
+
                 // Chốt chặn 1: Nếu ID trống hoặc không hợp lệ, thoát ngay lập tức
                 if (deleteTarget === "" || deleteTarget === "null" || deleteTarget === "undefined") {
                     return;
@@ -716,10 +865,10 @@
 
                 // Kiểm tra xem có phải ID tạm thời cục bộ tự tạo không (ID Date.now() dài 13 ký tự)
                 const isTempId = deleteTarget.length > 10 || isNaN(Number(deleteTarget));
-                
+
                 if (!isTempId) {
                     const idInt = parseInt(deleteTarget);
-                    
+
                     // Chốt chặn 2: Bảo vệ cơ sở dữ liệu. Nếu idInt là NaN hoặc không hợp lệ, chặn đứng lệnh gửi lên Supabase.
                     if (!isNaN(idInt) && idInt > 0) {
                         try {
@@ -751,7 +900,7 @@
         function extractLatLng(input) {
             if (!input || input.trim() === '') return null;
             const text = input.trim();
-            
+
             // 1. Tìm cặp số thực (vĩ độ, kinh độ) phân tách bằng dấu phẩy ở bất kỳ đâu trong chuỗi
             const coordRegex = /([-+]?\d+\.\d+)\s*,\s*([-+]?\d+\.\d+)/;
             const coordMatch = text.match(coordRegex);
@@ -781,7 +930,7 @@
                         btn.classList.replace('bg-orange-100', 'bg-green-100');
                         btn.classList.replace('text-orange-700', 'text-green-700');
                         text.innerText = "Đã định vị";
-                        renderPlaces(); 
+                        renderPlaces();
                     },
                     (error) => {
                         icon.classList.remove('fa-spin');
@@ -789,7 +938,7 @@
                         errorText.innerText = "Không thể lấy vị trí. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.";
                         errorText.classList.remove('hidden');
                     },
-                    { 
+                    {
                         enableHighAccuracy: true, // Bắt buộc bật chíp GPS thật của điện thoại để lấy vị trí chính xác nhất
                         timeout: 10000,           // Thời gian chờ tối đa 10 giây
                         maximumAge: 0             // Không sử dụng vị trí lưu trong bộ nhớ đệm cũ
@@ -870,14 +1019,14 @@
         // Thêm mới quán (Không truyền id thủ công lên Supabase)
         async function handleAddNewPlace(e) {
             e.preventDefault();
-            
-            const name = document.getElementById('inputName').value;
-            const category = document.getElementById('inputCategory').value.trim();
-            const district = document.getElementById('inputDistrict').value.trim();
-            const address = document.getElementById('inputAddress').value;
-            const opening_hours = document.getElementById('inputOpeningHours').value.trim();
+
+            const name = sanitizeText(document.getElementById('inputName').value).trim();
+            const category = sanitizeText(document.getElementById('inputCategory').value).trim();
+            const district = sanitizeText(document.getElementById('inputDistrict').value).trim();
+            const address = sanitizeText(document.getElementById('inputAddress').value).trim();
+            const opening_hours = sanitizeText(document.getElementById('inputOpeningHours').value).trim();
             const latLngInput = document.getElementById('inputLatLng').value.trim();
-            const review = document.getElementById('inputReview').value;
+            const review = sanitizeText(document.getElementById('inputReview').value).trim();
 
             // Xử lý tọa độ GPS
             let lat = null;
@@ -908,7 +1057,7 @@
                     .select();
 
                 if (error) throw error;
-                
+
                 if (data && data.length > 0 && data[0].id) {
                     places.unshift(data[0]); // Đẩy bản ghi thực tế từ Supabase (có id chuẩn) vào danh sách
                 } else {
@@ -934,13 +1083,13 @@
             e.preventDefault();
 
             const id = parseInt(document.getElementById('editId').value);
-            const name = document.getElementById('editName').value;
-            const category = document.getElementById('editCategory').value.trim();
-            const district = document.getElementById('editDistrict').value.trim();
-            const address = document.getElementById('editAddress').value;
-            const opening_hours = document.getElementById('editOpeningHours').value.trim();
+            const name = sanitizeText(document.getElementById('editName').value).trim();
+            const category = sanitizeText(document.getElementById('editCategory').value).trim();
+            const district = sanitizeText(document.getElementById('editDistrict').value).trim();
+            const address = sanitizeText(document.getElementById('editAddress').value).trim();
+            const opening_hours = sanitizeText(document.getElementById('editOpeningHours').value).trim();
             const latLngInput = document.getElementById('editLatLng').value.trim();
-            const review = document.getElementById('editReview').value;
+            const review = sanitizeText(document.getElementById('editReview').value).trim();
 
             const updateData = { id, name, category, district, address, opening_hours, latLngInput, review };
 
@@ -997,13 +1146,13 @@
         function renderPlaces() {
             const filterCat = document.getElementById('filterCategory').value;
             const filterDist = document.getElementById('filterDistrict').value;
-            const searchQuery = document.getElementById('inputSearch').value.toLowerCase().trim();
+            const searchQuery = getSearchQuery();
             const grid = document.getElementById('placesGrid');
 
             let result = places.filter(p => {
                 const matchCat = filterCat === 'Tất cả' || p.category === filterCat;
                 const matchDist = filterDist === 'Tất cả' || p.district === filterDist;
-                const matchSearch = p.name.toLowerCase().includes(searchQuery);
+                const matchSearch = normalizeSearchText(p.name).includes(searchQuery);
                 const matchFav = !showOnlyFavorites || favoriteIds.includes(String(p.id));
                 return matchCat && matchDist && matchSearch && matchFav;
             });
@@ -1257,7 +1406,7 @@
                 ptrIndicator.style.borderBottomWidth = '1px';
                 await loadPlaces();
             }
-            
+
             // Đóng indicator sau khi load xong hoặc hủy kéo
             setTimeout(() => {
                 ptrIndicator.style.height = '0px';
@@ -1266,7 +1415,7 @@
                 ptrIndicator.style.borderBottomWidth = '0px';
                 ptrIndicator.style.opacity = '0';
             }, 600);
-            
+
             touchStart = 0;
         });
 
@@ -1275,4 +1424,5 @@
 
     </script>
 </body>
+
 </html>
