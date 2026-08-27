@@ -1,0 +1,16 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Chạy tự động lúc 00:00 UTC (07:00 sáng giờ VN) mỗi 3 ngày 1 lần
+    - cron: '0 0 */3 * *'
+  # Cho phép bấm nút test thủ công trên GitHub bất cứ lúc nào
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        run: |
+          curl -f -s -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" "https://cqtqpejhcsjqpllhhsls.supabase.co/rest/v1/places?select=id&limit=1"
