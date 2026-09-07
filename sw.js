@@ -1,8 +1,14 @@
-const CACHE_NAME = 'coffee-tracker-v29';
+const CACHE_NAME = 'coffee-tracker-v30';
 const ASSETS = [
   'index.html',
   'manifest.json',
   'icon.svg',
+  'css/style.css',
+  'js/utils.js',
+  'js/api.js',
+  'js/filters.js',
+  'js/modals.js',
+  'js/app.js',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
