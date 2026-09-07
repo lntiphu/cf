@@ -436,5 +436,83 @@ let isLocating = false;
             return null;
         }
 
+        // 4. Phân tích trang thông tin / mạng xã hội quán (Facebook, Instagram, TikTok, Website...)
+        function parsePlaceSocialLink(rawInput, placeName) {
+            let input = (rawInput || '').trim();
+            if (!input) {
+                const cleanName = typeof normalizeSearchText === 'function'
+                    ? normalizeSearchText(placeName || '').replace(/[^a-z0-9]/g, '')
+                    : (placeName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                return {
+                    title: 'TRANG THÔNG TIN',
+                    displayText: `${cleanName || 'quan'}.cafe`,
+                    url: `https://www.instagram.com/${cleanName || 'coffee'}/`,
+                    iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
+                };
+            }
+
+            // Kiểm tra Facebook
+            if (/facebook\.com|fb\.com|fb\.watch/i.test(input)) {
+                let url = input.startsWith('http://') || input.startsWith('https://') ? input : `https://${input}`;
+                let cleanText = input.replace(/^https?:\/\/(www\.)?(facebook\.com|fb\.com)\//i, '').replace(/\/$/, '');
+                if (cleanText.includes('?')) cleanText = cleanText.split('?')[0];
+                return {
+                    title: 'TRANG FACEBOOK',
+                    displayText: cleanText ? `fb.com/${cleanText}` : 'Facebook quán',
+                    url: url,
+                    iconClass: 'fa-brands fa-facebook text-xs text-[#1877F2]'
+                };
+            }
+
+            // Kiểm tra TikTok
+            if (/tiktok\.com/i.test(input)) {
+                let url = input.startsWith('http://') || input.startsWith('https://') ? input : `https://${input}`;
+                let cleanText = input.replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/i, '').replace(/\/$/, '');
+                if (cleanText.includes('?')) cleanText = cleanText.split('?')[0];
+                return {
+                    title: 'TRANG TIKTOK',
+                    displayText: cleanText ? `@${cleanText}` : 'TikTok quán',
+                    url: url,
+                    iconClass: 'fa-brands fa-tiktok text-xs text-stone-900'
+                };
+            }
+
+            // Kiểm tra Instagram
+            if (/instagram\.com|instagr\.am/i.test(input) || input.startsWith('@')) {
+                const handle = input.replace(/^@/, '').replace(/^(https?:\/\/)?(www\.)?(instagram\.com|instagr\.am)\//i, '').replace(/\/$/, '');
+                return {
+                    title: 'TRANG INSTAGRAM',
+                    displayText: handle ? `@${handle}` : input,
+                    url: `https://www.instagram.com/${handle}/`,
+                    iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
+                };
+            }
+
+            // Kiểm tra Website hoặc URL bất kỳ (có http/https hoặc domain phổ biến)
+            if (input.startsWith('http://') || input.startsWith('https://') || /\.(vn|com|net|org|co|info|me|cafe|food|io)/i.test(input)) {
+                let url = input.startsWith('http://') || input.startsWith('https://') ? input : `https://${input}`;
+                let cleanText = input.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '');
+                if (cleanText.length > 30) {
+                    cleanText = cleanText.slice(0, 27) + '...';
+                }
+                return {
+                    title: 'TRANG THÔNG TIN',
+                    displayText: cleanText,
+                    url: url,
+                    iconClass: 'fa-solid fa-globe text-xs text-[#B57324]'
+                };
+            }
+
+            // Mặc định: Coi như tên tài khoản mạng xã hội / Instagram
+            const cleanHandle = input.replace(/^@/, '');
+            return {
+                title: 'TRANG THÔNG TIN',
+                displayText: `@${cleanHandle}`,
+                url: `https://www.instagram.com/${cleanHandle}/`,
+                iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
+            };
+        }
+
+
 
 

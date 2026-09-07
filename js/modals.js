@@ -858,18 +858,18 @@ let currentGalleryList = [];
                 drinkEl.innerText = place.signature_drink || drinks[(idNum % drinks.length)] || 'Trà Ô Long sữa nướng';
             }
 
-            // 8. Instagram Quán
+            // 8. Trang thông tin / Mạng xã hội quán (Instagram, Facebook, TikTok, Website...)
             const igLinkEl = document.getElementById('detailInstagramLink');
             const igHandleEl = document.getElementById('detailInstagramHandle');
+            const socialTitleEl = document.getElementById('detailSocialTitle');
+            const socialIconEl = document.getElementById('detailSocialIcon');
             if (igLinkEl && igHandleEl) {
-                let ig = (place.instagram || '').trim();
-                if (!ig) {
-                    const cleanName = normalizeSearchText(place.name).replace(/[^a-z0-9]/g, '');
-                    ig = `${cleanName || 'coffee'}.cafe`;
-                }
-                const handle = ig.replace(/^@/, '').replace(/^(https?:\/\/)?(www\.)?instagram\.com\//, '').replace(/\/$/, '');
-                igHandleEl.innerText = handle;
-                igLinkEl.href = `https://www.instagram.com/${handle}/`;
+                const info = parsePlaceSocialLink(place.instagram, place.name);
+                igHandleEl.innerText = info.displayText;
+                igLinkEl.href = info.url;
+                if (socialTitleEl) socialTitleEl.innerText = info.title;
+                if (socialIconEl) socialIconEl.className = info.iconClass;
+                igLinkEl.title = `Mở ${info.displayText} (${info.title})`;
             }
 
             // 9. Cập nhật trạng thái các nút ở thanh đáy và liên kết bản đồ cafemaps.net
