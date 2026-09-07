@@ -96,10 +96,7 @@ const ITEMS_PER_PAGE = 9;
                     changePage(currentPage + 1);
                 }
             } else if (diffX < -threshold) {
-                // Vuốt sang TRÁI -> Về trang trước
-                if (currentPage > 1) {
-                    changePage(currentPage - 1);
-                }
+                // Đã tắt thao tác kéo/vuốt sang trái để back về trang trước theo yêu cầu
             }
 
             swipeStartX = 0;

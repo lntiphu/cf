@@ -1068,7 +1068,19 @@ let currentGalleryList = [];
             }, true);
         });
 
-        // 2. Đã tắt cử chỉ kéo chuột để trở về trang trước trên PC theo yêu cầu
+        // 2. Chặn hoàn toàn cử chỉ vuốt ngang / kéo trackpad 2 ngón tay trên PC gây Back/Forward trang web
+        window.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                // Cho phép cuộn ngang đối với các vùng có thanh cuộn ngang hợp lệ (như thanh lọc quán)
+                const scrollableX = e.target && e.target.closest && e.target.closest('.filter-scroll-track, .overflow-x-auto, [data-scrollable="x"]');
+                if (!scrollableX) {
+                    // Ngăn chặn hành vi Overscroll Navigation (kéo sang trái/phải để Back/Forward) của Chrome, Edge
+                    if (e.cancelable) {
+                        e.preventDefault();
+                    }
+                }
+            }
+        }, { passive: false });
 
         // 3. Xử lý nút Back của trình duyệt (trên điện thoại hoặc chuột máy tính)
         window.addEventListener('popstate', (e) => {
