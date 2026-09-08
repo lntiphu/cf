@@ -5,12 +5,22 @@
             overscroll-behavior-x: none !important;
         }
 
+        body,
+        #editModal,
+        #addModal,
+        #placeDetailModal,
+        #fullGalleryModal,
+        #photoLightboxModal,
+        .custom-scrollbar,
+        form {
+            overscroll-behavior: none !important;
+            overscroll-behavior-x: none !important;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: #FAF6F0;
             color: #2D2723;
-            overscroll-behavior: none !important;
-            overscroll-behavior-x: none !important;
         }
 
         .font-serif {
