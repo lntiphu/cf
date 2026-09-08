@@ -469,21 +469,21 @@ let currentGalleryList = [];
             gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-80 sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden";
             gridEl.innerHTML = `
                 <!-- Ảnh chính bên trái (chiếm 50% chiều rộng) -->
-                <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
                     <img src="${photos[0]}" alt="${placeName} 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
                 <!-- 4 ảnh nhỏ bên phải (chiếm 50% chiều rộng, lưới 2 cột x 2 hàng KÍCH THƯỚC BẰNG NHAU TUYỆT ĐỐI 100%) -->
                 <div class="grid grid-cols-2 gap-2 sm:gap-2.5 h-full min-h-0" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));">
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(1)">
                         <img src="${photos[1] || photos[0]}" alt="${placeName} 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(2)">
                         <img src="${photos[2] || photos[0]}" alt="${placeName} 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(3)">
                         <img src="${photos[3] || photos[0]}" alt="${placeName} 4" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(4)">
                         <img src="${photos[4] || photos[0]}" alt="${placeName} 5" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         ${extraCount > 0 ? `
                             <div class="absolute inset-0 bg-black/45 group-hover:bg-black/55 flex items-center justify-center transition">
@@ -946,7 +946,7 @@ let currentGalleryList = [];
             }
 
             gridEl.innerHTML = currentDetailPhotos.map((url, i) => `
-                <div class="rounded-2xl overflow-hidden bg-stone-100 border border-[#EAE3DC] aspect-4/3 shadow-2xs group cursor-pointer" onclick="window.open('${url}', '_blank')">
+                <div class="rounded-2xl overflow-hidden bg-stone-100 border border-[#EAE3DC] aspect-4/3 shadow-2xs group cursor-pointer" onclick="openPhotoLightbox(${i})">
                     <img src="${url}" alt="Ảnh ${i + 1}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
             `).join('');
@@ -996,6 +996,151 @@ let currentGalleryList = [];
         }
 
 
+        // ================= LIGHTBOX XEM & CHUYỂN ẢNH TOÀN MÀN HÌNH =================
+        let currentLightboxIndex = 0;
+        let lightboxTouchStartX = 0;
+        let lightboxTouchStartY = 0;
+
+        function openPhotoLightbox(index = 0) {
+            if (!currentDetailPhotos || currentDetailPhotos.length === 0) return;
+            const modal = document.getElementById('photoLightboxModal');
+            if (!modal) return;
+
+            currentLightboxIndex = Math.max(0, Math.min(index, currentDetailPhotos.length - 1));
+            renderLightboxContent();
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Gắn sự kiện vuốt cảm ứng trên mobile cho Lightbox
+            if (!modal.dataset.touchBound) {
+                modal.dataset.touchBound = 'true';
+                modal.addEventListener('touchstart', (e) => {
+                    if (e.touches && e.touches.length > 0) {
+                        lightboxTouchStartX = e.touches[0].clientX;
+                        lightboxTouchStartY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+
+                modal.addEventListener('touchend', (e) => {
+                    if (e.changedTouches && e.changedTouches.length > 0) {
+                        const diffX = e.changedTouches[0].clientX - lightboxTouchStartX;
+                        const diffY = e.changedTouches[0].clientY - lightboxTouchStartY;
+                        // Chỉ kích hoạt nếu vuốt ngang chủ đạo và đủ độ dài (>40px)
+                        if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY) * 1.3) {
+                            if (diffX < 0) {
+                                // Vuốt sang trái -> Xem ảnh tiếp theo
+                                lightboxNextPhoto();
+                            } else {
+                                // Vuốt sang phải -> Xem ảnh trước
+                                lightboxPrevPhoto();
+                            }
+                        }
+                    }
+                }, { passive: true });
+            }
+        }
+
+        function renderLightboxContent() {
+            if (!currentDetailPhotos || currentDetailPhotos.length === 0) return;
+            const total = currentDetailPhotos.length;
+            const currentUrl = currentDetailPhotos[currentLightboxIndex];
+
+            // 1. Cập nhật ảnh chính
+            const mainImg = document.getElementById('lightboxMainImg');
+            if (mainImg) {
+                mainImg.src = currentUrl;
+                mainImg.alt = `Ảnh ${currentLightboxIndex + 1} / ${total}`;
+            }
+
+            // 2. Cập nhật bộ đếm ảnh
+            const counter = document.getElementById('lightboxCounter');
+            if (counter) {
+                counter.innerText = `${currentLightboxIndex + 1} / ${total}`;
+            }
+
+            // 3. Ẩn/hiện nút mũi tên nếu chỉ có 1 ảnh
+            const btnPrev = document.getElementById('btnLightboxPrev');
+            const btnNext = document.getElementById('btnLightboxNext');
+            if (btnPrev && btnNext) {
+                if (total <= 1) {
+                    btnPrev.classList.add('hidden');
+                    btnNext.classList.add('hidden');
+                } else {
+                    btnPrev.classList.remove('hidden');
+                    btnNext.classList.remove('hidden');
+                }
+            }
+
+            // 4. Render danh sách thumbnail phía dưới
+            const thumbsContainer = document.getElementById('lightboxThumbnails');
+            if (thumbsContainer) {
+                if (total <= 1) {
+                    thumbsContainer.parentElement.classList.add('hidden');
+                } else {
+                    thumbsContainer.parentElement.classList.remove('hidden');
+                    thumbsContainer.innerHTML = currentDetailPhotos.map((url, i) => {
+                        const isActive = i === currentLightboxIndex;
+                        return `
+                            <div id="lightboxThumb_${i}" onclick="switchLightboxPhoto(${i})"
+                                class="w-11 h-11 sm:w-14 sm:h-14 rounded-lg overflow-hidden cursor-pointer flex-shrink-0 transition-all duration-200 ${
+                                    isActive
+                                        ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-[#14100E] opacity-100 scale-105 shadow-md'
+                                        : 'opacity-40 hover:opacity-80 border border-white/15'
+                                }">
+                                <img src="${url}" alt="Thumb ${i + 1}" loading="lazy" class="w-full h-full object-cover pointer-events-none">
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Cuộn thumbnail đang chọn vào vị trí giữa
+                    setTimeout(() => {
+                        const activeEl = document.getElementById(`lightboxThumb_${currentLightboxIndex}`);
+                        if (activeEl) {
+                            activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        }
+                    }, 50);
+                }
+            }
+        }
+
+        function switchLightboxPhoto(index) {
+            if (!currentDetailPhotos || currentDetailPhotos.length === 0) return;
+            currentLightboxIndex = (index + currentDetailPhotos.length) % currentDetailPhotos.length;
+            renderLightboxContent();
+        }
+
+        function lightboxNextPhoto() {
+            if (!currentDetailPhotos || currentDetailPhotos.length <= 1) return;
+            switchLightboxPhoto(currentLightboxIndex + 1);
+        }
+
+        function lightboxPrevPhoto() {
+            if (!currentDetailPhotos || currentDetailPhotos.length <= 1) return;
+            switchLightboxPhoto(currentLightboxIndex - 1);
+        }
+
+        function closePhotoLightbox() {
+            const modal = document.getElementById('photoLightboxModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+
+            // Nếu modal chi tiết quán vẫn đang mở, giữ nguyên chặn cuộn cho trang chi tiết
+            const detailModal = document.getElementById('placeDetailModal');
+            if (detailModal && !detailModal.classList.contains('hidden')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function handleLightboxBackdropClick(event) {
+            if (event.target && event.target.id === 'photoLightboxModal') {
+                closePhotoLightbox();
+            }
+        }
+
         // ================= XỬ LÝ QUAY LẠI BẰNG CHUỘT VÀ CON TRỎ =================
         let lastBackActionTime = 0; // Chống kích hoạt đúp (Debounce) giữa sự kiện chuột và popstate của trình duyệt
 
@@ -1017,6 +1162,14 @@ let currentGalleryList = [];
             const now = Date.now();
             if (now - lastBackActionTime < 350) {
                 return false; // Ngăn chặn nhảy 2 lần liên tiếp khi chuột gửi cả event lẫn popstate
+            }
+
+            // 0. Ưu tiên cao nhất: Nếu đang mở Lightbox xem ảnh thì đóng Lightbox trước!
+            const lightboxModal = document.getElementById('photoLightboxModal');
+            if (lightboxModal && !lightboxModal.classList.contains('hidden')) {
+                lastBackActionTime = now;
+                closePhotoLightbox();
+                return true;
             }
 
             // 1. Ưu tiên: Nếu đang mở bộ ảnh thì CHỈ ĐÓNG BỘ ẢNH, giữ nguyên màn hình chi tiết quán!
@@ -1089,6 +1242,14 @@ let currentGalleryList = [];
                 return; // Đã xử lý bởi sự kiện chuột trước đó, bỏ qua để không bị nhảy đúp
             }
 
+            // 0. Nếu đang mở Lightbox xem ảnh: chỉ đóng Lightbox trước
+            const lightboxModal = document.getElementById('photoLightboxModal');
+            if (lightboxModal && !lightboxModal.classList.contains('hidden')) {
+                lastBackActionTime = now;
+                closePhotoLightbox();
+                return;
+            }
+
             // Nếu bộ ảnh đang mở: chỉ đóng bộ ảnh và giữ lại chi tiết quán
             const galleryModal = document.getElementById('fullGalleryModal');
             const oldDynamicModal = document.getElementById('fullGalleryLightModal');
@@ -1115,8 +1276,24 @@ let currentGalleryList = [];
             }
         });
 
-        // 4. Lắng nghe phím Escape, Alt + Mũi tên trái, Backspace để đóng nhanh
+        // 4. Lắng nghe phím Escape, Mũi tên trái/phải để chuyển ảnh và đóng nhanh
         document.addEventListener('keydown', (e) => {
+            const lightboxModal = document.getElementById('photoLightboxModal');
+            if (lightboxModal && !lightboxModal.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    closePhotoLightbox();
+                    return;
+                }
+                if (e.key === 'ArrowRight') {
+                    lightboxNextPhoto();
+                    return;
+                }
+                if (e.key === 'ArrowLeft') {
+                    lightboxPrevPhoto();
+                    return;
+                }
+            }
+
             if (e.key === 'Escape') {
                 handleBackAction();
                 return;
