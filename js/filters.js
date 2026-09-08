@@ -398,6 +398,35 @@ let sortBy = 'default';
             });
         }
 
+        // Cấu hình 9 quán đặc biệt ưu tiên hiển thị ở trang đầu khi chưa lọc
+        const FEATURED_PRIORITY_IDS = [17, 102, 87, 56, 55, 47, 23, 13, 10];
+        const FEATURED_PATTERNS = [
+            { id: 17, match: (n) => n.startsWith('o ho') || n.includes('o ho coffee') },
+            { id: 102, match: (n) => n.startsWith('keng') },
+            { id: 87, match: (n) => n.includes('el.saigon') || n.includes('el saigon') },
+            { id: 56, match: (n) => n.includes('comfy') && n.includes('tu xuong') },
+            { id: 55, match: (n) => n.startsWith('tron ca phe') || n.startsWith('tron cafe') },
+            { id: 47, match: (n) => n.startsWith('cung.cafe') || n.startsWith('cung cafe') },
+            { id: 23, match: (n) => n.startsWith('mua ca phe') || n.startsWith('mua cafe') },
+            { id: 13, match: (n) => n.includes('16 gram') },
+            { id: 10, match: (n) => n.startsWith('phuong ca phe') || n.startsWith('phuong cafe') }
+        ];
+
+        function getFeaturedPriorityIndex(place) {
+            if (!place) return -1;
+            const pId = Number(place.id);
+            const idIdx = FEATURED_PRIORITY_IDS.indexOf(pId);
+            if (idIdx !== -1) return idIdx;
+
+            const normName = normalizeSearchText(place.name || '');
+            for (let i = 0; i < FEATURED_PATTERNS.length; i++) {
+                if (FEATURED_PATTERNS[i].match(normName)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         function getFilteredPlaces() {
             const filterDistEl = document.getElementById('filterDistrict');
             const filterDist = filterDistEl ? filterDistEl.value : 'Tất cả';
@@ -429,6 +458,17 @@ let sortBy = 'default';
                 return matchCat && matchDist && matchSearch && matchFav && matchOpen && matchMood && matchPurpose && matchAmenity && matchPrice;
             });
 
+            // Danh sách 9 quán ưu tiên hiển thị ở trang đầu khi chưa chọn bộ lọc nào
+            const isNoFilter = !searchQuery &&
+                selectedCategory === 'Tất cả' &&
+                selectedDistrict === 'Tất cả' &&
+                !showOnlyFavorites &&
+                !showOnlyOpenNow &&
+                !selectedMood &&
+                !selectedPurpose &&
+                !selectedAmenity &&
+                !selectedPrice;
+
             // Sắp xếp
             if (isNearMeActive || sortBy === 'distance') {
                 list.sort((a, b) => {
@@ -440,8 +480,22 @@ let sortBy = 'default';
                 list.sort((a, b) => (b.rating || 5) - (a.rating || 5));
             } else if (sortBy === 'name') {
                 list.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+            } else if (isNoFilter) {
+                // Mặc định khi chưa có bộ lọc gì: Đưa đúng 9 quán ưu tiên lên trang đầu theo thứ tự
+                list.sort((a, b) => {
+                    const prioA = getFeaturedPriorityIndex(a);
+                    const prioB = getFeaturedPriorityIndex(b);
+                    const isFeaturedA = prioA !== -1;
+                    const isFeaturedB = prioB !== -1;
+
+                    if (isFeaturedA && isFeaturedB) return prioA - prioB;
+                    if (isFeaturedA) return -1;
+                    if (isFeaturedB) return 1;
+
+                    return (Number(b.id) || 0) - (Number(a.id) || 0);
+                });
             } else {
-                // Mặc định: theo ID mới nhất
+                // Mặc định khi đã chọn bộ lọc: theo ID mới nhất
                 list.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
             }
 
