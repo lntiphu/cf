@@ -256,11 +256,6 @@ const ITEMS_PER_PAGE = 9;
                             <i class="fa-solid fa-rotate-left text-xs"></i> Đặt lại bộ lọc
                         </button>
                     </div>
-                    <div class="col-span-full flex justify-center sm:justify-end mt-4 pb-2">
-                        <p class="text-[10.5px] sm:text-[11px] text-stone-400 italic text-center sm:text-right leading-relaxed select-none">
-                            * Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
-                        </p>
-                    </div>
                 `;
                 return;
             }
@@ -484,15 +479,10 @@ const ITEMS_PER_PAGE = 9;
                             <i class="fa-solid fa-chevron-right text-sm"></i>
                         </button>
                     </div>
-                    <div class="col-span-full sm:hidden text-center px-4 mt-3 mb-6">
-                        <p class="text-[10.5px] text-stone-400 italic leading-relaxed select-none">
-                            * Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
-                        </p>
-                    </div>
                 `;
 
                 let desktopPaginationHTML = `
-                    <div class="col-span-full hidden sm:flex justify-center items-center gap-2 mt-10 mb-3">
+                    <div class="col-span-full hidden sm:flex justify-center items-center gap-2 mt-8 mb-4">
                         <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
                             class="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-[#B57324] hover:text-[#B57324] disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
                             <i class="fa-solid fa-chevron-left text-xs"></i> Trước
@@ -535,26 +525,9 @@ const ITEMS_PER_PAGE = 9;
                             Sau <i class="fa-solid fa-chevron-right text-xs"></i>
                         </button>
                     </div>
-
-                    <!-- Ghi chú phi thương mại nằm ở góc dưới cùng bên phải -->
-                    <div class="col-span-full hidden sm:flex justify-end mt-2 pb-2">
-                        <p class="text-[10.5px] sm:text-[11px] text-stone-400 italic text-right leading-relaxed select-none">
-                            * Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
-                        </p>
-                    </div>
                 `;
 
                 grid.innerHTML += mobilePaginationHTML + desktopPaginationHTML;
-            } else if (result.length > 0) {
-                // Khi chỉ có 1 trang (không có nút phân trang)
-                let singlePageFooterHTML = `
-                    <div class="col-span-full flex justify-center sm:justify-end mt-8 pb-2">
-                        <p class="text-[10.5px] sm:text-[11px] text-stone-400 italic text-center sm:text-right leading-relaxed select-none">
-                            * Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
-                        </p>
-                    </div>
-                `;
-                grid.innerHTML += singlePageFooterHTML;
             }
         }
 
