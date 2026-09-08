@@ -256,6 +256,11 @@ const ITEMS_PER_PAGE = 9;
                             <i class="fa-solid fa-rotate-left text-xs"></i> Đặt lại bộ lọc
                         </button>
                     </div>
+                    <div class="col-span-full flex justify-center sm:justify-end mt-4 mb-2">
+                        <p class="text-[11.5px] sm:text-xs text-stone-400 text-center sm:text-right max-w-xs leading-relaxed font-normal">
+                            Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
+                        </p>
+                    </div>
                 `;
                 return;
             }
@@ -453,7 +458,7 @@ const ITEMS_PER_PAGE = 9;
                         ontouchstart="handleSwipeStart(event)"
                         ontouchmove="handleSwipeMove(event)"
                         ontouchend="handleSwipeEnd(event)"
-                        class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-4 px-4 w-full bg-white/90 backdrop-blur-md rounded-2xl py-3 border border-stone-200 shadow-sm transition-all duration-150">
+                        class="col-span-full flex sm:hidden justify-between items-center gap-4 mt-8 mb-3 px-4 w-full bg-white/90 backdrop-blur-md rounded-2xl py-3 border border-stone-200 shadow-sm transition-all duration-150">
                         <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
                             class="w-10 h-10 rounded-full bg-stone-50 hover:bg-stone-100 text-stone-700 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200 flex items-center justify-center flex-shrink-0 shadow-sm border border-stone-200">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -479,14 +484,21 @@ const ITEMS_PER_PAGE = 9;
                             <i class="fa-solid fa-chevron-right text-sm"></i>
                         </button>
                     </div>
+                    <div class="col-span-full sm:hidden text-center px-4 -mt-1 mb-6">
+                        <p class="text-[11px] text-stone-400 leading-relaxed font-normal">
+                            Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
+                        </p>
+                    </div>
                 `;
 
                 let desktopPaginationHTML = `
-                    <div class="col-span-full hidden sm:flex justify-center items-center gap-2 mt-10 mb-6">
-                        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
-                            class="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-[#B57324] hover:text-[#B57324] disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-chevron-left text-xs"></i> Trước
-                        </button>
+                    <div class="col-span-full hidden sm:grid grid-cols-1 lg:grid-cols-3 items-center gap-4 mt-10 mb-6">
+                        <div class="hidden lg:block"></div>
+                        <div class="flex justify-center items-center gap-2">
+                            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}
+                                class="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-[#B57324] hover:text-[#B57324] disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-chevron-left text-xs"></i> Trước
+                            </button>
                 `;
 
                 const range = [];
@@ -520,14 +532,30 @@ const ITEMS_PER_PAGE = 9;
                 }
 
                 desktopPaginationHTML += `
-                        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}
-                            class="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-[#B57324] hover:text-[#B57324] disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
-                            Sau <i class="fa-solid fa-chevron-right text-xs"></i>
-                        </button>
+                            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}
+                                class="px-3.5 py-2 rounded-xl bg-white border border-stone-200 text-stone-700 hover:border-[#B57324] hover:text-[#B57324] disabled:opacity-40 disabled:cursor-not-allowed transition duration-200 text-sm font-semibold flex items-center gap-1 shadow-sm">
+                                Sau <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </button>
+                        </div>
+                        <div class="flex justify-center lg:justify-end">
+                            <p class="text-[11.5px] sm:text-xs text-stone-400 text-center lg:text-right max-w-xs leading-relaxed font-normal">
+                                Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
+                            </p>
+                        </div>
                     </div>
                 `;
 
                 grid.innerHTML += mobilePaginationHTML + desktopPaginationHTML;
+            } else if (result.length > 0) {
+                // Khi chỉ có 1 trang (không có nút phân trang)
+                let singlePageFooterHTML = `
+                    <div class="col-span-full flex justify-center sm:justify-end mt-8 mb-6">
+                        <p class="text-[11.5px] sm:text-xs text-stone-400 text-center sm:text-right max-w-xs leading-relaxed font-normal">
+                            Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
+                        </p>
+                    </div>
+                `;
+                grid.innerHTML += singlePageFooterHTML;
             }
         }
 
