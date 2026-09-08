@@ -901,7 +901,7 @@ let currentGalleryList = [];
             const drinkEl = document.getElementById('detailSignatureDrink');
             if (drinkEl) {
                 const drinks = ['Trà đào cam sả', 'Cà phê Muối béo ngậy', 'Trà Ô Long sữa nướng', 'Matcha Latte nguyên chất', 'Cold Brew cam vàng'];
-                drinkEl.innerText = place.signature_drink || drinks[(idNum % drinks.length)] || 'Trà Ô Long sữa nướng';
+                drinkEl.innerText = place.signature_drink || drinks[(Math.abs(Number(place.id)) || 1) % drinks.length] || 'Trà Ô Long sữa nướng';
             }
 
             // 8. Trang thông tin / Mạng xã hội quán (Instagram, Facebook, TikTok, Website...)

@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator && isHttpOrigin) {
     });
 
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=50', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('/sw.js?v=51', { updateViaCache: 'none' })
             .then(reg => {
                 reg.update();
                 console.log('Service Worker đã đăng ký thành công.', reg);
