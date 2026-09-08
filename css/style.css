@@ -196,6 +196,82 @@
             }
         }
 
+        @property --border-angle {
+            syntax: '<angle>';
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        @keyframes rotate-border-beam {
+            0% {
+                --border-angle: 0deg;
+            }
+            100% {
+                --border-angle: 360deg;
+            }
+        }
+
+        /* ================= THẺ QUÁN ĐÃ ĐI: VIỀN XANH CHẠY VÒNG QUANH KHUNG KHI RÊ CHUỘT ================= */
+        /* Mặc định chưa rê chuột: Giữ nguyên khung viền tự nhiên như các thẻ quán khác */
+        .place-card.is-visited {
+            border-color: #EFE8DF;
+            position: relative;
+        }
+
+        /* Dải viền xanh sáng chuyển động chạy vòng quanh khung thẻ quán */
+        .place-card.is-visited::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 1rem; /* Khớp chuẩn rounded-2xl (16px) */
+            padding: 2.5px;
+            background: conic-gradient(
+                from var(--border-angle),
+                transparent 0deg,
+                transparent 160deg,
+                rgba(134, 239, 172, 0.2) 220deg,
+                #86EFAC 280deg,
+                #4ADE80 330deg,
+                #86EFAC 360deg
+            );
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            -webkit-mask-composite: destination-out;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 30;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            animation: rotate-border-beam 2.2s linear infinite;
+        }
+
+        /* Khi rê chuột vào quán đã đi (Desktop): Hiện dải viền xanh chạy vòng vòng quanh khung */
+        @media (hover: hover) and (pointer: fine) {
+            .place-card.is-visited:hover {
+                border-color: rgba(134, 239, 172, 0.35) !important;
+                box-shadow: 0 24px 44px -10px rgba(74, 222, 128, 0.3) !important;
+            }
+            .place-card.is-visited:hover::after {
+                opacity: 1;
+            }
+            .flex-row.place-card.is-visited:hover {
+                border-color: rgba(134, 239, 172, 0.35) !important;
+                box-shadow: 0 18px 36px -8px rgba(74, 222, 128, 0.25) !important;
+            }
+        }
+
+        /* Trên thiết bị cảm ứng (Mobile): Chạy dải sáng khi chạm vào */
+        @media (hover: none), (pointer: coarse), (max-width: 640px) {
+            .place-card.is-visited:active {
+                border-color: rgba(134, 239, 172, 0.35) !important;
+                box-shadow: 0 4px 12px rgba(74, 222, 128, 0.25) !important;
+            }
+            .place-card.is-visited:active::after {
+                opacity: 1;
+            }
+        }
+
         /* Dòng cảm nhận / trích dẫn ngắn phong cách tạp chí chuẩn đẹp, siêu sắc nét */
         .card-review-quote {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -294,70 +370,15 @@
             animation: live-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
 
-        /* Hiệu ứng thu nhỏ Header mượt mà khi cuộn trang (Shrink Navbar on Scroll) */
+        /* Thanh Header nằm ở đầu trang (Không trôi theo khi cuộn) */
         #mainHeader {
-            transition: top 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #mainHeader.is-scrolled {
-            top: 6px;
+            position: relative;
+            width: 100%;
+            z-index: 20;
         }
 
         #mainHeaderInner {
-            transition: max-width 0.38s cubic-bezier(0.16, 1, 0.3, 1),
-                        padding 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-                        background-color 0.3s ease,
-                        box-shadow 0.3s ease,
-                        border-color 0.3s ease;
-        }
-
-        #mainHeader.is-scrolled #mainHeaderInner {
-            max-width: 640px; /* Thu gọn thành viên thuốc pill sang trọng */
-            padding-top: 6px;
-            padding-bottom: 6px;
-            padding-left: 14px;
-            padding-right: 14px;
-            background-color: rgba(255, 255, 255, 0.94);
-            box-shadow: 0 10px 30px rgba(45, 35, 25, 0.12), 0 2px 6px rgba(45, 35, 25, 0.05);
-            border-color: rgba(230, 221, 210, 0.95);
-        }
-
-        #headerLogoImg {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #mainHeader.is-scrolled #headerLogoImg {
-            width: 30px;
-            height: 30px;
-        }
-
-        #headerBrandTitle {
-            transition: font-size 0.3s ease;
-        }
-
-        #mainHeader.is-scrolled #headerBrandTitle {
-            font-size: 13.5px;
-        }
-
-        #headerSubText {
-            transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.25s ease;
-        }
-
-        #mainHeader.is-scrolled #headerSubText {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            margin: 0;
-        }
-
-        #btnHeaderAdd {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #mainHeader.is-scrolled #btnHeaderAdd {
-            padding-top: 4px;
-            padding-bottom: 4px;
-            padding-left: 12px;
-            padding-right: 12px;
-            font-size: 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 30px rgba(45, 35, 25, 0.07), 0 1px 3px rgba(45, 35, 25, 0.05);
+            border: 1px solid rgba(239, 232, 223, 0.95);
         }
