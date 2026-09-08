@@ -1144,11 +1144,10 @@ let currentGalleryList = [];
         // ================= XỬ LÝ QUAY LẠI BẰNG CHUỘT VÀ CON TRỎ =================
         let lastBackActionTime = 0; // Chống kích hoạt đúp (Debounce) giữa sự kiện chuột và popstate của trình duyệt
 
-        // Đóng bằng click con trỏ vào khoảng trống (lề nền ngoài card nội dung)
+        // Đóng bằng click con trỏ vào khoảng trống (Đã tắt đối với trang chi tiết để tránh click nhầm khi lướt web trên PC)
         function handleDetailBackdropClick(event) {
-            if (event.target && event.target.id === 'placeDetailModal') {
-                closeDetailModal();
-            }
+            // Không tự động đóng khi click vào 2 bên lề trang chi tiết trên PC để tránh thoát ngoài ý muốn.
+            // Người dùng có thể dùng nút "Quay lại", phím Esc hoặc nút Back của trình duyệt/chuột.
         }
 
         function handleGalleryBackdropClick(event) {
