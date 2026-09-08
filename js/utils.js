@@ -7,6 +7,58 @@ let userLocation = null; // { lat: number, lng: number }
 let isNearMeActive = false;
 let isLocating = false;
 
+        // Bảng tọa độ trung tâm dự phòng theo quận/huyện ở TP.HCM
+        const DISTRICT_COORDS = {
+            'Quận 1': { lat: 10.7769, lng: 106.7009 },
+            'Q1': { lat: 10.7769, lng: 106.7009 },
+            'Q.1': { lat: 10.7769, lng: 106.7009 },
+            'Q. 1': { lat: 10.7769, lng: 106.7009 },
+            '1': { lat: 10.7769, lng: 106.7009 },
+            'Quận 2': { lat: 10.7872, lng: 106.7498 },
+            'Q2': { lat: 10.7872, lng: 106.7498 },
+            'Q.2': { lat: 10.7872, lng: 106.7498 },
+            'Quận 3': { lat: 10.7844, lng: 106.6844 },
+            'Q3': { lat: 10.7844, lng: 106.6844 },
+            'Q.3': { lat: 10.7844, lng: 106.6844 },
+            'Q. 3': { lat: 10.7844, lng: 106.6844 },
+            '3': { lat: 10.7844, lng: 106.6844 },
+            'Quận 4': { lat: 10.7610, lng: 106.7020 },
+            'Q4': { lat: 10.7610, lng: 106.7020 },
+            'Q.4': { lat: 10.7610, lng: 106.7020 },
+            'Quận 5': { lat: 10.7550, lng: 106.6667 },
+            'Q5': { lat: 10.7550, lng: 106.6667 },
+            'Q.5': { lat: 10.7550, lng: 106.6667 },
+            'Quận 6': { lat: 10.7480, lng: 106.6350 },
+            'Q6': { lat: 10.7480, lng: 106.6350 },
+            'Quận 7': { lat: 10.7340, lng: 106.7218 },
+            'Q7': { lat: 10.7340, lng: 106.7218 },
+            'Quận 8': { lat: 10.7240, lng: 106.6286 },
+            'Q8': { lat: 10.7240, lng: 106.6286 },
+            'Quận 9': { lat: 10.8428, lng: 106.7944 },
+            'Q9': { lat: 10.8428, lng: 106.7944 },
+            'Quận 10': { lat: 10.7716, lng: 106.6672 },
+            'Q10': { lat: 10.7716, lng: 106.6672 },
+            'Quận 11': { lat: 10.7656, lng: 106.6500 },
+            'Q11': { lat: 10.7656, lng: 106.6500 },
+            'Quận 12': { lat: 10.8672, lng: 106.6410 },
+            'Q12': { lat: 10.8672, lng: 106.6410 },
+            'Bình Thạnh': { lat: 10.8030, lng: 106.7020 },
+            'Quận Bình Thạnh': { lat: 10.8030, lng: 106.7020 },
+            'Phú Nhuận': { lat: 10.7992, lng: 106.6800 },
+            'Quận Phú Nhuận': { lat: 10.7992, lng: 106.6800 },
+            'Gò Vấp': { lat: 10.8386, lng: 106.6653 },
+            'Quận Gò Vấp': { lat: 10.8386, lng: 106.6653 },
+            'Tân Bình': { lat: 10.8014, lng: 106.6528 },
+            'Quận Tân Bình': { lat: 10.8014, lng: 106.6528 },
+            'Tân Phú': { lat: 10.7900, lng: 106.6280 },
+            'Quận Tân Phú': { lat: 10.7900, lng: 106.6280 },
+            'Bình Tân': { lat: 10.7650, lng: 106.6040 },
+            'Quận Bình Tân': { lat: 10.7650, lng: 106.6040 },
+            'Thủ Đức': { lat: 10.8494, lng: 106.7537 },
+            'TP. Thủ Đức': { lat: 10.8494, lng: 106.7537 },
+            'TP Thủ Đức': { lat: 10.8494, lng: 106.7537 }
+        };
+
         // Tính khoảng cách theo công thức Haversine (km)
         function getDistanceKm(lat1, lon1, lat2, lon2) {
             const R = 6371;
@@ -22,17 +74,26 @@ let isLocating = false;
 
         // Lấy khoảng cách từ vị trí người dùng đến quán (km)
         function getPlaceDistance(place) {
-            if (!userLocation) return null;
+            if (!userLocation || !place) return null;
             let lat = Number(place.lat);
             let lng = Number(place.lng);
             if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
                 const district = (place.district || '').trim();
-                const fallback = DISTRICT_COORDS[district];
+                let fallback = DISTRICT_COORDS[district];
+                if (!fallback && district) {
+                    for (const key in DISTRICT_COORDS) {
+                        if (district.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(district.toLowerCase())) {
+                            fallback = DISTRICT_COORDS[key];
+                            break;
+                        }
+                    }
+                }
                 if (fallback) {
                     lat = fallback.lat;
                     lng = fallback.lng;
                 } else {
-                    return null;
+                    lat = 10.7769;
+                    lng = 106.7009;
                 }
             }
             return getDistanceKm(userLocation.lat, userLocation.lng, lat, lng);
@@ -84,36 +145,63 @@ let isLocating = false;
             const nearMeIcon = document.getElementById('nearMeIcon');
             const nearMeText = document.getElementById('nearMeText');
             if (nearMeIcon) nearMeIcon.className = 'fa-solid fa-spinner fa-spin text-xs text-[#B57324]';
-            if (nearMeText) nearMeText.innerText = 'Đang định vị...';
+            if (nearMeText) nearMeText.innerText = 'Đang tìm...';
+
+            const onLocationSuccess = (pos) => {
+                isLocating = false;
+                userLocation = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude
+                };
+                isNearMeActive = true;
+                if (nearMeIcon) nearMeIcon.className = 'fa-solid fa-location-crosshairs text-xs text-white';
+                if (nearMeText) nearMeText.innerText = 'Gần tôi';
+                const sortSelect = document.getElementById('sortBy');
+                if (sortSelect) sortSelect.value = 'distance';
+                sortBy = 'distance';
+                updateFilterPillsUI();
+                currentPage = 1;
+                renderPlaces();
+            };
+
+            const onLocationError = (err) => {
+                // Nếu timeout với độ chính xác cao hoặc mạng yếu, tự động thử lại với GPS thường (rất quan trọng cho Laptop/PC)
+                if (err && (err.code === 3 || err.code === 2)) {
+                    navigator.geolocation.getCurrentPosition(
+                        onLocationSuccess,
+                        (fallbackErr) => {
+                            isLocating = false;
+                            isNearMeActive = false;
+                            if (nearMeIcon) nearMeIcon.className = 'fa-solid fa-location-crosshairs text-xs text-[#B57324]';
+                            if (nearMeText) nearMeText.innerText = 'Gần tôi';
+                            updateFilterPillsUI();
+                            let msg = 'Không thể xác định vị trí hiện tại.';
+                            if (fallbackErr && fallbackErr.code === 1) {
+                                msg = 'Vui lòng cho phép quyền truy cập vị trí trên trình duyệt để tìm quán gần bạn.';
+                            }
+                            alert(msg);
+                        },
+                        { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 }
+                    );
+                    return;
+                }
+
+                isLocating = false;
+                isNearMeActive = false;
+                if (nearMeIcon) nearMeIcon.className = 'fa-solid fa-location-crosshairs text-xs text-[#B57324]';
+                if (nearMeText) nearMeText.innerText = 'Gần tôi';
+                updateFilterPillsUI();
+                let msg = 'Không thể xác định vị trí hiện tại.';
+                if (err && err.code === 1) {
+                    msg = 'Vui lòng cho phép quyền truy cập vị trí trên trình duyệt để tìm quán gần bạn.';
+                }
+                alert(msg);
+            };
 
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    isLocating = false;
-                    userLocation = {
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude
-                    };
-                    isNearMeActive = true;
-                    if (nearMeText) nearMeText.innerText = 'Gần tôi';
-                    const sortSelect = document.getElementById('sortBy');
-                    if (sortSelect) sortSelect.value = 'distance';
-                    sortBy = 'distance';
-                    updateFilterPillsUI();
-                    currentPage = 1;
-                    renderPlaces();
-                },
-                (err) => {
-                    isLocating = false;
-                    isNearMeActive = false;
-                    if (nearMeText) nearMeText.innerText = 'Gần tôi';
-                    updateFilterPillsUI();
-                    let msg = 'Không thể xác định vị trí hiện tại.';
-                    if (err.code === 1) {
-                        msg = 'Vui lòng cho phép quyền truy cập vị trí trên trình duyệt để tìm quán gần bạn.';
-                    }
-                    alert(msg);
-                },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+                onLocationSuccess,
+                onLocationError,
+                { enableHighAccuracy: true, timeout: 7000, maximumAge: 60000 }
             );
         }
 
