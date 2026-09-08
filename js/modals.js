@@ -1447,11 +1447,10 @@ let currentGalleryList = [];
             }
         }
 
-        // Bắt sự kiện bấm ra ngoài vùng xám backdrop của Edit Modal
+        // Bắt sự kiện bấm ra ngoài vùng xám backdrop của Edit Modal (Đã tắt tự đóng khi kéo chuột hoặc click lề ngoài để bảo vệ dữ liệu đang nhập)
         function handleEditBackdropClick(event) {
-            if (event.target && event.target.id === 'editModal') {
-                cancelEditModal();
-            }
+            // Không tự động đóng khi kéo chuột hay click trúng viền ngoài để tránh mất toàn bộ dữ liệu người dùng đang nhập.
+            // Người dùng chỉ thoát khi chủ động bấm nút "✕", nút "Hủy bỏ" hoặc phím Esc.
         }
 
         // Mở Modal chỉnh sửa và điền dữ liệu cũ (Đầy đủ tất cả thông tin đã show ra ở quán)
