@@ -324,21 +324,21 @@
             <div class="bg-white rounded-3xl p-2.5 sm:p-3 shadow-xs border border-[#EAE3DC]">
                 <div id="detailPhotoGrid" class="grid grid-cols-2 gap-2 sm:gap-2.5 h-80 sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden">
                     <!-- Ảnh chính bên trái (chiếm 50% chiều rộng) -->
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
                         <img id="detailImgMain" src="" alt="Ảnh chính" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
                     <!-- 4 ảnh nhỏ bên phải (chiếm 50% chiều rộng, lưới 2 cột x 2 hàng KÍCH THƯỚC BẰNG NHAU 100%) -->
                     <div class="grid grid-cols-2 gap-2 sm:gap-2.5 h-full min-h-0" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));">
-                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(1)">
                             <img id="detailImgSub1" src="" alt="Ảnh phụ 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         </div>
-                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(2)">
                             <img id="detailImgSub2" src="" alt="Ảnh phụ 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         </div>
-                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(3)">
                             <img id="detailImgSub3" src="" alt="Ảnh phụ 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         </div>
-                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openFullGalleryModal()">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(4)">
                             <img id="detailImgSub4" src="" alt="Ảnh phụ 4" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <!-- Badge số ảnh còn lại (+X ảnh) -->
                             <div id="detailMoreBadgeWrap" class="hidden absolute inset-0 bg-black/45 group-hover:bg-black/55 flex items-center justify-center transition">
@@ -350,7 +350,7 @@
 
                 <!-- Link xem tất cả ảnh phía dưới bộ ảnh -->
                 <div class="pt-2.5 pb-0.5 px-2 flex items-center justify-between">
-                    <button type="button" onclick="openFullGalleryModal()" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition cursor-pointer">
+                    <button type="button" onclick="openPhotoLightbox(0)" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition cursor-pointer">
                         <i class="fa-regular fa-images text-stone-500 text-sm"></i>
                         <span id="detailViewAllPhotosText">Xem tất cả 5 ảnh</span>
                     </button>
@@ -538,6 +538,48 @@
         <!-- Grid hiển thị danh sách ảnh -->
         <div class="max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 flex-1" onclick="event.stopPropagation()">
             <div id="fullGalleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 sm:gap-4 pb-12">
+                <!-- Render bằng Javascript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Xem & Chuyển Ảnh Quán Chuẩn Toàn Màn Hình (Photo Lightbox Slider) -->
+    <div id="photoLightboxModal" class="fixed inset-0 z-[85] bg-[#14100E]/95 backdrop-blur-md hidden flex flex-col justify-between p-3 sm:p-6 select-none transition-all duration-200" onclick="handleLightboxBackdropClick(event)">
+        <!-- Top Bar: Bộ đếm ảnh (trái) & Nút đóng (phải) -->
+        <div class="flex items-center justify-between w-full max-w-6xl mx-auto z-20" onclick="event.stopPropagation()">
+            <div id="lightboxCounter" class="px-3.5 py-1.5 rounded-full bg-white/10 text-white font-semibold text-xs sm:text-sm tracking-wider border border-white/10 backdrop-blur-md">
+                1 / 1
+            </div>
+            <button type="button" onclick="closePhotoLightbox()"
+                class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/90 hover:text-white flex items-center justify-center border border-white/10 backdrop-blur-md transition hover:scale-105 active:scale-95 cursor-pointer shadow-lg" title="Đóng (Esc)">
+                <i class="fa-solid fa-xmark text-sm sm:text-base"></i>
+            </button>
+        </div>
+
+        <!-- Center Area: Ảnh lớn & 2 nút điều hướng Trái / Phải -->
+        <div class="relative flex-1 flex items-center justify-center min-h-0 w-full max-w-6xl mx-auto my-2 sm:my-3" onclick="event.stopPropagation()">
+            <!-- Nút ảnh trước (Left Chevron) -->
+            <button type="button" id="btnLightboxPrev" onclick="lightboxPrevPhoto()"
+                class="absolute left-1 sm:left-4 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/45 hover:bg-black/75 text-white flex items-center justify-center backdrop-blur-md border border-white/15 transition hover:scale-105 active:scale-95 cursor-pointer shadow-xl" title="Ảnh trước (Mũi tên trái)">
+                <i class="fa-solid fa-chevron-left text-sm sm:text-base"></i>
+            </button>
+
+            <!-- Khung ảnh chính -->
+            <div class="w-full h-full flex items-center justify-center p-1 sm:p-4 overflow-hidden">
+                <img id="lightboxMainImg" src="" alt="Ảnh quán"
+                    class="max-h-[66vh] sm:max-h-[72vh] max-w-[92vw] sm:max-w-[85vw] object-contain rounded-xl sm:rounded-2xl shadow-2xl transition-all duration-200 cursor-default">
+            </div>
+
+            <!-- Nút ảnh tiếp theo (Right Chevron) -->
+            <button type="button" id="btnLightboxNext" onclick="lightboxNextPhoto()"
+                class="absolute right-1 sm:right-4 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/45 hover:bg-black/75 text-white flex items-center justify-center backdrop-blur-md border border-white/15 transition hover:scale-105 active:scale-95 cursor-pointer shadow-xl" title="Ảnh kế tiếp (Mũi tên phải)">
+                <i class="fa-solid fa-chevron-right text-sm sm:text-base"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Bar: Dải thumbnail các ảnh bên dưới -->
+        <div class="w-full max-w-4xl mx-auto z-20 py-1 overflow-x-auto no-scrollbar flex items-center justify-center" onclick="event.stopPropagation()">
+            <div id="lightboxThumbnails" class="flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 overflow-x-auto max-w-full no-scrollbar">
                 <!-- Render bằng Javascript -->
             </div>
         </div>
