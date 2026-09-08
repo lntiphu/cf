@@ -1,14 +1,14 @@
-const CACHE_NAME = 'coffee-tracker-v49';
+const CACHE_NAME = 'coffee-tracker-v50';
 const ASSETS = [
-  'index.html',
-  'manifest.json',
-  'icon.svg',
-  'css/style.css',
-  'js/utils.js',
-  'js/api.js',
-  'js/filters.js',
-  'js/modals.js',
-  'js/app.js',
+  './index.html',
+  './manifest.json',
+  './icon.svg',
+  './css/style.css',
+  './js/utils.js',
+  './js/api.js',
+  './js/filters.js',
+  './js/modals.js',
+  './js/app.js',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
@@ -16,10 +16,18 @@ const ASSETS = [
 
 // Cài đặt service worker và lưu các tài nguyên tĩnh vào cache
 self.addEventListener('install', (e) => {
+  // Không chặn install nếu 1 tài nguyên nào đó tải lỗi (ví dụ CDN bị chặn),
+  // tránh lỗi "Failed to update a ServiceWorker ... Not found".
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(
+        ASSETS.map((asset) =>
+          cache.add(new Request(asset, { cache: 'reload' })).catch((err) => {
+            console.warn('[SW] Bỏ qua tài nguyên không tải được:', asset, err);
+          })
+        )
+      )
+    ).then(() => self.skipWaiting())
   );
 });
 
