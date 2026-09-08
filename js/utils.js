@@ -254,31 +254,42 @@ let isLocating = false;
                 .trim();
         }
 
-        // Kiểm tra xem quán có đang mở cửa vào thời điểm hiện tại không
+        // Kiểm tra xem quán có đang mở cửa vào thời điểm hiện tại không (Hỗ trợ 1 hoặc nhiều khung giờ, Vd: 07:00 - 12:00, 14:00 - 22:00)
         function isOpenNow(openingHours) {
             if (!openingHours || typeof openingHours !== 'string') return null;
             const text = openingHours.toLowerCase().trim();
             if (!text) return null;
             if (text.includes('cả ngày') || text.includes('24/7') || text.includes('24h') || text.includes('24/24')) return true;
 
-            const match = text.match(/(\d{1,2})[:h](\d{0,2})\s*[-–—]\s*(\d{1,2})[:h](\d{0,2})/);
-            if (!match) return null;
-
-            const startH = parseInt(match[1], 10);
-            const startM = match[2] ? parseInt(match[2], 10) : 0;
-            const endH = parseInt(match[3], 10);
-            const endM = match[4] ? parseInt(match[4], 10) : 0;
+            // Bắt tất cả các cặp khoảng giờ, ví dụ: "07:00 - 12:00, 14:00 - 22:00" hoặc "07h30 - 12h & 14h - 22h"
+            const regex = /(\d{1,2})[:h](\d{0,2})\s*[-–—]\s*(\d{1,2})[:h](\d{0,2})/g;
+            const matches = [...text.matchAll(regex)];
+            if (!matches || matches.length === 0) return null;
 
             const now = new Date();
             const currentMins = now.getHours() * 60 + now.getMinutes();
-            const startMins = startH * 60 + startM;
-            let endMins = endH * 60 + endM;
 
-            if (endMins <= startMins) {
-                // Mở qua nửa đêm (Vd: 18:00 - 02:00)
-                return currentMins >= startMins || currentMins <= endMins;
+            for (const match of matches) {
+                const startH = parseInt(match[1], 10);
+                const startM = match[2] ? parseInt(match[2], 10) : 0;
+                const endH = parseInt(match[3], 10);
+                const endM = match[4] ? parseInt(match[4], 10) : 0;
+
+                const startMins = startH * 60 + startM;
+                let endMins = endH * 60 + endM;
+
+                let inRange = false;
+                if (endMins <= startMins) {
+                    // Mở qua nửa đêm (Vd: 18:00 - 02:00)
+                    inRange = (currentMins >= startMins || currentMins <= endMins);
+                } else {
+                    inRange = (currentMins >= startMins && currentMins <= endMins);
+                }
+
+                if (inRange) return true; // Đang trong ít nhất 1 khung giờ mở cửa
             }
-            return currentMins >= startMins && currentMins <= endMins;
+
+            return false; // Nằm ngoài tất cả các khung giờ
         }
 
         // Hiển thị thông báo Toast hiện đại, tự biến mất
