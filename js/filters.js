@@ -51,9 +51,11 @@ let sortBy = 'default';
                 return;
             }
 
+            // Giới hạn độ dài tối đa 100 ký tự mà KHÔNG được trim để người dùng thoải mái gõ khoảng trắng (Space) giữa các từ
             if (!event || !event.isComposing) {
-                const cleanValue = cleanTextField(input.value).slice(0, 100);
-                if (input.value !== cleanValue) input.value = cleanValue;
+                if (input.value.length > 100) {
+                    input.value = input.value.slice(0, 100);
+                }
             }
             const btnClear = document.getElementById('btnClearSearch');
             if (btnClear) {
