@@ -1,4 +1,4 @@
-const CACHE_NAME = 'coffee-tracker-v35';
+const CACHE_NAME = 'coffee-tracker-v36';
 const ASSETS = [
   'index.html',
   'manifest.json',
