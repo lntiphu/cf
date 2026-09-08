@@ -435,64 +435,118 @@ let currentGalleryList = [];
         }
 
 
-        // Bộ ảnh cà phê chất lượng cao dùng làm fallback khi quán chưa có ảnh
-        const CAFE_AESTHETIC_PHOTOS = [
-            'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1442512595331-e89e73853f31?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80',
-            'https://images.unsplash.com/photo-1507133750040-4a8f570215b8?auto=format&fit=crop&w=800&q=80'
-        ];
-
         let currentDetailPhotos = [];
 
-        // Hiển thị bố cục 5 ảnh chuẩn theo hình mẫu Cafe Maps (1 ảnh lớn 50% bên trái, 4 ảnh nhỏ 2x2 50% bên phải)
+        // Hiển thị bố cục ảnh theo số lượng ảnh THẬT mà quán có (loại bỏ hoàn toàn ảnh mẫu/ảnh có sẵn khi quán chưa có ảnh)
         function renderDetailPhotoGrid(photos, placeName) {
+            const photoContainer = document.getElementById('detailPhotoContainer');
             const gridEl = document.getElementById('detailPhotoGrid');
             const viewAllTextEl = document.getElementById('detailViewAllPhotosText');
             if (!gridEl) return;
 
-            const count = photos.length;
+            const count = photos ? photos.length : 0;
+
+            // Nếu quán CHƯA có ảnh nào -> Ẩn hoàn toàn khối ảnh
+            if (count === 0) {
+                if (photoContainer) photoContainer.classList.add('hidden');
+                gridEl.innerHTML = '';
+                return;
+            }
+
+            // Có ảnh -> Hiện khối ảnh
+            if (photoContainer) photoContainer.classList.remove('hidden');
+
             if (viewAllTextEl) {
                 viewAllTextEl.innerText = count === 1 ? 'Xem ảnh đầy đủ' : `Xem tất cả ${count} ảnh`;
             }
 
-            const extraCount = count > 5 ? (count - 5) : 0;
-
-            gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-80 sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden";
-            gridEl.innerHTML = `
-                <!-- Ảnh chính bên trái (chiếm 50% chiều rộng) -->
-                <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
-                    <img src="${photos[0]}" alt="${placeName} 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <!-- 4 ảnh nhỏ bên phải (chiếm 50% chiều rộng, lưới 2 cột x 2 hàng KÍCH THƯỚC BẰNG NHAU TUYỆT ĐỐI 100%) -->
-                <div class="grid grid-cols-2 gap-2 sm:gap-2.5 h-full min-h-0" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));">
+            if (count === 1) {
+                // 1 ảnh: Hiển thị 1 ảnh banner toàn khung hình
+                gridEl.className = "rounded-2xl overflow-hidden h-72 sm:h-[420px] md:h-[480px]";
+                gridEl.style.display = "";
+                gridEl.style.gridTemplateColumns = "";
+                gridEl.style.gridTemplateRows = "";
+                gridEl.innerHTML = `
+                    <div class="relative h-full w-full overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
+                        <img src="${photos[0]}" alt="${placeName}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                `;
+            } else if (count === 2) {
+                // 2 ảnh: 2 cột chia đôi đều nhau
+                gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-72 sm:h-[420px] md:h-[480px] rounded-2xl overflow-hidden";
+                gridEl.style.display = "";
+                gridEl.style.gridTemplateColumns = "";
+                gridEl.style.gridTemplateRows = "";
+                gridEl.innerHTML = `
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
+                        <img src="${photos[0]}" alt="${placeName} 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
                     <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(1)">
-                        <img src="${photos[1] || photos[0]}" alt="${placeName} 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <img src="${photos[1]}" alt="${placeName} 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(2)">
-                        <img src="${photos[2] || photos[0]}" alt="${placeName} 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                `;
+            } else if (count === 3) {
+                // 3 ảnh: 1 ảnh lớn bên trái, 2 ảnh nhỏ xếp dọc bên phải
+                gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-72 sm:h-[440px] md:h-[500px] rounded-2xl overflow-hidden";
+                gridEl.style.display = "";
+                gridEl.style.gridTemplateColumns = "";
+                gridEl.style.gridTemplateRows = "";
+                gridEl.innerHTML = `
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
+                        <img src="${photos[0]}" alt="${placeName} 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(3)">
-                        <img src="${photos[3] || photos[0]}" alt="${placeName} 4" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="grid grid-rows-2 gap-2 sm:gap-2.5 h-full min-h-0">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(1)">
+                            <img src="${photos[1]}" alt="${placeName} 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(2)">
+                            <img src="${photos[2]}" alt="${placeName} 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
                     </div>
-                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(4)">
-                        <img src="${photos[4] || photos[0]}" alt="${placeName} 5" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        ${extraCount > 0 ? `
-                            <div class="absolute inset-0 bg-black/45 group-hover:bg-black/55 flex items-center justify-center transition">
-                                <span class="text-white font-bold text-xs sm:text-base tracking-wide drop-shadow-md">+${extraCount} ảnh</span>
-                            </div>
-                        ` : ''}
+                `;
+            } else if (count === 4) {
+                // 4 ảnh: Lưới 2x2 cân xứng
+                gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-72 sm:h-[440px] md:h-[500px] rounded-2xl overflow-hidden";
+                gridEl.style.display = "grid";
+                gridEl.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
+                gridEl.style.gridTemplateRows = "repeat(2, minmax(0, 1fr))";
+                gridEl.innerHTML = [0, 1, 2, 3].map(i => `
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(${i})">
+                        <img src="${photos[i]}" alt="${placeName} ${i + 1}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     </div>
-                </div>
-            `;
+                `).join('');
+            } else {
+                // 5 ảnh trở lên: 1 ảnh lớn bên trái, 4 ảnh nhỏ 2x2 bên phải (có badge +X nếu > 5)
+                const extraCount = count > 5 ? (count - 5) : 0;
+                gridEl.className = "grid grid-cols-2 gap-2 sm:gap-2.5 h-80 sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden";
+                gridEl.style.display = "";
+                gridEl.style.gridTemplateColumns = "";
+                gridEl.style.gridTemplateRows = "";
+                gridEl.innerHTML = `
+                    <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
+                        <img src="${photos[0]}" alt="${placeName} 1" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 sm:gap-2.5 h-full min-h-0" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));">
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(1)">
+                            <img src="${photos[1]}" alt="${placeName} 2" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(2)">
+                            <img src="${photos[2]}" alt="${placeName} 3" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(3)">
+                            <img src="${photos[3]}" alt="${placeName} 4" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(4)">
+                            <img src="${photos[4]}" alt="${placeName} 5" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            ${extraCount > 0 ? `
+                                <div class="absolute inset-0 bg-black/45 group-hover:bg-black/55 flex items-center justify-center transition">
+                                    <span class="text-white font-bold text-xs sm:text-base tracking-wide drop-shadow-md">+${extraCount} ảnh</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // Mở Modal Chi Tiết Quán chuẩn Cafe Maps 1:1
@@ -501,22 +555,25 @@ let currentGalleryList = [];
             if (!place) return;
             currentDetailPlaceId = String(id);
 
-            const idNum = Math.abs(Number(place.id)) || 1;
-
             // 1. Phân tích Gallery ảnh (chỉ lấy ảnh thật của quán, loại bỏ hoàn toàn ảnh trùng lặp)
             let rawGallery = [];
             try {
                 const raw = place.gallery_images;
                 rawGallery = Array.isArray(raw) ? raw : (raw ? JSON.parse(raw) : []);
-                if (!Array.isArray(rawGallery)) rawGallery = [];
+                rawGallery = (Array.isArray(rawGallery) ? rawGallery : [])
+                    .filter(img => typeof img === 'string' && img.trim() && !img.startsWith('data:image/svg'))
+                    .map(img => img.trim());
             } catch (e) { rawGallery = []; }
 
             const coverCandidate = (place.image && place.image.trim() && !place.image.startsWith('data:image/svg')) ? place.image.trim() :
                                   (place.image_url && place.image_url.trim() && !place.image_url.startsWith('data:image/svg')) ? place.image_url.trim() : '';
+            // Chỉ nhận ảnh bìa nếu nó THẬT SỰ tồn tại trong gallery của quán (ảnh người dùng đã add)
+            // → tránh nhầm ảnh gợi ý/ảnh mẫu làm ảnh chủ đề với các quán chưa có ảnh
+            const validCover = (coverCandidate && rawGallery.some(img => typeof img === 'string' && img.trim() === coverCandidate)) ? coverCandidate : '';
 
-            // Lọc ra danh sách ảnh ĐỘC NHẤT (không bao giờ trùng lặp cùng 1 ảnh)
+            // Lọc ra danh sách ảnh ĐỘC NHẤT (chỉ lấy ảnh thật mà người dùng đã thêm)
             let uniquePhotos = [];
-            if (coverCandidate) uniquePhotos.push(coverCandidate);
+            if (validCover) uniquePhotos.push(validCover);
             rawGallery.forEach(img => {
                 const url = (typeof img === 'string') ? img.trim() : '';
                 if (url && !url.startsWith('data:image/svg') && !uniquePhotos.includes(url)) {
@@ -524,21 +581,10 @@ let currentGalleryList = [];
                 }
             });
 
-            // Luôn bổ sung đủ 5 ảnh thẩm mỹ để bố cục 5 ảnh luôn chuẩn đẹp như thiết kế
-            let displayPhotos = [...uniquePhotos];
-            let seedIdx = 0;
-            while (displayPhotos.length < 5) {
-                const fallbackImg = CAFE_AESTHETIC_PHOTOS[(idNum * 3 + seedIdx) % CAFE_AESTHETIC_PHOTOS.length];
-                if (!displayPhotos.includes(fallbackImg)) {
-                    displayPhotos.push(fallbackImg);
-                }
-                seedIdx++;
-                if (seedIdx > 25) break;
-            }
+            // Chỉ dùng ảnh thật của quán - tuyệt đối không thêm ảnh mẫu có sẵn
+            currentDetailPhotos = [...uniquePhotos];
 
-            currentDetailPhotos = [...displayPhotos];
-
-            // Render bố cục 5 ảnh chuẩn như hình mẫu Cafe Maps
+            // Render bố cục ảnh theo số ảnh thật của quán (hoặc ẩn nếu chưa có ảnh)
             renderDetailPhotoGrid(currentDetailPhotos, place.name);
 
             // 2. Tên & Đánh giá (Chuẩn Cafe Maps)
@@ -1493,7 +1539,9 @@ let currentGalleryList = [];
             // Bộ sưu tập ảnh (Gallery) — ảnh đầu tiên = ảnh chủ đề (Tối đa 5 ảnh)
             try {
                 const raw = place.gallery_images;
-                editGalleryImages = Array.isArray(raw) ? [...raw] : (raw ? JSON.parse(raw) : []);
+                // Chỉ giữ lại ảnh thật (URL/Base64), loại bỏ sẵn các phần tử rỗng/ảnh gợi ý dư thừa
+                const parsed = Array.isArray(raw) ? [...raw] : (raw ? JSON.parse(raw) : []);
+                editGalleryImages = parsed.filter(img => typeof img === 'string' && img.trim() && !img.startsWith('data:image/svg'));
             } catch (e) {
                 editGalleryImages = [];
             }

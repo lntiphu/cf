@@ -140,7 +140,7 @@ let places = [];
             } catch (e) {
                 gallery = [];
             }
-            place.gallery_images = JSON.stringify(gallery);
+            place.gallery_images = JSON.stringify(gallery.filter(img => typeof img === 'string' && img.trim()).map(img => img.trim()));
             if (!place.image && gallery.length > 0 && typeof gallery[0] === 'string' && gallery[0].trim()) {
                 place.image = gallery[0].trim();
             }
