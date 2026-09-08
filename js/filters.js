@@ -461,7 +461,7 @@ let sortBy = 'default';
             // Danh sách 9 quán ưu tiên hiển thị ở trang đầu khi chưa chọn bộ lọc nào
             const isNoFilter = !searchQuery &&
                 selectedCategory === 'Tất cả' &&
-                selectedDistrict === 'Tất cả' &&
+                filterDist === 'Tất cả' &&
                 !showOnlyFavorites &&
                 !showOnlyOpenNow &&
                 !selectedMood &&
