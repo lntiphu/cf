@@ -27,6 +27,7 @@ let sortBy = 'default';
             }
         })();
         let visitedIds = (JSON.parse(localStorage.getItem('visitedIds')) || []).map(id => String(id));
+        window.visitedIds = visitedIds;
 
 
         function getSearchQuery() {

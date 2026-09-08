@@ -1353,13 +1353,25 @@ let currentGalleryList = [];
         // Xử lý bật/tắt Đã đi trong modal chi tiết
         function handleDetailToggleVisited() {
             if (!currentDetailPlaceId) return;
-            if (visitedIds.includes(currentDetailPlaceId)) {
-                visitedIds = visitedIds.filter(id => id !== currentDetailPlaceId);
+            const idStr = String(currentDetailPlaceId);
+            if (visitedIds.includes(idStr)) {
+                visitedIds = visitedIds.filter(id => id !== idStr);
             } else {
-                visitedIds.push(currentDetailPlaceId);
+                visitedIds.push(idStr);
             }
+            window.visitedIds = visitedIds;
             localStorage.setItem('visitedIds', JSON.stringify(visitedIds));
             updateDetailActionButtons();
+
+            // Cập nhật ngay lập tức viền xanh lá của thẻ quán ở trang chính
+            const cardEls = document.querySelectorAll(`.place-card[data-place-id="${idStr}"]`);
+            cardEls.forEach(cardEl => {
+                if (visitedIds.includes(idStr)) {
+                    cardEl.classList.add('is-visited');
+                } else {
+                    cardEl.classList.remove('is-visited');
+                }
+            });
         }
 
         // Xử lý mở Modal Chỉnh sửa từ nút Sửa (vị trí khoanh đỏ)

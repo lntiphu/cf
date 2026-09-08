@@ -275,6 +275,7 @@ const ITEMS_PER_PAGE = 9;
                 const coverImg = getCoverImage(place);
                 const openStatus = isOpenNow(place.opening_hours);
                 const isFav = favoriteIds.includes(String(place.id));
+                const isVisited = (window.visitedIds || visitedIds || []).includes(String(place.id));
                 const price = getPlacePrice(place);
                 const tags = getPlaceTags(place);
                 const distKm = (isNearMeActive && userLocation) ? getPlaceDistance(place) : null;
@@ -286,7 +287,8 @@ const ITEMS_PER_PAGE = 9;
                 if (viewMode === 'list') {
                     // Chế độ xem Danh sách (List View - chuẩn tỉ lệ cafemaps.net)
                     card = `
-                        <div class="place-card bg-white rounded-2xl overflow-hidden border border-[#EFE8DF] flex flex-row items-stretch cursor-pointer group"
+                        <div class="place-card ${isVisited ? 'is-visited' : ''} bg-white rounded-2xl overflow-hidden border border-[#EFE8DF] flex flex-row items-stretch cursor-pointer group"
+                            data-place-id="${place.id}"
                             onclick="openDetailModal('${place.id}')">
                             <!-- Ảnh bên trái: 150px × auto (gần vuông) như cafemaps -->
                             <div class="relative w-[150px] sm:w-[180px] flex-shrink-0 overflow-hidden bg-stone-100" style="min-height:140px;">
@@ -353,7 +355,8 @@ const ITEMS_PER_PAGE = 9;
                 } else {
                     // Chế độ xem Lưới (Grid View - ảnh 16:9 chuẩn cafemaps.net)
                     card = `
-                        <div class="place-card bg-white rounded-2xl overflow-hidden border border-[#EFE8DF] flex flex-col group cursor-pointer"
+                        <div class="place-card ${isVisited ? 'is-visited' : ''} bg-white rounded-2xl overflow-hidden border border-[#EFE8DF] flex flex-col group cursor-pointer"
+                            data-place-id="${place.id}"
                             onclick="openDetailModal('${place.id}')" title="Bấm để xem chi tiết quán">
 
                             <!-- Ảnh tỉ lệ 16:9 (aspect-video) như cafemaps -->
@@ -590,31 +593,7 @@ const ITEMS_PER_PAGE = 9;
             touchStart = 0;
         });
 
-        // Xử lý thu nhỏ Header khi cuộn trang (Shrink Navbar on Scroll)
-        let isHeaderScrolled = false;
-
-        let headerTicking = false;
-        function handleHeaderScroll() {
-            if (!headerTicking) {
-                window.requestAnimationFrame(() => {
-                    const header = document.getElementById('mainHeader');
-                    if (header) {
-                        const scrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
-                        if (scrollY > 40 && !isHeaderScrolled) {
-                            isHeaderScrolled = true;
-                            header.classList.add('is-scrolled');
-                        } else if (scrollY <= 15 && isHeaderScrolled) {
-                            isHeaderScrolled = false;
-                            header.classList.remove('is-scrolled');
-                        }
-                    }
-                    headerTicking = false;
-                });
-                headerTicking = true;
-            }
-        }
-        window.addEventListener('scroll', handleHeaderScroll, { passive: true });
-        handleHeaderScroll();
+        // Thanh Header cố định chuẩn Cafe Maps (Giữ nguyên kích thước và vị trí cố định)
 
         // Bảo vệ ô tìm kiếm: triệt tiêu hoàn toàn autofill mã Base64 hoặc token từ Chrome trên di động
         const searchInputEl = document.getElementById('inputSearch');
