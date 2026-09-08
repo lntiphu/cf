@@ -17,12 +17,21 @@ if ('serviceWorker' in navigator && isHttpOrigin) {
     });
 
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+        navigator.serviceWorker.register('/sw.js?v=50', { updateViaCache: 'none' })
             .then(reg => {
                 reg.update();
                 console.log('Service Worker đã đăng ký thành công.', reg);
             })
-            .catch(err => console.log('Đăng ký Service Worker thất bại: ', err));
+            .catch(async err => {
+                console.log('Đăng ký Service Worker thất bại: ', err);
+                try {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                    console.warn('Đã gỡ Service Worker cũ do đăng ký thất bại.');
+                } catch (unregErr) {
+                    console.warn('Không thể gỡ Service Worker cũ:', unregErr);
+                }
+            });
     });
 }
 
