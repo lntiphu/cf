@@ -32,7 +32,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col">
 
     <!-- SVG Filter xóa hoàn toàn nền trắng của ảnh JPEG trên iOS Safari và các thiết bị di động -->
     <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
@@ -86,7 +86,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-12">
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 pb-4 sm:pb-6">
 
         <!-- Hero Section chuẩn Cafe Maps -->
         <div class="text-left mb-5">
@@ -298,6 +298,13 @@
         </div>
 
     </main>
+ 
+    <!-- Dòng chữ phi thương mại sát góc dưới cùng bên phải của trang -->
+    <footer class="w-full px-3 sm:px-6 pb-2 pt-1 flex justify-center sm:justify-end mt-auto pointer-events-none select-none">
+        <p class="text-[10px] sm:text-[11px] text-stone-400 italic text-center sm:text-right leading-none">
+            * Website phi thương mại mục đích để tìm kiếm các địa điểm ăn uống trong một ngày không biết đi đâu
+        </p>
+    </footer>
 
     <!-- Modal Chi Tiết Quán chuẩn Cafe Maps (Place Detail Modal) -->
     <div id="placeDetailModal" class="fixed inset-0 bg-[#FAF7F2] z-50 hidden overflow-y-auto overflow-x-hidden cursor-default" onclick="handleDetailBackdropClick(event)">
