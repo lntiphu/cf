@@ -327,8 +327,8 @@
 
         <!-- Main Content Area -->
         <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-12" onclick="event.stopPropagation()">
-            <!-- 1. Bộ sưu tập 5 ảnh (5-Photo Collage chuẩn 1:1 Cafe Maps) -->
-            <div class="bg-white rounded-3xl p-2.5 sm:p-3 shadow-xs border border-[#EAE3DC]">
+            <!-- 1. Bộ sưu tập ảnh quán -->
+            <div id="detailPhotoContainer" class="bg-white rounded-3xl p-2.5 sm:p-3 shadow-xs border border-[#EAE3DC]">
                 <div id="detailPhotoGrid" class="grid grid-cols-2 gap-2 sm:gap-2.5 h-80 sm:h-[480px] md:h-[530px] rounded-2xl overflow-hidden">
                     <!-- Ảnh chính bên trái (chiếm 50% chiều rộng) -->
                     <div class="relative h-full w-full min-h-0 min-w-0 overflow-hidden cursor-pointer group bg-stone-100" onclick="openPhotoLightbox(0)">
@@ -356,10 +356,10 @@
                 </div>
 
                 <!-- Link xem tất cả ảnh phía dưới bộ ảnh -->
-                <div class="pt-2.5 pb-0.5 px-2 flex items-center justify-between">
+                <div id="detailPhotoBottomBar" class="pt-2.5 pb-0.5 px-2 flex items-center justify-between">
                     <button type="button" onclick="openPhotoLightbox(0)" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition cursor-pointer">
                         <i class="fa-regular fa-images text-stone-500 text-sm"></i>
-                        <span id="detailViewAllPhotosText">Xem tất cả 5 ảnh</span>
+                        <span id="detailViewAllPhotosText">Xem tất cả ảnh</span>
                     </button>
                 </div>
             </div>
@@ -473,11 +473,11 @@
                         class="bg-[#FAF7F2] hover:bg-white rounded-2xl p-3.5 border border-[#EAE3DC]/70 flex items-center justify-between gap-3 transition group hover:border-[#B57324]">
                         <div class="flex items-center gap-3 min-w-0">
                             <div class="w-8 h-8 rounded-full bg-white group-hover:bg-[#FAF0E6] flex items-center justify-center text-[#B57324] flex-shrink-0 shadow-2xs transition">
-                                <i id="detailSocialIcon" class="fa-brands fa-instagram text-xs"></i>
+                                <i id="detailSocialIcon" class="fa-solid fa-circle-info text-xs text-stone-400"></i>
                             </div>
                             <div class="text-xs truncate">
                                 <div id="detailSocialTitle" class="font-bold text-stone-400 text-[10px] uppercase tracking-wider">TRANG THÔNG TIN</div>
-                                <div id="detailInstagramHandle" class="text-stone-800 font-bold group-hover:text-[#B57324] transition truncate">kengcafe.cafe</div>
+                                <div id="detailInstagramHandle" class="text-stone-800 font-bold group-hover:text-[#B57324] transition truncate">@Hiện không có</div>
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs text-stone-400 group-hover:text-[#B57324] transition flex-shrink-0"></i>
