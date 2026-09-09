@@ -513,14 +513,11 @@ let isLocating = false;
         function parsePlaceSocialLink(rawInput, placeName) {
             let input = (rawInput || '').trim();
             if (!input) {
-                const cleanName = typeof normalizeSearchText === 'function'
-                    ? normalizeSearchText(placeName || '').replace(/[^a-z0-9]/g, '')
-                    : (placeName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                 return {
                     title: 'TRANG THÔNG TIN',
-                    displayText: `${cleanName || 'quan'}.cafe`,
-                    url: `https://www.instagram.com/${cleanName || 'coffee'}/`,
-                    iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
+                    displayText: '@Hiện không có',
+                    url: '#',
+                    iconClass: 'fa-solid fa-circle-info text-xs text-stone-400'
                 };
             }
 
@@ -585,6 +582,5 @@ let isLocating = false;
                 iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
             };
         }
-
 
 

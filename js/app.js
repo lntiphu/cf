@@ -45,7 +45,7 @@ try {
 } catch (e) {}
 let currentPage = 1;
 try {
-    const savedPage = parseInt(localStorage.getItem('hafu_current_page'), 10);
+    const savedPage = parseInt(sessionStorage.getItem('hafu_current_page'), 10);
     if (Number.isInteger(savedPage) && savedPage > 0) {
         currentPage = savedPage;
     }
@@ -166,7 +166,7 @@ const ITEMS_PER_PAGE = 9;
 
         function changePage(page) {
             currentPage = Math.max(1, parseInt(page, 10) || 1);
-            try { localStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
+            try { sessionStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
 
             // Cuộn lên đầu trang ngay lập tức khi bắt đầu chuyển trang
             const mainElement = document.querySelector('main');
@@ -254,7 +254,7 @@ const ITEMS_PER_PAGE = 9;
             const countText = document.getElementById('placeCountText');
 
             // Lưu cả các lần chuyển về trang 1 do bộ lọc/tìm kiếm.
-            try { localStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
+            try { sessionStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
 
             if (countText) {
                 countText.innerText = `${result.length} quán được tìm thấy`;
@@ -285,7 +285,7 @@ const ITEMS_PER_PAGE = 9;
 
             if (currentPage > totalPages && totalPages > 0) {
                 currentPage = totalPages;
-                try { localStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
+                try { sessionStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
             }
 
             const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
