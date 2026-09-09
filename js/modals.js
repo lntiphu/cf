@@ -592,7 +592,7 @@ let currentGalleryList = [];
             if (nameEl) nameEl.innerText = place.name;
 
             const ratingEl = document.getElementById('detailRating');
-            if (ratingEl) ratingEl.innerText = `${Number(place.rating || 5).toFixed(1)}`;
+            if (ratingEl) ratingEl.innerText = place.rating != null && place.rating !== '' ? Number(place.rating).toFixed(1) : '';
 
             const addrEl = document.getElementById('detailAddress');
             if (addrEl) {
@@ -601,7 +601,7 @@ let currentGalleryList = [];
                 if (dist && (!displayAddr || !displayAddr.toLowerCase().includes(dist.toLowerCase()))) {
                     displayAddr = displayAddr ? `${displayAddr}, ${dist}` : dist;
                 }
-                addrEl.innerText = displayAddr || 'TP. Hồ Chí Minh';
+                addrEl.innerText = displayAddr;
             }
 
             const priceEl = document.getElementById('detailPrice');
@@ -615,7 +615,7 @@ let currentGalleryList = [];
             if (openStatusEl && openTextEl) {
                 if (openStatus === true) {
                     openStatusEl.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EBF5EE] text-[#2E7D32] font-semibold border border-[#C8E6C9]";
-                    openTextEl.innerText = `Đang mở • ${place.opening_hours || '08:00 – 22:00'}`;
+                    openTextEl.innerText = `Đang mở${place.opening_hours ? ` • ${place.opening_hours}` : ''}`;
                     if (openDotEl) {
                         openDotEl.innerHTML = `<span class="status-dot-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>`;
                     }
@@ -627,7 +627,7 @@ let currentGalleryList = [];
                     }
                 } else {
                     openStatusEl.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-stone-100 text-stone-600 font-semibold border border-stone-200";
-                    openTextEl.innerText = place.opening_hours ? `${place.opening_hours}` : 'Mở cửa hàng ngày';
+                    openTextEl.innerText = place.opening_hours || '';
                     if (openDotEl) {
                         openDotEl.innerHTML = `<span class="relative inline-flex rounded-full h-2 w-2 bg-stone-400"></span>`;
                     }
@@ -802,8 +802,6 @@ let currentGalleryList = [];
                     if (rawPurpose) {
                         purposes = rawPurpose.split(',').map(p => p.trim()).filter(Boolean);
                     }
-                } else {
-                    purposes = ['hẹn hò', 'làm việc'];
                 }
                 
                 purposeWrap.innerHTML = purposes.map((p, i) => {
@@ -830,8 +828,6 @@ let currentGalleryList = [];
                             .map(s => s.trim())
                             .filter(Boolean);
                     }
-                } else {
-                    spaces = ['ngoài trời', 'trong nhà'];
                 }
                 
                 spaceWrap.innerHTML = spaces.map((s, i) => {
@@ -857,8 +853,6 @@ let currentGalleryList = [];
                     if (amenitiesStr) {
                         rawAmenities = amenitiesStr.split(',').map(a => a.trim()).filter(Boolean);
                     }
-                } else {
-                    rawAmenities = ['wifi tốc độ cao', 'máy lạnh', 'thanh toán thẻ'];
                 }
                 
                 amenitiesWrap.innerHTML = rawAmenities.map((a, i) => {
@@ -890,18 +884,13 @@ let currentGalleryList = [];
             // 6. Chỗ để xe (Parking)
             const parkingTextEl = document.getElementById('detailParkingText');
             if (parkingTextEl) {
-                // Chỉ dùng giá trị mặc định khi parking là undefined hoặc null
-                const parkingText = (place.parking !== undefined && place.parking !== null) 
-                    ? place.parking 
-                    : 'Gửi xe trước quán (miễn phí)';
-                parkingTextEl.innerHTML = parkingText;
+                parkingTextEl.innerHTML = place.parking || '';
             }
 
             // 7. Thức uống đặc trưng
             const drinkEl = document.getElementById('detailSignatureDrink');
             if (drinkEl) {
-                const drinks = ['Trà đào cam sả', 'Cà phê Muối béo ngậy', 'Trà Ô Long sữa nướng', 'Matcha Latte nguyên chất', 'Cold Brew cam vàng'];
-                drinkEl.innerText = place.signature_drink || drinks[(Math.abs(Number(place.id)) || 1) % drinks.length] || 'Trà Ô Long sữa nướng';
+                drinkEl.innerText = place.signature_drink || '';
             }
 
             // 8. Trang thông tin / Mạng xã hội quán (Instagram, Facebook, TikTok, Website...)
@@ -1525,16 +1514,16 @@ let currentGalleryList = [];
             document.getElementById('editDistrict').value = place.district || '';
             document.getElementById('editAddress').value = place.address || '';
             document.getElementById('editOpeningHours').value = place.opening_hours || '';
-            document.getElementById('editPrice').value = place.price || getPlacePrice(place);
-            document.getElementById('editRating').value = place.rating || 5;
+            document.getElementById('editPrice').value = place.price || '';
+            document.getElementById('editRating').value = place.rating != null && place.rating !== '' ? place.rating : '';
             document.getElementById('editSignatureDrink').value = place.signature_drink || '';
             // Chỉ dùng giá trị mặc định khi undefined/null, KHÔNG dùng khi chuỗi rỗng
             document.getElementById('editVibe').value = (place.vibe !== undefined && place.vibe !== null) ? place.vibe : '';
             document.getElementById('editPurpose').value = (place.purpose !== undefined && place.purpose !== null) ? place.purpose : '';
             // Chỉ dùng giá trị mặc định khi undefined/null, KHÔNG dùng khi chuỗi rỗng
-            document.getElementById('editParking').value = (place.parking !== undefined && place.parking !== null) ? place.parking : 'Gửi xe trước quán (miễn phí)';
-            document.getElementById('editAmenities').value = (place.amenities !== undefined && place.amenities !== null) ? place.amenities : 'wifi, điều hoà';
-            document.getElementById('editIdealFor').value = (place.ideal_for !== undefined && place.ideal_for !== null) ? place.ideal_for : 'Làm việc remote, Hẹn hò nhẹ nhàng, Gặp bạn bè';
+            document.getElementById('editParking').value = place.parking || '';
+            document.getElementById('editAmenities').value = place.amenities || '';
+            document.getElementById('editIdealFor').value = place.ideal_for || '';
 
             // Bộ sưu tập ảnh (Gallery) — ảnh đầu tiên = ảnh chủ đề (Tối đa 5 ảnh)
             try {

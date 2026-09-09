@@ -343,12 +343,9 @@ let isLocating = false;
             return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23F5F0EB' width='400' height='300'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='48' fill='%23C4B5A5'%3E%F0%9F%93%B7%3C/text%3E%3Ctext x='50%25' y='62%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='13' fill='%23B0A090'%3ECh%C6%B0a c%C3%B3 %E1%BA%A3nh%3C/text%3E%3C/svg%3E`;
         }
 
-        // Tạo giá trung bình theo phong cách Cafe Maps (35k-65k)
-        function getPlacePrice(place) {
-            if (place.price) return place.price;
-            const prices = ['35k–65k', '40k–70k', '45k–80k', '30k–55k', '50k–90k'];
-            const idx = (Math.abs(Number(place.id)) || 1) % prices.length;
-            return prices[idx];
+         // Chỉ hiển thị giá do người dùng nhập.
+         function getPlacePrice(place) {
+             return place && place.price ? String(place.price).trim() : '';
         }
 
         // Hàm nén ảnh siêu nhẹ bằng HTML5 Canvas (chuyển sang WebP 800px, giảm 98% dung lượng để lưu trơn tru)
@@ -409,26 +406,7 @@ let isLocating = false;
                 return vibes.map(v => v.charAt(0).toUpperCase() + v.slice(1));
             }
 
-            // Fallback theo ID cho các quán mặc định cũ nếu chưa có trường vibe
-            const fallbackMap = {
-                1: ['Chill', 'Cắm trại'],
-                2: ['Bình dân', 'Nhộn nhịp'],
-                3: ['Làm việc', 'Specialty'],
-                4: ['Ấm cúng', 'Gặp gỡ'],
-                5: ['Hiện đại', 'Châu Âu'],
-                6: ['Nhộn nhịp', 'Tụ tập']
-            };
-            if (fallbackMap[place.id]) return fallbackMap[place.id];
-
-            // Nếu có purpose thì dùng làm fallback phụ
-            if (place.purpose) {
-                const pArr = String(place.purpose).split(',').map(p => p.trim()).filter(Boolean);
-                if (pArr.length > 0) return pArr.map(p => p.charAt(0).toUpperCase() + p.slice(1));
-            }
-
-            // Fallback theo category và id
-            const idNum = Math.abs(Number(place.id)) || 1;
-            return (idNum % 2 === 0 ? ['Vintage', 'Lãng mạn'] : ['Yên tĩnh', 'Chill']);
+             return [];
         }
 
         // Tương thích: getPlaceTags trả về đúng danh sách Vibe chính
@@ -462,11 +440,7 @@ let isLocating = false;
             const normAmenity = normalizeSearchText(amenity);
             if (tags.some(t => normalizeSearchText(t).includes(normAmenity))) return true;
             if (review.includes(normAmenity) || name.includes(normAmenity)) return true;
-            const idNum = Math.abs(Number(place.id)) || 1;
-            if (amenity === 'Ngoài trời') return (idNum % 2 === 0);
-            if (amenity === 'Chỗ hút thuốc') return (idNum % 3 === 0);
-            if (amenity === 'Có ổ điện') return (idNum % 2 === 1);
-            return true;
+             return true;
         }
 
         // Lọc và sắp xếp danh sách quán
@@ -611,7 +585,6 @@ let isLocating = false;
                 iconClass: 'fa-brands fa-instagram text-xs text-[#E4405F]'
             };
         }
-
 
 
 

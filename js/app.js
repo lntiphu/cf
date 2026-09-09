@@ -322,7 +322,7 @@ const ITEMS_PER_PAGE = 9;
                                         <div class="flex items-center gap-1.5 flex-shrink-0">
                                             <span class="inline-flex items-center gap-1 text-[#B57324] font-bold text-xs">
                                                 <i class="fa-solid fa-star text-amber-400 text-[11px]"></i>
-                                                ${(place.rating || 5).toFixed(1)}
+                                                ${place.rating != null && place.rating !== '' ? Number(place.rating).toFixed(1) : ''}
                                             </span>
                                             <button type="button" onclick="event.stopPropagation(); toggleFavorite('${place.id}')"
                                                 class="w-7 h-7 rounded-full border border-stone-200 hover:border-[#B57324] bg-white shadow-sm flex items-center justify-center transition cursor-pointer"
@@ -407,7 +407,7 @@ const ITEMS_PER_PAGE = 9;
                                     </h3>
                                     <span class="inline-flex items-center gap-1 text-[#B57324] font-bold text-xs flex-shrink-0">
                                         <i class="fa-solid fa-star text-amber-400 text-[11px]"></i>
-                                        ${(place.rating || 5).toFixed(1)}
+                                        ${place.rating != null && place.rating !== '' ? Number(place.rating).toFixed(1) : ''}
                                     </span>
                                 </div>
 
