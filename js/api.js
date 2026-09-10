@@ -395,6 +395,7 @@ async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
             const rating = parseFloat(document.getElementById('inputRating') ? document.getElementById('inputRating').value : 5) || 5;
             const signature_drink = sanitizeText(document.getElementById('inputSignatureDrink') ? document.getElementById('inputSignatureDrink').value : '').trim();
             const vibe = sanitizeText(document.getElementById('inputVibe') ? document.getElementById('inputVibe').value : '').trim();
+            const purpose = sanitizeText(document.getElementById('inputPurpose') ? document.getElementById('inputPurpose').value : '').trim();
             const ideal_for = sanitizeText(document.getElementById('inputIdealFor') ? document.getElementById('inputIdealFor').value : '').trim();
             const amenities = sanitizeText(document.getElementById('inputAmenities') ? document.getElementById('inputAmenities').value : '').trim();
             const parking = sanitizeText(document.getElementById('inputParking') ? document.getElementById('inputParking').value : '').trim();
@@ -417,10 +418,8 @@ async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
             if (price) extraData.price = price;
             if (signature_drink) extraData.signature_drink = signature_drink;
             if (vibe) extraData.vibe = vibe;
-            if (ideal_for) {
-                extraData.ideal_for = ideal_for;
-                extraData.purpose = ideal_for;
-            }
+            if (purpose) extraData.purpose = purpose;
+            if (ideal_for) extraData.ideal_for = ideal_for;
             if (amenities) extraData.amenities = amenities;
             if (parking) extraData.parking = parking;
             const packedReview = packPlaceMeta(review, extraData);
@@ -448,7 +447,7 @@ async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
                 gallery_images
             };
 
-            const localNewPlace = {
+            const             localNewPlace = {
                 ...dbPayload,
                 image: image || null,
                 instagram: instagram || null,
@@ -456,7 +455,7 @@ async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
                 signature_drink: signature_drink || null,
                 vibe: vibe || null,
                 ideal_for: ideal_for || null,
-                purpose: ideal_for || null,
+                purpose: purpose || null,
                 amenities: amenities || null,
                 parking: parking || null,
                 rating: rating || 5,
@@ -480,7 +479,7 @@ async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
                     savedPlace.signature_drink = signature_drink || savedPlace.signature_drink;
                     savedPlace.vibe = vibe || savedPlace.vibe;
                     savedPlace.ideal_for = ideal_for || savedPlace.ideal_for;
-                    savedPlace.purpose = ideal_for || savedPlace.purpose;
+                    savedPlace.purpose = purpose || savedPlace.purpose;
                     savedPlace.amenities = amenities || savedPlace.amenities;
                     savedPlace.parking = parking || savedPlace.parking;
                     savedPlace.rating = rating || savedPlace.rating;
