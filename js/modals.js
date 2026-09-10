@@ -887,7 +887,7 @@ let currentGalleryList = [];
                 parkingTextEl.innerHTML = place.parking || '';
             }
 
-            // 7. Thức uống đặc trưng
+            // 7. Signature
             const drinkEl = document.getElementById('detailSignatureDrink');
             if (drinkEl) {
                 drinkEl.innerText = place.signature_drink || '';
