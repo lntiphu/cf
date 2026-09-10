@@ -504,7 +504,7 @@ let sortBy = 'default';
         }
 
         // Bật/Tắt Trạng thái Yêu thích (So sánh chuỗi an toàn tuyệt đối)
-        function toggleFavorite(id) {
+        async function toggleFavorite(id) {
             if (!id) return;
             const idStr = String(id);
             if (favoriteIds.includes(idStr)) {
@@ -514,6 +514,10 @@ let sortBy = 'default';
             }
             localStorage.setItem('favoriteIds', JSON.stringify(favoriteIds));
             renderPlaces();
+            const place = places.find(p => String(p.id) === idStr);
+            if (place && typeof saveSharedPlaceStatus === 'function') {
+                await saveSharedPlaceStatus(idStr, favoriteIds.includes(idStr), visitedIds.includes(idStr));
+            }
         }
 
 
@@ -578,4 +582,3 @@ let sortBy = 'default';
             if (catListEdit) catListEdit.innerHTML = catOptionsHTML;
             if (distListEdit) distListEdit.innerHTML = distOptionsHTML;
         }
-

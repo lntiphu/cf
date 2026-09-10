@@ -1386,7 +1386,7 @@ let currentGalleryList = [];
         }
 
         // Xử lý bật/tắt Đã đi trong modal chi tiết
-        function handleDetailToggleVisited() {
+        async function handleDetailToggleVisited() {
             if (!currentDetailPlaceId) return;
             const idStr = String(currentDetailPlaceId);
             if (visitedIds.includes(idStr)) {
@@ -1407,6 +1407,11 @@ let currentGalleryList = [];
                     cardEl.classList.remove('is-visited');
                 }
             });
+
+            const place = places.find(p => String(p.id) === idStr);
+            if (place && typeof saveSharedPlaceStatus === 'function') {
+                await saveSharedPlaceStatus(idStr, favoriteIds.includes(idStr), visitedIds.includes(idStr));
+            }
         }
 
         // Xử lý mở Modal Chỉnh sửa từ nút Sửa (vị trí khoanh đỏ)

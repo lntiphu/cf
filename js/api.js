@@ -10,6 +10,49 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // Dữ liệu quán cà phê toàn cục
 let places = [];
 
+// Trạng thái dùng chung toàn website (không phụ thuộc trình duyệt).
+async function loadSharedPlaceStatuses() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('place_statuses')
+            .select('place_id, is_favorite, is_visited');
+        if (error) throw error;
+
+        const sharedFavorites = [];
+        const sharedVisited = [];
+        (Array.isArray(data) ? data : []).forEach(status => {
+            const id = String(status.place_id);
+            if (status.is_favorite) sharedFavorites.push(id);
+            if (status.is_visited) sharedVisited.push(id);
+        });
+
+        favoriteIds = sharedFavorites;
+        visitedIds = sharedVisited;
+        window.visitedIds = visitedIds;
+        localStorage.setItem('favoriteIds', JSON.stringify(favoriteIds));
+        localStorage.setItem('visitedIds', JSON.stringify(visitedIds));
+    } catch (error) {
+        // Giữ dữ liệu local nếu bảng chưa được tạo hoặc Supabase tạm thời lỗi.
+        console.warn('Không thể tải trạng thái dùng chung, tiếp tục dùng local:', error.message);
+    }
+}
+
+async function saveSharedPlaceStatus(placeId, isFavorite, isVisited) {
+    try {
+        const { error } = await supabaseClient
+            .from('place_statuses')
+            .upsert({
+                place_id: Number(placeId),
+                is_favorite: Boolean(isFavorite),
+                is_visited: Boolean(isVisited),
+                updated_at: new Date().toISOString()
+            }, { onConflict: 'place_id' });
+        if (error) throw error;
+    } catch (error) {
+        console.warn('Không thể đồng bộ trạng thái dùng chung:', error.message);
+    }
+}
+
         // Dữ liệu mẫu làm fallback dự phòng
         const defaultPlaces = [
             { id: 1, name: "Phê La - Tôn Thất Đạm", category: "Cafe", district: "Quận 1", address: "125 Tôn Thất Đạm, Bến Nghé", opening_hours: "07:00 - 22:00", rating: 4.8, review: "Trà Ô Long đậm vị, không gian cắm trại cực chill.", lat: 10.7725, lng: 106.7042, map_link: "", vibe: "Chill, Cắm trại", purpose: "Hẹn hò, Gặp bạn bè" },
@@ -244,6 +287,7 @@ let places = [];
 
                 // Đồng bộ bản sao cục bộ an toàn
                 savePlacesLocally();
+                await loadSharedPlaceStatuses();
             } catch (err) {
                 console.error("Lỗi khi tải dữ liệu từ Supabase (Chuyển sang dùng bộ nhớ cục bộ):", err);
                 places = (storedPlaces.length > 0 ? storedPlaces : defaultPlaces).map(normalizePlaceTextFields);
@@ -579,4 +623,3 @@ let places = [];
                 openDetailModal(id);
             }
         }
-
