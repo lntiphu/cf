@@ -1239,6 +1239,13 @@ let currentGalleryList = [];
                 return true;
             }
 
+            // Khi không mở modal, nút Back sẽ quay về trang danh sách trước đó.
+            if (typeof currentPage !== 'undefined' && currentPage > 1) {
+                lastBackActionTime = now;
+                changePage(currentPage - 1);
+                return true;
+            }
+
             return false;
         }
 
@@ -1274,6 +1281,15 @@ let currentGalleryList = [];
             const now = Date.now();
             if (now - lastBackActionTime < 350) {
                 return; // Đã xử lý bởi sự kiện chuột trước đó, bỏ qua để không bị nhảy đúp
+            }
+
+            // Lịch sử phân trang: Back từ trang hiện tại về đúng trang trước.
+            if (e.state && e.state.coffeePage && Number.isInteger(e.state.page)) {
+                lastBackActionTime = now;
+                currentPage = Math.max(1, e.state.page);
+                try { sessionStorage.setItem('hafu_current_page', String(currentPage)); } catch (err) {}
+                renderPlaces();
+                return;
             }
 
             // 0. Nếu đang mở Lightbox xem ảnh: chỉ đóng Lightbox trước

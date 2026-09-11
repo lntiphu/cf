@@ -165,7 +165,13 @@ const ITEMS_PER_PAGE = 9;
 
 
         function changePage(page) {
-            currentPage = Math.max(1, parseInt(page, 10) || 1);
+            const nextPage = Math.max(1, parseInt(page, 10) || 1);
+            if (nextPage === currentPage) return;
+
+            currentPage = nextPage;
+            try {
+                history.pushState({ coffeePage: true, page: currentPage }, '', window.location.href);
+            } catch (e) {}
             try { sessionStorage.setItem('hafu_current_page', String(currentPage)); } catch (e) {}
 
             // Cuộn lên đầu trang ngay lập tức khi bắt đầu chuyển trang
@@ -700,6 +706,14 @@ const ITEMS_PER_PAGE = 9;
 
         // Hàm khởi tạo sau khi load places
         async function initializeApp() {
+            try {
+                if (currentPage > 1) {
+                    history.replaceState({ coffeePage: true, page: 1 }, '', window.location.href);
+                    history.pushState({ coffeePage: true, page: currentPage }, '', window.location.href);
+                } else {
+                    history.replaceState({ coffeePage: true, page: 1 }, '', window.location.href);
+                }
+            } catch (e) {}
             updateViewModeButtonsUI(viewMode);
             await loadPlaces();
             checkHashAndOpenModal();
