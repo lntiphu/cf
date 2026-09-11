@@ -94,8 +94,8 @@ let currentGalleryList = [];
         }
 
 
-        // ================= QUẢN LÝ BỘ SƯU TẬP ẢNH (TỐI ĐA 5 ẢNH) =================
-        const MAX_GALLERY_PHOTOS = 5;
+        // ================= QUẢN LÝ BỘ SƯU TẬP ẢNH (TỐI ĐA 10 ẢNH) =================
+        const MAX_GALLERY_PHOTOS = 10;
 
         // --- 1. Quản lý ảnh trong modal Thêm quán mới ---
         let addGalleryImages = [];
@@ -121,7 +121,7 @@ let currentGalleryList = [];
             }
 
             if (count === 0) {
-                grid.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-3.5 italic bg-stone-50 rounded-xl border border-dashed border-stone-200">Chưa có ảnh nào (Tối đa 5 ảnh — Bạn có thể chọn 1 trong 5 ảnh làm ảnh chủ đề)</p>';
+                grid.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-3.5 italic bg-stone-50 rounded-xl border border-dashed border-stone-200">Chưa có ảnh nào (Tối đa 10 ảnh — Bạn có thể chọn 1 trong 10 ảnh làm ảnh chủ đề)</p>';
                 return;
             }
 
@@ -282,7 +282,7 @@ let currentGalleryList = [];
             }
 
             if (count === 0) {
-                grid.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-3.5 italic bg-stone-50 rounded-xl border border-dashed border-stone-200">Chưa có ảnh nào (Tối đa 5 ảnh — Bạn có thể chọn 1 trong 5 ảnh làm ảnh chủ đề)</p>';
+                grid.innerHTML = '<p class="col-span-full text-center text-stone-400 text-xs py-3.5 italic bg-stone-50 rounded-xl border border-dashed border-stone-200">Chưa có ảnh nào (Tối đa 10 ảnh — Bạn có thể chọn 1 trong 10 ảnh làm ảnh chủ đề)</p>';
                 return;
             }
 
